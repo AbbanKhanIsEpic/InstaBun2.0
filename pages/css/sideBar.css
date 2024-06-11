@@ -1,0 +1,28 @@
+/*Variables*/
+:root {
+  --transitionTime: 2s;
+}
+
+/*When sidebar is actived*/
+#sideBar.active {
+  width: 150px;
+}
+
+/*Transitions*/
+
+#sideBar {
+  width: 280px;
+  transition: var(--transitionTime) ease;
+}
+
+#sideBar.active .name {
+  transition: opacity var(--transitionTime), max-width var(--transitionTime);
+  opacity: 0;
+  max-width: 0px;
+}
+
+#sideBar .name {
+  transition: opacity var(--transitionTime), max-width var(--transitionTime);
+  opacity: 1;
+  max-width: 200px;
+}

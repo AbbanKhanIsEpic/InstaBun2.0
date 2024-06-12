@@ -12,34 +12,42 @@
 
 <body class="container-fluid h-100 overflow-hidden">
     <div class="row row-cols grid">
-        <div class="col d-flex flex-column flex-shrink-0 position-absolute text-white bg-dark h-100" id="sideBar">
+        <div class="col d-flex flex-column position-absolute text-white bg-dark h-100" id="sideBar">
             <div class="d-flex flex-row justify-content-between mt-2">
-                <span class="fs-3 d-flex text-decoration-none name">Instabun</span>
-                <span class="d-flex align-self-end justify-content-end" id="toggleSideBar">Close</span>
+                <span class="fs-3 d-flex text-decoration-none name user-select-none">
+                    Instabun
+                </span>
+                <span class="d-flex align-self-end justify-content-end" role="button" id="toggleSideBar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+                        class="bi bi-list" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5" />
+                    </svg>
+                </span>
             </div>
             <hr>
             <ul class="nav nav-pills d-flex flex-column mb-auto align-items-center row-gap-4">
-                <li class="fs-4 d-flex align-items-center justify-content-center">
+                <li class="fs-4 d-flex align-items-center justify-content-center w-100 rounded-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                         class="bi bi-house me-1" viewBox="0 -1 16 16">
                         <path
                             d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
                     </svg>
-                    <span class="name">
+                    <span class="name user-select-none">
                         Home
                     </span>
                 </li>
-                <li class="fs-4 d-flex align-items-center justify-content-center">
+                <li class="fs-4 d-flex align-items-center justify-content-center w-100 rounded-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                         class="bi bi-search me-1" viewBox="0 0 16 16">
                         <path
                             d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
                     </svg>
-                    <span class="name">
+                    <span class="name user-select-none">
                         Explore
                     </span>
                 </li>
-                <li class="fs-4 d-flex align-items-center justify-content-center">
+                <li class="fs-4 d-flex align-items-center justify-content-center w-100 rounded-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                         class="bi bi-plus-square me-1" viewBox="0 0 16 16">
                         <path
@@ -47,11 +55,11 @@
                         <path
                             d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
                     </svg>
-                    <span class="name">
+                    <span class="name user-select-none">
                         Create
                     </span>
                 </li>
-                <li class="fs-4 d-flex align-items-center justify-content-center">
+                <li class="fs-4 d-flex align-items-center justify-content-center w-100 rounded-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
                         class="bi bi-chat-right-dots me-1" viewBox="0 -1 16 16">
                         <path
@@ -59,7 +67,7 @@
                         <path
                             d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
                     </svg>
-                    <span class="name">
+                    <span class="name user-select-none">
                         Message
                     </span>
                 </li>
@@ -82,19 +90,35 @@
                 </ul>
             </div>
         </div>
-        <div class="col bg-dark-subtle overflow-y-auto vh-100" id="contentPage">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam, explicabo debitis tempora at unde quidem ea
-            amet corporis atque fugit quod quos temporibus reprehenderit, placeat voluptatibus, repellendus labore odio
-            id.
-            Culpa, dolor. Voluptates dolore quis esse inventore tempore nostrum accusantium et est assumenda ullam,
-            soluta sed rem illum beatae repudiandae quidem deserunt similique eos eligendi, sequi provident quasi
-            pariatur necessitatibus!
-            Ex quas at dolorum modi iure pariatur sapiente illo animi delectus natus nobis, dignissimos amet quidem
-            laudantium consequuntur! Totam ipsum tenetur doloribus commodi distinctio rem autem dolorum est, dolores
-            sit?
-            Reprehenderit, voluptate quod accusantium repellat odit labore exercitationem impedit dicta deleniti quasi
-            possimus corrupti expedita ab maxime soluta numquam aliquam est iusto minima id velit quidem saepe sunt
-            explicabo! Autem.
+        <div class="col bg-dark-subtle overflow-y-auto vh-100 d-flex row" id="contentPage">
+            <div class="flex" id="stories">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle mb-3"
+                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2 ">
+                    <strong>mdo</strong>
+                </a><a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle mb-3"
+                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2 ">
+                    <strong>mdo</strong>
+                </a>
+            </div>
+            <div id="posts" class="">
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Totam, explicabo debitis tempora at unde
+                quidem ea
+                amet corporis atque fugit quod quos temporibus reprehenderit, placeat voluptatibus, repellendus labore
+                odio
+                id.
+                Culpa, dolor. Voluptates dolore quis esse inventore tempore nostrum accusantium et est assumenda ullam,
+                soluta sed rem illum beatae repudiandae quidem deserunt similique eos eligendi, sequi provident quasi
+                pariatur necessitatibus!
+                Ex quas at dolorum modi iure pariatur sapiente illo animi delectus natus nobis, dignissimos amet quidem
+                laudantium consequuntur! Totam ipsum tenetur doloribus commodi distinctio rem autem dolorum est, dolores
+                sit?
+                Reprehenderit, voluptate quod accusantium repellat odit labore exercitationem impedit dicta deleniti
+                quasi
+                possimus corrupti expedita ab maxime soluta numquam aliquam est iusto minima id velit quidem saepe sunt
+                explicabo! Autem.
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

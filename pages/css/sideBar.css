@@ -1,34 +1,64 @@
 /* Variables */
 :root {
   --transitionTime: 2s;
+  --maxWidth: 240px;
+  --minWidth: 150px;
 }
-
-/* When sidebar is activated */
-#sideBar.active {
-  width: 150px;
-}
-
-/* Transitions */
 
 /* Sidebar width transition */
 #sideBar {
-  width: 280px;
+  width: var(--maxWidth);
   transition: width var(--transitionTime, 0.3s) ease;
+  overflow: hidden;
 }
 
+#sideBar.active {
+  width: var(--minWidth);
+}
+
+/* Sidebar name transition */
 #sideBar .name {
-  transition: opacity var(--transitionTime) ease, max-width var(--transitionTime) ease;
+  transition: opacity var(--transitionTime),
+    max-width var(--transitionTime) ease;
   opacity: 1;
   max-width: 200px;
 }
 
-/* Sidebar name transition */
 #sideBar.active .name {
-  transition: opacity var(--transitionTime) ease, max-width var(--transitionTime) ease;
   opacity: 0;
-  max-width: 0px;
-} 
+  max-width: 0;
+}
 
-#contentPage{
-  padding-left: 280px;
+#contentPage {
+  padding-left: var(--maxWidth);
+  transition: padding-left var(--transitionTime, 0.3s) ease;
+}
+
+#sideBar.active + #contentPage {
+  padding-left: var(--minWidth);
+}
+
+li {
+  --animationTime: 0.5s;
+}
+
+li svg {
+  width: 20px;
+  height: 20px;
+  transition: width var(--animationTime) ease, height var(--animationTime) ease;
+}
+
+li:hover svg {
+  transition: width var(--animationTime) ease, height var(--animationTime) ease;
+  width: 22px;
+  height: 22px;
+}
+
+li:hover {
+  background: #000;
+  cursor: pointer;
+}
+
+#stories {
+  height: 100px;
 }

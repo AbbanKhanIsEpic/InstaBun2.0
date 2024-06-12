@@ -1,28 +1,34 @@
-/*Variables*/
+/* Variables */
 :root {
   --transitionTime: 2s;
 }
 
-/*When sidebar is actived*/
+/* When sidebar is activated */
 #sideBar.active {
   width: 150px;
 }
 
-/*Transitions*/
+/* Transitions */
 
+/* Sidebar width transition */
 #sideBar {
   width: 280px;
-  transition: var(--transitionTime) ease;
-}
-
-#sideBar.active .name {
-  transition: opacity var(--transitionTime), max-width var(--transitionTime);
-  opacity: 0;
-  max-width: 0px;
+  transition: width var(--transitionTime, 0.3s) ease;
 }
 
 #sideBar .name {
-  transition: opacity var(--transitionTime), max-width var(--transitionTime);
+  transition: opacity var(--transitionTime) ease, max-width var(--transitionTime) ease;
   opacity: 1;
   max-width: 200px;
+}
+
+/* Sidebar name transition */
+#sideBar.active .name {
+  transition: opacity var(--transitionTime) ease, max-width var(--transitionTime) ease;
+  opacity: 0;
+  max-width: 0px;
+} 
+
+#contentPage{
+  padding-left: 280px;
 }

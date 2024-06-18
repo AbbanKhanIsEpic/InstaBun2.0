@@ -1,8 +1,12 @@
-/* Variables */
 :root {
   --transitionTime: 2s;
   --maxWidth: 240px;
   --minWidth: 150px;
+  --hoverTime: 0.5s;
+}
+
+body {
+  background: #000;
 }
 
 /* Sidebar width transition */
@@ -30,6 +34,7 @@
 }
 
 #contentPage {
+  min-width: 100%;
   padding-left: var(--maxWidth);
   transition: padding-left var(--transitionTime, 0.3s) ease;
 }
@@ -38,27 +43,19 @@
   padding-left: var(--minWidth);
 }
 
-li {
-  --animationTime: 0.5s;
-}
-
 li svg {
   width: 20px;
   height: 20px;
-  transition: width var(--animationTime) ease, height var(--animationTime) ease;
+  transition: width var(--hoverTime) ease, height var(--hoverTime) ease;
 }
 
 li:hover svg {
-  transition: width var(--animationTime) ease, height var(--animationTime) ease;
+  transition: width var(--hoverTime) ease, height var(--hoverTime) ease;
   width: 22px;
   height: 22px;
 }
 
 li:hover {
-  background: #000;
+  background: #1a1a1a;
   cursor: pointer;
-}
-
-#stories {
-  height: 100px;
 }

@@ -3,11 +3,20 @@
   height: 120px;
 }
 
+#leftarrow {
+  width: 30px;
+  height: 30px;
+}
+
 .story {
   min-width: 80px;
   min-height: 80px;
   max-width: 80px;
   max-height: 80px;
+}
+
+.story:first-of-type {
+  margin-left: 3rem !important;
 }
 
 .story-background {

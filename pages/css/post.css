@@ -1,21 +1,22 @@
 .card {
   width: 400px;
-  height: 700px;
+  height: auto;
   margin-bottom: 150px;
-}
-
-.card-body {
-  padding: 0%;
-  margin: 0%;
-  height: 100%;
 }
 
 .postContent {
   width: 100%;
 }
 
-.postContent video,
-.postContent img {
-  height: 100%;
+.card-header {
   width: 100%;
+  padding: 0%;
+  margin: 0%;
+}
+
+.contentContainer video,
+.contentContainer img {
+  width: 100%;
+  height: auto;
+  max-height: 700px;
 }

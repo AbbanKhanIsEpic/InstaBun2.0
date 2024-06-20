@@ -1,5 +1,5 @@
 .card {
-  width: 400px;
+  width: 470px;
   height: auto;
   margin-bottom: 150px;
 }
@@ -19,4 +19,13 @@
   width: 100%;
   height: auto;
   max-height: 700px;
+}
+
+textarea {
+  border: none;
+  outline: none;
+  resize: none;
+}
+form {
+  width: 461px;
 }

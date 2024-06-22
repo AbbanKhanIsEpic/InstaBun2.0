@@ -1,4 +1,2 @@
-- Make the arrow for the stories work
-- Add modal for the stories and comments
-- Templating -> Also need to make a components for the post, story and sidear
+- Multiple stories in one modal of the same user
 - Fix the bug with the opening of sidebar

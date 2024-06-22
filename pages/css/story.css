@@ -33,6 +33,6 @@
   background: linear-gradient(to right, rgb(5, 182, 5), green);
 }
 
-.modal-dialog {
+.modal-body {
   height: 400px;
 }

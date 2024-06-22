@@ -1,7 +1,6 @@
 .card {
   width: 470px;
   height: auto;
-  margin-bottom: 150px;
 }
 
 .postContent {
@@ -28,4 +27,10 @@ textarea {
 }
 form {
   width: 461px;
+}
+.sendQuickComment {
+  display: none;
+}
+hr {
+  color: gray;
 }

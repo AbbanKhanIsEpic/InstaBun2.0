@@ -34,3 +34,20 @@ form {
 hr {
   color: gray;
 }
+
+.postInteraction:hover {
+  fill: gray;
+}
+
+.like {
+  animation: beat 0.5s;
+}
+
+@keyframes beat {
+  50% {
+    transform: scale(1.4);
+  }
+  to {
+    transform: scale(1);
+  }
+}

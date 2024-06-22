@@ -16,10 +16,6 @@
   max-height: 80px;
 }
 
-.story:first-of-type {
-  margin-left: 3rem !important;
-}
-
 .story-background {
   width: 75px;
   height: 75px;
@@ -35,4 +31,8 @@
 
 .story-background.friend {
   background: linear-gradient(to right, rgb(5, 182, 5), green);
+}
+
+.modal-dialog {
+  height: 400px;
 }

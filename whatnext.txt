@@ -1,2 +1,6 @@
-- Multiple stories in one modal of the same user
-- Fix the bug with the opening of sidebar
+My current video mutter mutes all video element
+However, I should just mute one because
+when you are moving to the next slide -> the video should mute, thus only one need to be muted
+
+
+- Start working with other screens :D

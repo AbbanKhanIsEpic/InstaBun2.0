@@ -9,27 +9,27 @@
   height: 30px;
 }
 
-.story {
+.story-icon {
   min-width: 80px;
   min-height: 80px;
   max-width: 80px;
   max-height: 80px;
 }
 
-.story-background {
+.story-icon-background {
   width: 75px;
   height: 75px;
   background: linear-gradient(to left, #e100a8, #8d0085, red, orange);
   transition: width var(--hoverTime) ease, height var(--hoverTime) ease;
 }
 
-.story-background:hover {
+.story-icon-background:hover {
   transition: width var(--hoverTime) ease, height var(--hoverTime) ease;
   width: 80px;
   height: 80px;
 }
 
-.story-background.friend {
+.story-icon-background.friend {
   background: linear-gradient(to right, rgb(5, 182, 5), green);
 }
 

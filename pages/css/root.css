@@ -1,0 +1,10 @@
+:root {
+  --transitionTime: 2s;
+  --maxWidth: 240px;
+  --minWidth: 150px;
+  --hoverTime: 0.5s;
+}
+
+body {
+  background: #000;
+}

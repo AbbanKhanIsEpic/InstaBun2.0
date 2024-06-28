@@ -15,7 +15,7 @@
 
 .contentContainer video,
 .contentContainer img {
-  width: 100%;
+  width: 470px;
   height: auto;
   max-height: 700px;
 }

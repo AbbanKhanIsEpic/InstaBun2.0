@@ -7,7 +7,7 @@ class DirectMessage {
   async sendMessage(senderID, receiverID, message) {
     try {
       const query = `
-        INSERT INTO abbankDB.DirectMessages (SenderID, RecieverID, Time, Message)
+        INSERT INTO instabun.DirectMessages (SenderID, RecieverID, Time, Message)
         VALUES (?, ?, NOW(), ?);`;
       await update(query, [senderID, receiverID, message]);
       return "Send message operation successful";
@@ -50,7 +50,7 @@ class DirectMessage {
           //2 -> Both of them follow each other
           //3 -> Impossible
           const receiverDMLimit = await user.getDMLimit(receiverID);
-          const query = `SELECT COUNT(*) FROM abbankDB.Follows WHERE FollowerID = ? AND FollowingID = ? OR FollowerID = ? AND FollowingID = ?;`;
+          const query = `SELECT COUNT(*) FROM instabun.Follows WHERE FollowerID = ? AND FollowingID = ? OR FollowerID = ? AND FollowingID = ?;`;
           const [status] = (
             await select(query, [senderID, receiverID, receiverID, senderID])
           )["COUNT(*)"];
@@ -161,7 +161,7 @@ class DirectMessage {
   //Check if the user has cleared the message on their side before
   async #hasClearedMessageBefore(senderID, recieverID) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.ClearDirectMessage WHERE SenderID = ? AND RecieverID = ?;`;
+      const query = `SELECT count(*) FROM instabun.ClearDirectMessage WHERE SenderID = ? AND RecieverID = ?;`;
       const [result] = await select(query, [senderID, recieverID]);
       return result["count(*)"] == 1;
     } catch (error) {

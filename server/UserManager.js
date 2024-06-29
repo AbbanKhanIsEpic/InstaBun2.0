@@ -1,7 +1,7 @@
-//Imports
 const { select, update } = require("./DB");
-
 const FollowManager = require("./FollowManager");
+
+//Imports
 
 class UserManager {
   //Update the user's profile
@@ -148,7 +148,7 @@ class UserManager {
   //Check if the user's login credential is correct
   async userLogin(username, password) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.Users where Username = ? AND Password = ?`;
+      const query = `SELECT count(*) FROM instabun.Users where Username = ? AND Password = ?`;
       const [result] = await select(query, [username, password]);
       return result["count(*)"] == 1;
     } catch (error) {

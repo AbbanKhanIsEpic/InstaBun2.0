@@ -36,7 +36,7 @@ class GroupMessage {
   //Save the message
   async sendMessage(userID, groupID, message) {
     try {
-      const query = `INSERT INTO abbankDB.GroupMessages (UserID, GroupID, Time, Message) VALUES (?, ?, now(), ?);`;
+      const query = `INSERT INTO instabun.GroupMessages (UserID, GroupID, Time, Message) VALUES (?, ?, now(), ?);`;
       await update(query, [userID, groupID, message]);
       return "Send message operation successful";
     } catch (error) {

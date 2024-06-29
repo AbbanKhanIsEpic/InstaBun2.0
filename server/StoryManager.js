@@ -4,7 +4,7 @@ const FollowManager = require("./FollowManager");
 class StoryManager {
   async upload(userID, StoryLink, Title, isVideo) {
     try {
-      const query = `INSERT INTO abbankDB.Story (UserID,isVideo,StoryLink,Title,uploadDateTime) VALUES (?, ?, ?, ?,now());`;
+      const query = `INSERT INTO instabun.Story (UserID,isVideo,StoryLink,Title,uploadDateTime) VALUES (?, ?, ?, ?,now());`;
       await update(query, [userID, isVideo, StoryLink, Title]);
       return "Upload story operation successful";
     } catch (error) {
@@ -16,7 +16,7 @@ class StoryManager {
   //So there will be no overridden in firebase
   async total(userID) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.Story where UserID = ?;`;
+      const query = `SELECT count(*) FROM instabun.Story where UserID = ?;`;
       const [result] = await select(query, [userID]);
       return result["count(*)"];
     } catch (error) {
@@ -42,7 +42,7 @@ class StoryManager {
         (SELECT 
           COUNT(*)
             FROM
-            abbankDB.Follows
+            instabun.Follows
             WHERE
               (FollowerID = ?
               AND FollowingID = Users.UserID)

@@ -82,7 +82,7 @@ class GroupManager {
   //Get the latest group's id
   async #getLatestGroupID(createrUserID) {
     try {
-      const query = `SELECT GroupID FROM abbankDB.Collective WHERE OwnerID = ? Order by GroupID DESC LIMIT 1;`;
+      const query = `SELECT GroupID FROM instabun.Collective WHERE OwnerID = ? Order by GroupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
       return result.GroupID;
     } catch (error) {
@@ -93,7 +93,7 @@ class GroupManager {
   //Return a list users who are members of the group (groupID)
   async getGroupMembers(groupID) {
     try {
-      const query = `SELECT Users.UserID, Users.Username, Users.DisplayName, Users.ProfileIconLink FROM abbankDB.GroupMembers
+      const query = `SELECT Users.UserID, Users.Username, Users.DisplayName, Users.ProfileIconLink FROM instabun.GroupMembers
     INNER JOIN
      Users ON Users.UserID = GroupMembers.UserID
     INNER JOIN

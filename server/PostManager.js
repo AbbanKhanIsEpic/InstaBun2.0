@@ -6,7 +6,7 @@ class PostManager {
   //This is used for the naming convension for uploading files to firebase
   async total(userID) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.Post where UserID = ?;`;
+      const query = `SELECT count(*) FROM instabun.Post where UserID = ?;`;
       const [result] = await select(query, [userID]);
       return result["count(*)"];
     } catch (error) {
@@ -30,7 +30,7 @@ class PostManager {
       await Promise.all(tagPromises);
 
       //Create the post
-      const query = `INSERT INTO abbankDB.Post (UserID, isVideo , PostLink,Title) VALUES (?,?,?,?);`;
+      const query = `INSERT INTO instabun.Post (UserID, isVideo , PostLink,Title) VALUES (?,?,?,?);`;
       await update(query, [userID, isVideo, postLink, title]);
       //Since this is the latest post, we can get its ID
       const postID = await this.#getLatestPostID(userID);
@@ -45,7 +45,7 @@ class PostManager {
   //It is for abstraction
   async #doesTagExist(tag) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.Tag where TagName = ?;`;
+      const query = `SELECT count(*) FROM instabun.Tag where TagName = ?;`;
       const [result] = await select(query, [tag]);
       return result["count(*)"] == 1;
     } catch (error) {
@@ -57,7 +57,7 @@ class PostManager {
   //It is for abstraction
   async #createTag(tag) {
     try {
-      const query = `INSERT INTO abbankDB.Tag (TagName) VALUES (?);`;
+      const query = `INSERT INTO instabun.Tag (TagName) VALUES (?);`;
       await update(query, [tag]);
       return "Create tag operation successful";
     } catch (error) {
@@ -71,7 +71,7 @@ class PostManager {
   //The latest postID is the post the user just uploaded
   async #getLatestPostID(userID) {
     try {
-      const query = `SELECT idPost FROM abbankDB.Post where UserID = ? Order by idPost DESC Limit 1;`;
+      const query = `SELECT idPost FROM instabun.Post where UserID = ? Order by idPost DESC Limit 1;`;
       const [result] = await select(query, [userID]);
       return result.idPost;
     } catch (error) {
@@ -84,7 +84,7 @@ class PostManager {
       const tagIDsArray = await this.#getTagIDs(tags);
       const attachTagIDToPostPromise = tagIDsArray.map(async (tagID) => {
         //Now attaching individual tag to the post
-        const query = `INSERT INTO abbankDB.PostTags (postID,tagID) VALUES (?,?);`;
+        const query = `INSERT INTO instabun.PostTags (postID,tagID) VALUES (?,?);`;
         await update(query, [postID, tagID]);
       });
       await Promise.all(attachTagIDToPostPromise);
@@ -189,7 +189,7 @@ class PostManager {
       Users.Visibility,
       COUNT(DISTINCT tagID) AS total
   FROM
-      abbankDB.PostTags
+      instabun.PostTags
   INNER JOIN
       Post ON Post.idPost = PostTags.postID
   INNER JOIN
@@ -247,7 +247,7 @@ class PostManager {
       (SELECT 
       COUNT(*)
         FROM
-        abbankDB.Follows
+        instabun.Follows
         WHERE
           (FollowerID = ?
           AND FollowingID = Users.UserID)
@@ -255,7 +255,7 @@ class PostManager {
           AND FollowingID = ?))
       AS Status
         FROM
-        abbankDB.Post
+        instabun.Post
         INNER JOIN
           Users ON Users.UserID = Post.UserID
         WHERE
@@ -312,7 +312,7 @@ class PostManager {
           const upload = element.postID;
 
           try {
-            const uploaderDetailQuery = `SELECT Username, ProfileIconLink FROM abbankDB.Users WHERE UserID = ?;`;
+            const uploaderDetailQuery = `SELECT Username, ProfileIconLink FROM instabun.Users WHERE UserID = ?;`;
             const [uploaderDetail] = await select(uploaderDetailQuery, [
               uploader,
             ]);
@@ -357,7 +357,7 @@ class PostManager {
 
   async #getTagIDs(tags) {
     try {
-      const query = `SELECT idTag FROM abbankDB.Tag WHERE TagName in (?);`;
+      const query = `SELECT idTag FROM instabun.Tag WHERE TagName in (?);`;
       const result = await select(query, [tags]);
       //Convert JSON to array for easy reading
       const idsArray = result.map((element) => element.idTag);
@@ -400,7 +400,7 @@ class PostManager {
         );
       }
 
-      const query = `SELECT idPost FROM abbankDB.Post WHERE UserID IN (?);`;
+      const query = `SELECT idPost FROM instabun.Post WHERE UserID IN (?);`;
 
       const followingsPostID = await select(query, [followingArray]);
 
@@ -426,7 +426,7 @@ class PostManager {
   async getProfilePost(viewerID, profileUserID, page) {
     try {
       const postIDsResultSet = await select(
-        `SELECT Post.idPost FROM abbankDB.Users INNER JOIN Post ON Post.UserID = Users.UserID WHERE Users.UserID = ?;`,
+        `SELECT Post.idPost FROM instabun.Users INNER JOIN Post ON Post.UserID = Users.UserID WHERE Users.UserID = ?;`,
         [profileUserID]
       );
 
@@ -462,7 +462,7 @@ class PostManager {
         Post.idPost,
         Users.UserID
           FROM
-          abbankDB.Post
+          instabun.Post
           INNER JOIN
             Users ON Users.UserID = Post.UserID
           WHERE
@@ -493,7 +493,7 @@ class PostManager {
 
   async hasShared(userID, postID) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.PostShare where postID = ? AND userID = ?;`;
+      const query = `SELECT count(*) FROM instabun.PostShare where postID = ? AND userID = ?;`;
       const [result] = await select(query, [postID, userID]);
       return result["count(*)"] == 1;
     } catch (error) {

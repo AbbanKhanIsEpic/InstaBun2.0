@@ -36,13 +36,61 @@ connectToDatabase();
 //All the api end-points
 
 //User
-app.get("/api/user/login", (req, res) => {
+app.get("/api/user/loginViaUsername", (req, res) => {
   const { username, password } = req.query;
 
   const user = new UserManager();
 
   user
-    .userLogin(username, password)
+    .userLoginViaUsername(username, password)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/user/loginViaEmail", (req, res) => {
+  const { email, password } = req.query;
+
+  const user = new UserManager();
+
+  user
+    .userLoginViaEmail(email, password)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/user/check2SV-ViaEmail", (req, res) => {
+  const { email } = req.query;
+
+  const user = new UserManager();
+
+  user
+    .checkTwoStepVerificationEnabledViaEmail(email)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/user/check2SV-ViaUsername", (req, res) => {
+  const { username } = req.query;
+
+  const user = new UserManager();
+
+  user
+    .checkTwoStepVerificationEnabledViaUsername(username)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -75,22 +123,6 @@ app.get("/api/user/block", (req, res) => {
 
   user
     .isUserBlocked(userID, profileUserID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.get("/api/user/isUserEmail", (req, res) => {
-  const { username, emailAddress } = req.query;
-
-  const user = new UserManager();
-
-  user
-    .doUserEmailMatch(username, emailAddress)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -242,22 +274,6 @@ app.get("/api/user/profileIcon", (req, res) => {
     .getUserProfileIconLink(userID)
     .then((profileIconLink) => {
       res.status(200).send({ ProfileIconLink: profileIconLink });
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.get("/api/user/visibility", (req, res) => {
-  const { userID } = req.query;
-
-  const user = new UserManager();
-
-  user
-    .getVisibility(userID)
-    .then((visibility) => {
-      res.status(200).send({ Visibility: visibility });
     })
     .catch((error) => {
       console.error(error);

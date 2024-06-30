@@ -14,7 +14,7 @@ class UserManager {
     newDMLimit
   ) {
     try {
-      const query = `UPDATE abbankDB.Users SET DisplayName = ?, Bio = ?, ProfileIconLink = ?, Visibility = ?, DMLimit = ?  WHERE (UserID = ?)`;
+      const query = `UPDATE instabun.Users SET DisplayName = ?, Bio = ?, ProfileIconLink = ?, Visibility = ?, DMLimit = ?  WHERE (UserID = ?)`;
       await update(query, [
         newDisplayName,
         newBio,
@@ -29,9 +29,32 @@ class UserManager {
     }
   }
 
+  async createAccount(
+    username,
+    displayName,
+    password,
+    profileIconLink,
+    emailAddress
+  ) {
+    try {
+      const query = `INSERT INTO Users (Username,DisplayName, Password, DateCreated, ProfileIconLink, EmailAddress, Visibility, DMLimit) VALUES (?, ?, ?, now(), ?, ?, 0, 0);
+      `;
+      await update(query, [
+        username,
+        displayName,
+        password,
+        profileIconLink,
+        emailAddress,
+      ]);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Block control
   async isUserBlocked(blockerUserID, blockedUserID) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.BlockUser where BlockerUserID = ? AND BlockedUserID = ?;`;
+      const query = `SELECT count(*) FROM instabun.BlockUser where BlockerUserID = ? AND BlockedUserID = ?;`;
       const [result] = await select(query, [blockerUserID, blockedUserID]);
       return result["count(*)"] == 1;
     } catch (error) {
@@ -63,9 +86,10 @@ class UserManager {
     }
   }
 
-  async getUserID(username) {
+  //Get section
+  async getUserIDViaUsername(username) {
     try {
-      const query = `SELECT UserID FROM abbankDB.Users where Username = ?`;
+      const query = `SELECT UserID FROM instabun.Users where Username = ?`;
       const [result] = await select(query, [username]);
       return result["UserID"];
     } catch (error) {
@@ -75,7 +99,7 @@ class UserManager {
 
   async getUsername(userID) {
     try {
-      const query = `SELECT Username FROM abbankDB.Users where UserID = ?`;
+      const query = `SELECT Username FROM instabun.Users where UserID = ?`;
       const [result] = await select(query, [userID]);
       return result["Username"];
     } catch (error) {
@@ -83,21 +107,22 @@ class UserManager {
     }
   }
 
-  //Checking if the email address is the user's email
-  //This is used to allow user to login if they forgot their password
-  async doUserEmailMatch(username, emailAddress) {
+  async getEmail(username) {
     try {
-      const query = `SELECT count(*) FROM abbankDB.Users where Username = ? AND EmailAddress = ?`;
-      const [result] = await select(query, [username, emailAddress]);
-      return result["count(*)"] == 1;
+      const query = `SELECT Email FROM instabun.Users where Username = ?`;
+      const [result] = await select(query, [username]);
+      return result["Email"];
     } catch (error) {
       return error;
     }
   }
 
+  //Checking if the email address is the user's email
+  //This is used to allow user to login if they forgot their password
+
   async getDisplayName(userID) {
     try {
-      const query = `SELECT DisplayName FROM abbankDB.Users where UserID = ?`;
+      const query = `SELECT DisplayName FROM instabun.Users where UserID = ?`;
       const [result] = await select(query, [userID]);
       return result["DisplayName"];
     } catch (error) {
@@ -107,7 +132,7 @@ class UserManager {
 
   async getUserProfile(userID) {
     try {
-      const query = `SELECT Username,DisplayName,ProfileIconLink,Bio FROM abbankDB.Users where UserID = ?;`;
+      const query = `SELECT Username,DisplayName,ProfileIconLink,Bio FROM instabun.Users where UserID = ?;`;
       const [result] = await select(query, [userID]);
       return result;
     } catch (error) {
@@ -117,7 +142,7 @@ class UserManager {
 
   async getUserProfileIconLink(userID) {
     try {
-      const query = `SELECT ProfileIconLink FROM abbankDB.Users where UserID = ?`;
+      const query = `SELECT ProfileIconLink FROM instabun.Users where UserID = ?`;
       const [result] = await select(query, [userID]);
       //This happens if the userID does not exists
       //When created an account, a user will a profile icon
@@ -137,7 +162,7 @@ class UserManager {
     //This is to give a better result
     searchingUsername = "%" + searchingUsername + "%";
     try {
-      const query = `SELECT Username,DisplayName,ProfileIconLink FROM abbankDB.Users where Username Like ? AND UserID !=  ? limit ${page},${userPerPage};`;
+      const query = `SELECT Username,DisplayName,ProfileIconLink FROM instabun.Users where Username Like ? AND UserID !=  ? limit ${page},${userPerPage};`;
       const result = await select(query, [searchingUsername, userID]);
       return result;
     } catch (error) {
@@ -145,8 +170,79 @@ class UserManager {
     }
   }
 
+  async isUsernameTaken(username) {
+    try {
+      const query = `SELECT count(*) FROM instabun.Users where Username = ?;`;
+      const [result] = await select(query, [username]);
+      return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async checkTwoStepVerificationEnabledViaUsername(username) {
+    try {
+      const query = `SELECT 2SVE FROM instabun.Users where Username = ?;`;
+      const [result] = await select(query, [username]);
+      return result["2SVE"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async checkTwoStepVerificationEnabledViaEmail(email) {
+    try {
+      const query = `SELECT 2SVE FROM instabun.Users where Email = ?;`;
+      const [result] = await select(query, [email]);
+      return result["2SVE"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async enableTwoStepVerification(userID) {
+    try {
+      const query = `UPDATE instabun.Users SET 2SVE = 1 WHERE (UserID = ?)`;
+      await update(query, [userID]);
+      return "Update profile operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async disableTwoStepVerification(userID) {
+    try {
+      const query = `UPDATE instabun.Users SET 2SVE = 0 WHERE (UserID = ?)`;
+      await update(query, [userID]);
+      return "Update profile operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async isEmailTaken(email) {
+    try {
+      const query = `SELECT count(*) FROM instabun.Users where EmailAddress = ?;`;
+      const [result] = await select(query, [email]);
+      return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getDMLimit(userID) {
+    try {
+      const query = `SELECT DMLimit FROM instabun.Users where UserID = ?;`;
+      const [result] = await select(query, [userID]);
+      return result["DMLimit"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Login section
   //Check if the user's login credential is correct
-  async userLogin(username, password) {
+  async userLoginViaUsername(username, password) {
     try {
       const query = `SELECT count(*) FROM instabun.Users where Username = ? AND Password = ?`;
       const [result] = await select(query, [username, password]);
@@ -156,63 +252,12 @@ class UserManager {
     }
   }
 
-  async createAccount(
-    username,
-    displayName,
-    password,
-    profileIconLink,
-    emailAddress
-  ) {
+  async userLoginViaEmail(emailAddress, password) {
     try {
-      const query = `INSERT INTO Users (Username,DisplayName, Password, DateCreated, ProfileIconLink, EmailAddress, Visibility, DMLimit) VALUES (?, ?, ?, now(), ?, ?, 0, 0);
-      `;
-      await update(query, [
-        username,
-        displayName,
-        password,
-        profileIconLink,
-        emailAddress,
-      ]);
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async isUsernameTaken(username) {
-    try {
-      const query = `SELECT count(*) FROM abbankDB.Users where Username = ?;`;
-      const [result] = await select(query, [username]);
+      const query = `SELECT count(*) FROM instabun.Users where Email = ? AND Password = ?`;
+      const [result] = await select(query, [emailAddress, password]);
+      console.log(result);
       return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async isEmailTaken(email) {
-    try {
-      const query = `SELECT count(*) FROM abbankDB.Users where EmailAddress = ?;`;
-      const [result] = await select(query, [email]);
-      return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async getVisibility(userID) {
-    try {
-      const query = `SELECT Visibility FROM abbankDB.Users where UserID = ?`;
-      const [result] = await select(query, [userID]);
-      return result["Visibility"];
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async getDMLimit(userID) {
-    try {
-      const query = `SELECT DMLimit FROM abbankDB.Users where UserID = ?;`;
-      const [result] = await select(query, [userID]);
-      return result["DMLimit"];
     } catch (error) {
       return error;
     }

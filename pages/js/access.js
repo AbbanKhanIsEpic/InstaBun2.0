@@ -1,5 +1,4 @@
 const changePasswordVis = document.querySelector("#changePasswordVis");
-const passwordInput = document.querySelector("#passwordInput");
 changePasswordVis.addEventListener("click", function () {
   if (passwordInput.type == "text") {
     passwordInput.type = "password";
@@ -17,3 +16,49 @@ changePasswordVis.addEventListener("click", function () {
                     </svg>`;
   }
 });
+
+function sendEmail(template_id, code, location, toEmail, purpose) {
+  const data = {
+    service_id: "service_6yolmlh",
+    template_id: template_id,
+    user_id: "Vmn8fY73xhau4Ic9h",
+    template_params: {
+      code: code,
+      location: location,
+      to_email: toEmail,
+      purpose: purpose,
+    },
+  };
+  fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => response.json()) // parses JSON response into native JavaScript objects
+    .then((data) => {
+      console.log("Success:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+async function getLocation() {
+  await fetch(
+    "https://api.geoapify.com/v1/ipinfo?&apiKey=8f2e3799151b4063b5b4f35cd40536b0"
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      return {
+        location: `${data["city"]["name"]},${data["country"]["name"]}`,
+        ip_address: data["ip"],
+      };
+    })
+    .catch((error) => {
+      // Handle any errors that occurred during the request
+      console.error(error);
+    });
+}

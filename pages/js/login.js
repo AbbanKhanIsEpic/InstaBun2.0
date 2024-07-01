@@ -2,6 +2,11 @@ const loginButton = document.querySelector("#loginButton");
 const loginError = document.querySelector("#loginError");
 const passwordError = document.querySelector("#passwordError");
 const usernameError = document.querySelector("#usernameError");
+const twoStepModal = document.querySelector("#TwoStepModal");
+
+let timer = null;
+const duration = 900000; //15 mins
+let timeOver = null;
 
 const usernameOrEmailInput = document.querySelector("#usernameOrEmailInput"); // Input element
 const passwordInput = document.querySelector("#passwordInput");
@@ -56,7 +61,9 @@ document.querySelector("#redirect").addEventListener("click", function () {
 
 function loginViaUsername(username, password) {
   const server = "http://127.0.0.1:5000/api/user/loginViaUsername";
-  const query = `?username=${username}&password=${password}`;
+  const query = `?username=${encodeURIComponent(
+    username
+  )}&password=${encodeURIComponent(password)}`;
 
   fetch(server + query)
     .then((response) => response.json())
@@ -79,12 +86,13 @@ function loginViaUsername(username, password) {
 
 function loginViaEmail(email, password) {
   const server = "http://127.0.0.1:5000/api/user/loginViaEmail";
-  const query = `?email=${email}&password=${password}`;
+  const query = `?email=${encodeURIComponent(
+    email
+  )}&password=${encodeURIComponent(password)}`;
 
   fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       if (data) {
         loginError.textContent = ""; //I put it here bc to not make UI flashing
         checkTwoStepVerificationEnabledViaEmail(email);
@@ -100,27 +108,59 @@ function loginViaEmail(email, password) {
     });
 }
 
-function getLocation() {
-  // Implement the logic to get the location
-  // For example, you can use the Geolocation API
-  // and return the location coordinates
-}
-
 function checkTwoStepVerificationEnabledViaEmail(email) {
   const server = "http://127.0.0.1:5000/api/user/check2SV-ViaEmail";
-  const query = `?email=${email}`;
+  const query = `?email=${encodeURIComponent(email)}`;
 
   fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
-      const location = await getLocation();
-      console.log(location);
+      if (data) {
+        twoStepModal.style.display = "block";
+        timeOver = false;
+        startTimer();
+        sendTwoStepCode(email);
+        document
+          .querySelector("#sendEmailAgain")
+          .addEventListener("click", function () {
+            if (!timeOver) {
+              alert(
+                "When the code expires, then you will be able to request another code"
+              );
+            } else {
+              resetTimer();
+              sendTwoStepCode(email);
+            }
+          });
+      } else {
+      }
     })
     .catch((error) => {
       // Handle any errors that occurred during the request
       console.error(error);
     });
+}
+
+async function sendTwoStepCode(email) {
+  try {
+    const location = await getLocation()["location"];
+    console.log(location);
+    const code = Math.floor(Math.random() * 1000000) + 111111;
+    await sendEmail("template_ocpdspf", code, location, email, "login");
+    const codeInput = document.querySelector("#codeInput");
+    const verifyError = document.querySelector("#verifyError");
+    document.querySelector("#verifyBtn").addEventListener("click", function () {
+      if (codeInput.value != code) {
+        verifyError.textContent = "Make sure to enter the code correctly";
+        codeInput.style.borderColor = "red";
+      } else {
+        console.log("Done");
+      }
+    });
+    console.log(code);
+  } catch (locationError) {
+    console.error("Error fetching location:", locationError);
+  }
 }
 
 function checkTwoStepVerificationEnabledViaUsername(username) {
@@ -136,4 +176,17 @@ function checkTwoStepVerificationEnabledViaUsername(username) {
       // Handle any errors that occurred during the request
       console.error(error);
     });
+}
+
+function startTimer() {
+  timer = window.setTimeout(function () {
+    console.log("Time is up");
+    timeOver = true;
+  }, duration);
+}
+
+function resetTimer() {
+  timeOver = false;
+  clearTimeout(timer);
+  startTimer(duration);
 }

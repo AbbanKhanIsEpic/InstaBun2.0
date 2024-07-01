@@ -51,6 +51,27 @@
         <div class="mt-3 mb-3">Don't have an account? <span role="button" id="redirect"><strong>Sign up</strong></span>
         </div>
     </div>
+    <div class="modal glassmorph" tabindex="-1" id="TwoStepModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-black text-white glassmorph">
+                <div class="modal-header  border-0">
+                    <h5 class="modal-title">2-Step Verification</h5>
+                </div>
+                <div class="modal-body border-5">
+                    <h4 class="text-center mb-4">Authenication code</h4>
+                    <input id="codeInput" type="text"
+                        class="display-6 form-control rounded rounded-3 bg-black text-white" maxlength="6"
+                        title="Enter number to complete 2-step authenication" placeholder="XXXXXX">
+                    <button class="btn bg-primary w-100 mt-3 text-white" id="verifyBtn">Verify</button>
+                    <span class="flex-end w-50 text-danger" id="verifyError"></span>
+                </div>
+                <div class="modal-footer border-0">
+                    Have not received email? <span class="text-primary" role="button" id="sendEmailAgain">Send email
+                        again</span>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="/pages/js/access.js"></script>
     <script src="/pages/js/login.js"></script>
 </body>

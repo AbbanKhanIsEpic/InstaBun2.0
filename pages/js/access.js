@@ -17,7 +17,7 @@ changePasswordVis.addEventListener("click", function () {
   }
 });
 
-function sendEmail(template_id, code, location, toEmail, purpose) {
+async function sendEmail(template_id, code, location, toEmail, purpose) {
   const data = {
     service_id: "service_6yolmlh",
     template_id: template_id,
@@ -46,19 +46,18 @@ function sendEmail(template_id, code, location, toEmail, purpose) {
 }
 
 async function getLocation() {
-  await fetch(
-    "https://api.geoapify.com/v1/ipinfo?&apiKey=8f2e3799151b4063b5b4f35cd40536b0"
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      return {
-        location: `${data["city"]["name"]},${data["country"]["name"]}`,
-        ip_address: data["ip"],
-      };
-    })
-    .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error(error);
-    });
+  try {
+    const response = await fetch(
+      "https://api.geoapify.com/v1/ipinfo?&apiKey=8f2e3799151b4063b5b4f35cd40546b0"
+    );
+    const data = await response.json();
+    const locationData = {
+      location: `${data.city.name}, ${data.country.name}`,
+      ip_address: data.ip,
+    };
+    return locationData;
+  } catch (error) {
+    console.error("Error fetching location data:", error);
+    return null;
+  }
 }

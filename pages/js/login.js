@@ -8,31 +8,31 @@ let timer = null;
 const duration = 900000; //15 mins
 let timeOver = null;
 
-const usernameOrEmailInput = document.querySelector("#usernameOrEmailInput"); // Input element
+const userIdentifierInput = document.querySelector("#userIdentifierInput"); // Input element
 const passwordInput = document.querySelector("#passwordInput");
 
 loginButton.addEventListener("click", function () {
-  const usernameOrEmail = usernameOrEmailInput.value;
+  const userIdentifier = userIdentifierInput.value;
   const password = passwordInput.value;
 
   let isValid = true;
-  const isEmail = validator.isEmail(usernameOrEmail);
+  const isEmail = validator.isEmail(userIdentifier);
 
   // Reset error messages and input borders
   usernameError.textContent = "";
   passwordError.textContent = "";
-  usernameOrEmailInput.style.borderColor = "";
+  userIdentifierInput.style.borderColor = "";
   passwordInput.style.borderColor = "";
 
   // User must enter username
-  if (usernameOrEmail.length === 0) {
+  if (userIdentifier.length === 0) {
     usernameError.textContent = "Username or email address is required";
-    usernameOrEmailInput.style.borderColor = "red";
+    userIdentifierInput.style.borderColor = "red";
     isValid = false;
   }
-  if (!isEmail && usernameOrEmail.includes("@")) {
+  if (!isEmail && userIdentifier.includes("@")) {
     usernameError.textContent = "Email address is incorrect";
-    usernameOrEmailInput.style.borderColor = "red";
+    userIdentifierInput.style.borderColor = "red";
     isValid = false;
   }
 
@@ -46,11 +46,8 @@ loginButton.addEventListener("click", function () {
   if (!isValid) {
     return;
   }
-  if (isEmail) {
-    loginViaEmail(usernameOrEmail, password);
-  } else {
-    loginViaUsername(usernameOrEmail, password);
-  }
+
+  login(userIdentifier, password);
 });
 
 document.querySelector("#redirect").addEventListener("click", function () {
@@ -58,126 +55,32 @@ document.querySelector("#redirect").addEventListener("click", function () {
 });
 
 //function
+function login(userIdentifier, password) {
+  const server = "http://127.0.0.1:5000/api/user/login"; // Replace with your server URL
+  const data = { userIdentifier, password };
 
-function loginViaUsername(username, password) {
-  const server = "http://127.0.0.1:5000/api/user/loginViaUsername";
-  const query = `?username=${encodeURIComponent(
-    username
-  )}&password=${encodeURIComponent(password)}`;
-
-  fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      if (data) {
-        loginError.textContent = ""; //I put it here bc to not make UI flashing
-        checkTwoStepVerificationEnabledViaUsername(username);
-      } else {
-        loginError.textContent = "Username or password incorrect";
-        usernameOrEmailInput.style.borderColor = "red";
-        passwordInput.style.borderColor = "red";
-      }
-    })
-    .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error(error);
-    });
-}
-
-function loginViaEmail(email, password) {
-  const server = "http://127.0.0.1:5000/api/user/loginViaEmail";
-  const query = `?email=${encodeURIComponent(
-    email
-  )}&password=${encodeURIComponent(password)}`;
-
-  fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data) {
-        loginError.textContent = ""; //I put it here bc to not make UI flashing
-        checkTwoStepVerificationEnabledViaEmail(email);
-      } else {
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      if (response.status == 401) {
         loginError.textContent = "Email address or password incorrect";
-        usernameOrEmailInput.style.borderColor = "red";
+        userIdentifierInput.style.borderColor = "red";
         passwordInput.style.borderColor = "red";
-      }
-    })
-    .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error(error);
-    });
-}
-
-function checkTwoStepVerificationEnabledViaEmail(email) {
-  const server = "http://127.0.0.1:5000/api/user/check2SV-ViaEmail";
-  const query = `?email=${encodeURIComponent(email)}`;
-
-  fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data) {
+      } else if (response.status == 497) {
         twoStepModal.style.display = "block";
-        timeOver = false;
-        startTimer();
-        sendTwoStepCode(email);
-        document
-          .querySelector("#sendEmailAgain")
-          .addEventListener("click", function () {
-            if (!timeOver) {
-              alert(
-                "When the code expires, then you will be able to request another code"
-              );
-            } else {
-              resetTimer();
-              sendTwoStepCode(email);
-            }
-          });
-      } else {
       }
+      return response.json();
     })
     .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error(error);
+      console.error("Login failed:", error.message);
+      // Handle login error (e.g., display error message to user)
     });
 }
-
-async function sendTwoStepCode(email) {
-  try {
-    const location = await getLocation()["location"];
-    console.log(location);
-    const code = Math.floor(Math.random() * 1000000) + 111111;
-    await sendEmail("template_ocpdspf", code, location, email, "login");
-    const codeInput = document.querySelector("#codeInput");
-    const verifyError = document.querySelector("#verifyError");
-    document.querySelector("#verifyBtn").addEventListener("click", function () {
-      if (codeInput.value != code) {
-        verifyError.textContent = "Make sure to enter the code correctly";
-        codeInput.style.borderColor = "red";
-      } else {
-        console.log("Done");
-      }
-    });
-    console.log(code);
-  } catch (locationError) {
-    console.error("Error fetching location:", locationError);
-  }
-}
-
-function checkTwoStepVerificationEnabledViaUsername(username) {
-  const server = "http://127.0.0.1:5000/api/user/check2SV-ViaUsername";
-  const query = `?username=${username}`;
-
-  fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((error) => {
-      // Handle any errors that occurred during the request
-      console.error(error);
-    });
-}
-
 function startTimer() {
   timer = window.setTimeout(function () {
     console.log("Time is up");

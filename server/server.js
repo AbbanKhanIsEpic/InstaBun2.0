@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
+//Status code
+const STATUS_TWO_STEP_REQUIRED = 497;
 
 const { createConnection } = require("./DB");
 
@@ -36,39 +38,41 @@ connectToDatabase();
 //All the api end-points
 
 //User
-app.get("/api/user/loginViaUsername", (req, res) => {
-  const { username, password } = req.query;
+app.post("/api/user/login", async (req, res) => {
+  const { userIdentifier, password } = req.body;
 
-  const user = new UserManager();
-
-  user
-    .userLoginViaUsername(username, password)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  try {
+    const user = new UserManager();
+    const loginResult = await user.userLogin(userIdentifier, password);
+    if (!loginResult) {
+      res.status(401).json({
+        error: "Unauthorised",
+        message: "Invalid username/email address or password",
+      });
+    } else {
+      const isAuth = await user.checkTwoStepVerificationEnabled(userIdentifier);
+      if (isAuth) {
+        //Auth is required
+        res.status(STATUS_TWO_STEP_REQUIRED).json({
+          error: "Login incomplete",
+          message: "2-step auth required",
+        });
+      } else {
+        // Login successful
+        res.status(200).json({
+          message: "Login successful",
+        });
+      }
+    }
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
     });
+  }
 });
 
-app.get("/api/user/loginViaEmail", (req, res) => {
-  const { email, password } = req.query;
-
-  const user = new UserManager();
-
-  user
-    .userLoginViaEmail(email, password)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.get("/api/user/check2SV-ViaEmail", (req, res) => {
+app.get("/api/user/isAuthEnabled", (req, res) => {
   const { email } = req.query;
 
   const user = new UserManager();

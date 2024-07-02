@@ -180,23 +180,24 @@ class UserManager {
     }
   }
 
-  async checkTwoStepVerificationEnabledViaUsername(username) {
-    try {
-      const query = `SELECT 2SVE FROM instabun.Users where Username = ?;`;
-      const [result] = await select(query, [username]);
-      return result["2SVE"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async checkTwoStepVerificationEnabledViaEmail(email) {
-    try {
-      const query = `SELECT 2SVE FROM instabun.Users where Email = ?;`;
-      const [result] = await select(query, [email]);
-      return result["2SVE"] == 1;
-    } catch (error) {
-      return error;
+  async checkTwoStepVerificationEnabled(userIdentifier) {
+    if (userIdentifier.includes("@")) {
+      try {
+        const query = `SELECT 2SVE FROM instabun.Users where Email = ?;`;
+        const [result] = await select(query, [userIdentifier]);
+        console.log(result["2SVE"] == 1);
+        return result["2SVE"] == 1;
+      } catch (error) {
+        return error;
+      }
+    } else {
+      try {
+        const query = `SELECT 2SVE FROM instabun.Users where Username = ?;`;
+        const [result] = await select(query, [userIdentifier]);
+        return result["2SVE"] == 1;
+      } catch (error) {
+        return error;
+      }
     }
   }
 
@@ -242,24 +243,23 @@ class UserManager {
 
   //Login section
   //Check if the user's login credential is correct
-  async userLoginViaUsername(username, password) {
-    try {
-      const query = `SELECT count(*) FROM instabun.Users where Username = ? AND Password = ?`;
-      const [result] = await select(query, [username, password]);
-      return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async userLoginViaEmail(emailAddress, password) {
-    try {
-      const query = `SELECT count(*) FROM instabun.Users where Email = ? AND Password = ?`;
-      const [result] = await select(query, [emailAddress, password]);
-      console.log(result);
-      return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
+  async userLogin(userIdentifier, password) {
+    if (userIdentifier.includes("@")) {
+      try {
+        const query = `SELECT count(*) FROM instabun.Users where Email = ? AND Password = ?`;
+        const [result] = await select(query, [userIdentifier, password]);
+        return result["count(*)"] == 1;
+      } catch (error) {
+        return error;
+      }
+    } else {
+      try {
+        const query = `SELECT count(*) FROM instabun.Users where Username = ? AND Password = ?`;
+        const [result] = await select(query, [userIdentifier, password]);
+        return result["count(*)"] == 1;
+      } catch (error) {
+        return error;
+      }
     }
   }
 }

@@ -17,7 +17,7 @@ const DirectMessage = require("./DirectMessage");
 const GroupManager = require("./GroupManager");
 const GroupMessage = require("./GroupMessage");
 const CommentManager = require("./CommentManager");
-const Email = require("./Email");
+const EmailManager = require("./EmailManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -75,41 +75,20 @@ app.post("/api/user/login", async (req, res) => {
 });
 
 app.post("/api/user/sendAuth", async (req, res) => {
-  const { toEmail, location } = req.body;
+  const { toEmail, code, location } = req.body;
 
-  console.log(toEmail, location);
+  console.log(toEmail, code, location);
 
   try {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const email = new Email();
-    const result = await email.auth(toEmail, code, location);
-    console.log(result);
-    res.status(200).json({
-      result: result,
-      code: code,
-    });
+    const emailManager = new EmailManager();
+    await emailManager.auth(toEmail, code, location);
+    res.status(200).json({ message: "Complete" });
   } catch (error) {
     res.status(500).send({
       error: error,
       message: "Error occurred",
     });
   }
-});
-
-app.get("/api/user/check2SV-ViaUsername", (req, res) => {
-  const { username } = req.query;
-
-  const user = new UserManager();
-
-  user
-    .checkTwoStepVerificationEnabledViaUsername(username)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
 });
 
 app.get("/api/user/displayName", (req, res) => {
@@ -128,7 +107,7 @@ app.get("/api/user/displayName", (req, res) => {
     });
 });
 
-app.get("/api/user/block", (req, res) => {
+app.get("/api/user/isBlock", (req, res) => {
   const { userID, profileUserID } = req.query;
 
   const user = new UserManager();
@@ -181,7 +160,7 @@ app.post("/api/user/unblock", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-app.get("/api/user/email", (req, res) => {
+app.get("/api/user/IsEmailTaken", (req, res) => {
   const { email } = req.query;
 
   const user = new UserManager();
@@ -197,7 +176,7 @@ app.get("/api/user/email", (req, res) => {
     });
 });
 
-app.get("/api/user/usernameExist", (req, res) => {
+app.get("/api/user/isUsernameTaken", (req, res) => {
   const { username } = req.query;
 
   const user = new UserManager();
@@ -327,6 +306,24 @@ app.post("/api/user/profile", (req, res) => {
     newDMLimit
   );
   res.json({ message: "Data received and processed successfully" });
+});
+
+app.get("/api/user/getEmailAddress", (req, res) => {
+  const { username } = req.query;
+
+  const user = new UserManager();
+
+  user
+    .getEmail(username)
+    .then((jsonifiedResult) => {
+      res.status(200).send({
+        email: jsonifiedResult,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
 });
 
 //Follow

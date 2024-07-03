@@ -1,0 +1,27 @@
+.message {
+  height: 72px;
+}
+#messageColumn {
+  width: 500px;
+}
+#messageColumn > :hover {
+  background: #1a1a1a;
+  cursor: pointer;
+}
+
+.overflow-y-auto:hover::-webkit-scrollbar {
+  display: block;
+}
+::-webkit-scrollbar {
+  display: none;
+  width: 10px;
+}
+#messageBar {
+  height: 74px;
+}
+input::placeholder {
+  color: gray !important;
+}
+.sendMessage {
+  max-width: 50%;
+}

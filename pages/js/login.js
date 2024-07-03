@@ -3,6 +3,8 @@ const loginError = document.querySelector("#loginError");
 const passwordError = document.querySelector("#passwordError");
 const usernameError = document.querySelector("#usernameError");
 const twoStepModal = document.querySelector("#TwoStepModal");
+const codeInput = document.querySelector("#codeInput");
+const verifyError = document.querySelector("#verifyError");
 
 let timer = null;
 const duration = 900000; //15 mins
@@ -55,8 +57,8 @@ document.querySelector("#redirect").addEventListener("click", function () {
 });
 
 //function
-function login(userIdentifier, password) {
-  const server = "http://127.0.0.1:5000/api/user/login"; // Replace with your server URL
+async function login(userIdentifier, password) {
+  const server = "http://127.0.0.1:5000/api/user/login";
   const data = { userIdentifier, password };
 
   fetch(server, {
@@ -68,13 +70,50 @@ function login(userIdentifier, password) {
   })
     .then(async (response) => {
       if (response.status == 401) {
-        loginError.textContent = "Email address or password incorrect";
-        userIdentifierInput.style.borderColor = "red";
-        passwordInput.style.borderColor = "red";
+        if (userIdentifier.includes("@")) {
+          loginError.textContent = "Email address or password incorrect";
+          userIdentifierInput.style.borderColor = "red";
+          passwordInput.style.borderColor = "red";
+        } else {
+          loginError.textContent = "Username or password incorrect";
+          userIdentifierInput.style.borderColor = "red";
+          passwordInput.style.borderColor = "red";
+        }
       } else if (response.status == 497) {
+        let toEmail;
+        if (!userIdentifier.includes("@")) {
+          toEmail = await getEmailAddress(userIdentifier);
+          console.log(toEmail);
+        } else {
+          toEmail = userIdentifier;
+        }
         twoStepModal.style.display = "block";
-        const result = await sendAuth(userIdentifier, "Durban, Ballito");
-        console.log(result);
+        let code = Math.floor(100000 + Math.random() * 900000);
+        const geoInfo = await getLocation();
+        const location = `${geoInfo["city"]["name"]}, ${geoInfo["country"]["name"]}`;
+        sendAuth(toEmail, code, location);
+        startTimer();
+        document
+          .querySelector("#sendEmailAgain")
+          .addEventListener("click", function () {
+            if (!timeOver) {
+              alert("You can only request when the code expires");
+            } else {
+              code = Math.floor(100000 + Math.random() * 900000);
+              sendAuth(toEmail, code, location);
+              resetTimer();
+            }
+          });
+        document
+          .querySelector("#verifyBtn")
+          .addEventListener("click", function () {
+            if (codeInput.value == code) {
+              window.open("http://127.0.0.1:5500/pages/home.html", "_self");
+            } else {
+              verifyError.textContent = "Make sure to enter the code correctly";
+              codeInput.style.borderColor = "red";
+            }
+          });
       }
       return response.json();
     })
@@ -96,9 +135,24 @@ function resetTimer() {
   startTimer(duration);
 }
 
-function sendAuth(toEmail, location) {
+async function getEmailAddress(username) {
+  const server = "http://127.0.0.1:5000/api/user/getEmailAddress";
+  const query = `?username=${encodeURIComponent(username)}`;
+
+  let email;
+
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      email = data["email"];
+    });
+  return email;
+}
+
+function sendAuth(toEmail, code, location) {
   const server = "http://127.0.0.1:5000/api/user/sendAuth"; // Replace with your server URL
-  const data = { toEmail, location };
+  const data = { toEmail, code, location };
 
   fetch(server, {
     method: "POST",

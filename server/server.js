@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 //Status code
 const STATUS_TWO_STEP_REQUIRED = 497;
 
@@ -16,6 +17,7 @@ const DirectMessage = require("./DirectMessage");
 const GroupManager = require("./GroupManager");
 const GroupMessage = require("./GroupMessage");
 const CommentManager = require("./CommentManager");
+const Email = require("./Email");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -72,20 +74,26 @@ app.post("/api/user/login", async (req, res) => {
   }
 });
 
-app.get("/api/user/isAuthEnabled", (req, res) => {
-  const { email } = req.query;
+app.post("/api/user/sendAuth", async (req, res) => {
+  const { toEmail, location } = req.body;
 
-  const user = new UserManager();
+  console.log(toEmail, location);
 
-  user
-    .checkTwoStepVerificationEnabledViaEmail(email)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  try {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const email = new Email();
+    const result = await email.auth(toEmail, code, location);
+    console.log(result);
+    res.status(200).json({
+      result: result,
+      code: code,
     });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
 });
 
 app.get("/api/user/check2SV-ViaUsername", (req, res) => {

@@ -66,13 +66,15 @@ function login(userIdentifier, password) {
     },
     body: JSON.stringify(data),
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.status == 401) {
         loginError.textContent = "Email address or password incorrect";
         userIdentifierInput.style.borderColor = "red";
         passwordInput.style.borderColor = "red";
       } else if (response.status == 497) {
         twoStepModal.style.display = "block";
+        const result = await sendAuth(userIdentifier, "Durban, Ballito");
+        console.log(result);
       }
       return response.json();
     })
@@ -92,4 +94,24 @@ function resetTimer() {
   timeOver = false;
   clearTimeout(timer);
   startTimer(duration);
+}
+
+function sendAuth(toEmail, location) {
+  const server = "http://127.0.0.1:5000/api/user/sendAuth"; // Replace with your server URL
+  const data = { toEmail, location };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      console.log(response);
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Login failed:", error.message);
+    });
 }

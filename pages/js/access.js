@@ -24,8 +24,7 @@ async function getLocation() {
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
-      result = data;
+      result = `${data["city"]["name"]}, ${data["country"]["name"]}`;
     })
     .catch((error) => {
       // Handle any errors that occurred during the request

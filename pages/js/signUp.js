@@ -3,15 +3,24 @@ const registerError = document.querySelector("#registerError");
 const passwordError = document.querySelector("#passwordError");
 const usernameError = document.querySelector("#usernameError");
 const confirmPasswordError = document.querySelector("#confirmPasswordError");
+const emailAddressError = document.querySelector("#emailAddressError");
 
 const usernameInput = document.querySelector("#usernameInput"); //Input element
 const passwordInput = document.querySelector("#passwordInput"); //Input element
 const confirmPasswordInput = document.querySelector("#confirmPasswordInput"); //Input element
+const emailInput = document.querySelector("#emailInput"); //Input element
+
+const finaliseCreation = document.querySelector("#finaliseCreation");
+
+let timer = null;
+const duration = 900000; //15 mins
+let timeOver = null;
 
 //Event listeners
-registerButton.addEventListener("click", function () {
+registerButton.addEventListener("click", async function () {
   const username = usernameInput.value.replaceAll(/\s/g, ""); //Remove all white spaces
   const password = passwordInput.value.replaceAll(/\s/g, ""); //Remove all white spaces
+  const emailAddress = emailInput.value.replaceAll(/\s/g, ""); //Remove all white spaces
 
   let isValid = true;
 
@@ -20,9 +29,11 @@ registerButton.addEventListener("click", function () {
   passwordError.textContent = "";
   confirmPasswordError.textContent = "";
   registerError.textContent = "";
+  emailAddressError.textContent = "";
   usernameInput.style.borderColor = "";
   passwordInput.style.borderColor = "";
   confirmPasswordInput.style.borderColor = "";
+  emailInput.style.borderColor = "";
 
   //User must enter username
   if (username.length == 0) {
@@ -45,6 +56,14 @@ registerButton.addEventListener("click", function () {
   //Username max length is 32 characters
   else if (username.length > 32) {
     setUsernameErrorMessage("Username is too long ~ Max length is 32");
+    isValid = false;
+  }
+  //Username can not contain special characters
+  else if (username.match(/[$@#&!]+/)) {
+    setUsernameErrorMessage("Username can not contain special characters");
+    isValid = false;
+  } else if (await isUsernameTaken(username)) {
+    setUsernameErrorMessage("Username is taken");
     isValid = false;
   }
 
@@ -89,15 +108,66 @@ registerButton.addEventListener("click", function () {
     isValid = false;
   }
 
+  //Confirm password will give an error if the password field is not entered
+  if (password.length == 0) {
+    confirmPasswordError.textContent = "Password is required";
+    confirmPasswordInput.style.borderColor = "red";
+    isValid = false;
+  }
+  //Checking if two password matches
   if (confirmPasswordInput.value != password) {
     confirmPasswordError.textContent = "Both passwords must match";
     confirmPasswordInput.style.borderColor = "red";
     isValid = false;
   }
 
+  //Checking if the email address is entered
+  if (emailAddress.length == 0) {
+    setEmailErrorMessage("Email address is required");
+    isValid = false;
+  }
+  //Checking if the email address is an actual email address
+  else if (!validator.isEmail(emailAddress)) {
+    setEmailErrorMessage("Email address is not corrrect");
+    isValid = false;
+  }
+  //Checking if the email address is taken
+  else if (await isEmailTaken(emailAddress)) {
+    setEmailErrorMessage("Email address is taken");
+    isValid = false;
+  }
+
   if (!isValid) {
     return;
   }
+
+  finaliseCreation.style.display = "block";
+  let code = Math.floor(100000 + Math.random() * 900000);
+  const geoInfo = await getLocation();
+  const location = `${geoInfo["city"]["name"]}, ${geoInfo["country"]["name"]}`;
+  sendCode(emailAddress, code, location);
+  startTimer();
+  document
+    .querySelector("#sendEmailAgain")
+    .addEventListener("click", function () {
+      if (!timeOver) {
+        alert("You can only request when the code expires");
+      } else {
+        code = Math.floor(100000 + Math.random() * 900000);
+        sendCode(emailAddress, code, location);
+        resetTimer();
+      }
+    });
+  document
+    .querySelector("#verifyBtn")
+    .addEventListener("click", async function () {
+      if (codeInput.value == code) {
+        await createAccount(username, emailAddress, password);
+      } else {
+        verifyError.textContent = "Make sure to enter the code correctly";
+        codeInput.style.borderColor = "red";
+      }
+    });
 });
 
 document.querySelector("#redirect").addEventListener("click", function () {
@@ -112,4 +182,85 @@ function setUsernameErrorMessage(message) {
 function setPasswordErrorMessage(message) {
   passwordError.textContent = message;
   passwordInput.style.borderColor = "red";
+}
+function setEmailErrorMessage(message) {
+  emailAddressError.textContent = message;
+  emailInput.style.borderColor = "red";
+}
+
+async function isEmailTaken(emailAddress) {
+  const server = "http://127.0.0.1:5000/api/user/IsEmailTaken";
+  const query = `?email=${encodeURIComponent(emailAddress)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}
+
+async function isUsernameTaken(username) {
+  const server = "http://127.0.0.1:5000/api/user/IsUsernameTaken";
+  const query = `?username=${encodeURIComponent(username)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}
+
+function startTimer() {
+  timer = window.setTimeout(function () {
+    console.log("Time is up");
+    timeOver = true;
+  }, duration);
+}
+
+function resetTimer() {
+  timeOver = false;
+  clearTimeout(timer);
+  startTimer(duration);
+}
+
+function sendCode(toEmail, code, location) {
+  const server = "http://127.0.0.1:5000/api/user/sendCreationCodeEmail";
+  const data = { toEmail, code, location };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Login failed:", error.message);
+    });
+}
+
+function createAccount(username, emailAddress, password) {
+  const server = "http://127.0.0.1:5000/api/user/createAccount";
+  const data = { username, emailAddress, password };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Login failed:", error.message);
+    });
 }

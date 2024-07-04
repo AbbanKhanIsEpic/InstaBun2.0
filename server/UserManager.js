@@ -29,23 +29,10 @@ class UserManager {
     }
   }
 
-  async createAccount(
-    username,
-    displayName,
-    password,
-    profileIconLink,
-    emailAddress
-  ) {
+  async createAccount(username, emailAddress, password) {
     try {
-      const query = `INSERT INTO Users (Username,DisplayName, Password, DateCreated, ProfileIconLink, EmailAddress, Visibility, DMLimit) VALUES (?, ?, ?, now(), ?, ?, 0, 0);
-      `;
-      await update(query, [
-        username,
-        displayName,
-        password,
-        profileIconLink,
-        emailAddress,
-      ]);
+      const query = `INSERT INTO Users (Username,Email,DisplayName, Password) VALUES (?,?,?,?);`;
+      await update(query, [username, emailAddress, username, password]);
     } catch (error) {
       return error;
     }
@@ -223,7 +210,7 @@ class UserManager {
 
   async isEmailTaken(email) {
     try {
-      const query = `SELECT count(*) FROM instabun.Users where EmailAddress = ?;`;
+      const query = `SELECT count(*) FROM instabun.Users where Email = ?;`;
       const [result] = await select(query, [email]);
       return result["count(*)"] == 1;
     } catch (error) {

@@ -57,11 +57,15 @@ class EmailManager {
         from: '"InstaBun AutoMailer" <process.env.EMAIL_USER>',
         to: userEmail,
         subject: "Password change verification Code",
-        html: `<div>Hello <br> <br> <strong>${{
-          code,
-        }}</strong> is your password change verification code. Enter the above code into the verification screen to login. This code will expire in 15 minutes <br> <br> This request was received from <strong>${{
-          location,
-        }}</strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
+        html:
+          `<div>Hello <br> <br> <strong>` +
+          code +
+          `,
+        </strong> is your password change verification code. Enter the above code into the verification screen to change your password. This code will expire in 15 minutes <br> <br> This request was received from <strong>
+          ` +
+          location +
+          `,
+        </strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
       };
 
       // Send the email
@@ -90,11 +94,15 @@ class EmailManager {
         from: '"InstaBun AutoMailer" <process.env.EMAIL_USER>',
         to: userEmail,
         subject: "Account creation verification Code",
-        html: `<div>Hello <br> <br> <strong>${{
-          code,
-        }}</strong> is your account creation verification code. Enter the above code into the verification screen to login. This code will expire in 15 minutes <br> <br> This request was received from <strong>${{
-          location,
-        }}</strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
+        html:
+          `<div>Hello <br> <br> <strong>` +
+          code +
+          `,
+        </strong> is your account creation verification code. Enter the above code into the verification screen to create your account. This code will expire in 15 minutes <br> <br> This request was received from <strong>
+          ` +
+          location +
+          `,
+        </strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
       };
 
       // Send the email

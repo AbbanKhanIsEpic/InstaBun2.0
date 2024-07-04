@@ -74,23 +74,6 @@ app.post("/api/user/login", async (req, res) => {
   }
 });
 
-app.post("/api/user/sendAuth", async (req, res) => {
-  const { toEmail, code, location } = req.body;
-
-  console.log(toEmail, code, location);
-
-  try {
-    const emailManager = new EmailManager();
-    await emailManager.auth(toEmail, code, location);
-    res.status(200).json({ message: "Complete" });
-  } catch (error) {
-    res.status(500).send({
-      error: error,
-      message: "Error occurred",
-    });
-  }
-});
-
 app.get("/api/user/displayName", (req, res) => {
   const { userID } = req.query;
 
@@ -134,20 +117,10 @@ app.post("/api/user/block", (req, res) => {
 });
 
 app.post("/api/user/createAccount", (req, res) => {
-  const username = req.body.username;
-  const displayName = req.body.displayName;
-  const password = req.body.password;
-  const profileIconLink = req.body.profileIconLink;
-  const emailAddress = req.body.emailAddress;
+  const { username, emailAddress, password } = req.body;
 
   const user = new UserManager();
-  user.createAccount(
-    username,
-    displayName,
-    password,
-    profileIconLink,
-    emailAddress
-  );
+  user.createAccount(username, password, emailAddress);
   res.json({ message: "Data received and processed successfully" });
 });
 
@@ -324,6 +297,59 @@ app.get("/api/user/getEmailAddress", (req, res) => {
       console.error(error);
       res.status(500).send("Error occurred");
     });
+});
+
+//Email
+
+app.post("/api/user/sendAuthEmail", async (req, res) => {
+  const { toEmail, code, location } = req.body;
+
+  console.log(toEmail, code, location);
+
+  try {
+    const emailManager = new EmailManager();
+    await emailManager.auth(toEmail, code, location);
+    res.status(200).json({ message: "Complete" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
+});
+
+app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
+  const { toEmail, code, location } = req.body;
+
+  console.log(toEmail, code, location);
+
+  try {
+    const emailManager = new EmailManager();
+    await emailManager.createAccount(toEmail, code, location);
+    res.status(200).json({ message: "Complete" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
+});
+
+app.post("/api/user/sendChangePasswordEmail", async (req, res) => {
+  const { toEmail, code, location } = req.body;
+
+  console.log(toEmail, code, location);
+
+  try {
+    const emailManager = new EmailManager();
+    await emailManager.passwordChange(toEmail, code, location);
+    res.status(200).json({ message: "Complete" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
 });
 
 //Follow

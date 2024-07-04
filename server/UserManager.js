@@ -249,6 +249,17 @@ class UserManager {
       }
     }
   }
+
+  //Change user's password
+  async changePassword(emailAddress, password) {
+    try {
+      const query = `UPDATE instabun.users SET Password = ? WHERE (Email = ?);`;
+      await update(query, [password, emailAddress]);
+      return "Update user's password operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
 module.exports = UserManager;

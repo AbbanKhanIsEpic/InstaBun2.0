@@ -143,8 +143,7 @@ registerButton.addEventListener("click", async function () {
 
   finaliseCreation.style.display = "block";
   let code = Math.floor(100000 + Math.random() * 900000);
-  const geoInfo = await getLocation();
-  const location = `${geoInfo["city"]["name"]}, ${geoInfo["country"]["name"]}`;
+  const location = await getLocation();
   sendCode(emailAddress, code, location);
   startTimer();
   document

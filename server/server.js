@@ -3,7 +3,6 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
-const bcrypt = require("bcrypt");
 //Status code
 const STATUS_TWO_STEP_REQUIRED = 497;
 
@@ -106,22 +105,35 @@ app.get("/api/user/isBlock", (req, res) => {
     });
 });
 
-app.post("/api/user/block", (req, res) => {
-  const userID = req.body.userID;
-  const profileUserID = req.body.profileUserID;
-
-  const user = new UserManager();
-
-  user.block(userID, profileUserID);
-  res.json({ message: "Data received and processed successfully" });
-});
-
 app.post("/api/user/createAccount", (req, res) => {
   const { username, emailAddress, password } = req.body;
 
-  const user = new UserManager();
-  user.createAccount(username, password, emailAddress);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    const user = new UserManager();
+    user.createAccount(username, emailAddress, password);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+app.post("/api/user/changePassword", (req, res) => {
+  const { emailAddress, password } = req.body;
+
+  try {
+    const user = new UserManager();
+    user.changePassword(emailAddress, password);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+      message: "Error occurred",
+    });
+  }
 });
 
 app.post("/api/user/unblock", (req, res) => {

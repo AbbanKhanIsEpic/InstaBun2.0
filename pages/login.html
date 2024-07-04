@@ -89,8 +89,18 @@
                     <input id="codePasswordInput" type="text"
                         class="display-6 form-control rounded rounded-3 bg-black text-white d-none" maxlength="6"
                         title="Enter number to complete 2-step authenication" placeholder="XXXXXX">
+                    <input id="newPasswordInput" type="text"
+                        class="display-6 form-control rounded rounded-3 bg-black text-white d-none"
+                        title="Enter number to complete 2-step authenication" placeholder="New password...">
+                    <span class="flex-end w-50 text-danger" id="newPasswordError"></span>
+                    <input id="newConfirmPasswordInput" type="text"
+                        class="display-6 form-control rounded rounded-3 bg-black text-white d-none mt-4"
+                        title="Enter number to complete 2-step authenication" placeholder="Confirm new password...">
+                    <span class="flex-end w-50 text-danger" id="confirmNewPasswordError"></span>
                     <button class="btn bg-primary w-100 mt-3 text-white d-none" id="verifyPasswordBtn">Verify</button>
                     <button class="btn bg-primary w-100 mt-3 text-white" id="sendEmail">Send email</button>
+                    <button class="btn bg-primary w-100 mt-3 text-white d-none" id="updatePassword">Update
+                        password</button>
                     <span class="flex-end w-50 text-danger" id="verifyPasswordError"></span>
                 </div>
                 <div class="modal-footer border-0">

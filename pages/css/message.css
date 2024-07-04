@@ -8,12 +8,17 @@
   background: #1a1a1a;
   cursor: pointer;
 }
+.selected {
+  background: #2e2e2e;
+}
 
-.overflow-y-auto:hover::-webkit-scrollbar {
+#messageColumn:hover::-webkit-scrollbar {
   display: block;
 }
-::-webkit-scrollbar {
+#messageColumn::-webkit-scrollbar {
   display: none;
+}
+::-webkit-scrollbar {
   width: 10px;
 }
 #messageBar {
@@ -22,6 +27,7 @@
 input::placeholder {
   color: gray !important;
 }
-.sendMessage {
+.sendMessage,
+.recieveMessage {
   max-width: 50%;
 }

@@ -24,9 +24,18 @@
 #messageBar {
   height: 74px;
 }
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: gray !important;
 }
+
+textarea {
+  border: none;
+  outline: none !important;
+  resize: none;
+  max-height: 32px;
+}
+
 .sendMessage,
 .recieveMessage {
   max-width: 50%;

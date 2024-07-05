@@ -14,7 +14,7 @@
 </head>
 
 <body class="container-fluid min-vh-100 min-vw-100 overflow-hidden m-0 p-0 text-white text-decoration-none">
-    <div class="row row-cols grid min-vw-100">
+    <div class="row row-cols grid content">
         <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0" id="sideBar">
             <div class="d-flex flex-row justify-content-between mt-2 ms-4 me-2">
                 <span class="fs-3 d-flex name user-select-none align-self-end"> Instabun </span>
@@ -86,7 +86,8 @@
         </div>
         <div id="contentPage" class="col vh-100 w-100 d-flex flex-row">
             <div id="messageColumn" class="border-end border-dark overflow-y-auto">
-                <div class="border-bottom border-dark pt-2 ps-2 pb-2">
+                <div class="border-bottom border-dark pt-2 ps-2 pb-2" data-bs-toggle="modal"
+                    data-bs-target="#newMessageModal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         class="bi bi-pencil-square" viewBox="0 0 16 16">
                         <path
@@ -202,7 +203,7 @@
                         </svg></div>
                 </div>
                 <div id="messageOutput" class="d-flex flex-column w-100 overflow-y-auto h-100">
-                    <div class="w-100 d-flex justify-content-end pb-2">
+                    <div class="w-100 d-flex justify-content-end pb-3">
                         <div class="sendMessage rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
                             sint fugiat nihil. Cum labore officia culpa aut dolorem quisquam, unde molestias eum,
@@ -236,7 +237,7 @@
                             quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.
                         </div>
                     </div>
-                    <div class="w-100 d-flex justify-content-start pb-2 ps-2">
+                    <div class="w-100 d-flex justify-content-start pb-3">
                         <div class="recieveMessage rounded-4 bg-dark pt-1 ps-2 pb-1 pe-2">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
                             sint fugiat nihil. Cum labore officia culpa aut dolorem quisquam, unde molestias eum,
@@ -281,7 +282,7 @@
                                     d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
                             </svg>
                         </div>
-                        <textarea name="text" id="messageTextArea"
+                        <textarea name="text" id="messageTextArea" rows="1"
                             class="text-white bg-black border-0 d-flex form-control" placeholder="Message"></textarea>
                         <div class="input-group-text bg-transparent border-0 d-flex text-primary">
                             Post
@@ -291,7 +292,100 @@
             </div>
         </div>
     </div>
-    <script src="/pages/js/sidebar.js"></script
+    <div class="modal glassmorph" tabindex="-1" id="newMessageModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-black text-white glassmorph">
+                <div class="modal-header">
+                    <h5 class="modal-title">Start a new conversation</h5>
+                </div>
+                <div class="modal-body">
+                    <form class="input-group">
+                        <span class="input-group-text bg-transparent text-white border-0"><strong>To:</strong></span>
+                        <input type="text" class="form-control bg-transparent text-white border-0"
+                            placeholder="Search...">
+                    </form>
+                </div>
+                <div class="modal-footer w-100 p-0">
+                    <div id="userList" class="d-flex w-100 flex-column">
+                        <div class="d-flex justify-content-between w-100 user p-0">
+                            <div class="w-100 ps-2 d-flex flex-row align-items-center">
+                                <img src="https://github.com/mdo.png" alt="" width="44" height="44"
+                                    class="rounded-circle me-2" />
+                                <div class="d-flex flex-column">
+                                    <span>
+                                        Goblin clan
+                                    </span>
+                                    <span class="text-white-50">5 members</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-self-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height=" 24" fill="currentColor"
+                                    class="bi bi-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between w-100 user">
+                            <div class="w-100 ps-2 d-flex flex-row align-items-center">
+                                <img src="https://github.com/mdo.png" alt="" width="44" height="44"
+                                    class="rounded-circle me-2" />
+                                <div class="d-flex flex-column">
+                                    <span>
+                                        Goblin clan
+                                    </span>
+                                    <span class="text-white-50">5 members</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-self-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height=" 24" fill="currentColor"
+                                    class="bi bi-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between w-100 user">
+                            <div class="w-100 ps-2 d-flex flex-row align-items-center">
+                                <img src="https://github.com/mdo.png" alt="" width="44" height="44"
+                                    class="rounded-circle me-2" />
+                                <div class="d-flex flex-column">
+                                    <span>
+                                        Goblin clan
+                                    </span>
+                                    <span class="text-white-50">5 members</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-self-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height=" 24" fill="currentColor"
+                                    class="bi bi-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between w-100 user">
+                            <div class="w-100 ps-2 d-flex flex-row align-items-center">
+                                <img src="https://github.com/mdo.png" alt="" width="44" height="44"
+                                    class="rounded-circle me-2" />
+                                <div class="d-flex flex-column">
+                                    <span>
+                                        Goblin clan
+                                    </span>
+                                    <span class="text-white-50">5 members</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-self-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height=" 24" fill="currentColor"
+                                    class="bi bi-circle" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100 mt-4 p-2">Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/pages/js/sidebar.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>

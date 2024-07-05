@@ -24,14 +24,28 @@
 #messageBar {
   height: 74px;
 }
+#userList {
+  height: 240px;
+}
+.user {
+  min-height: 60px;
+  max-height: 60px;
+}
+.user:hover {
+  background: #1a1a1a;
+  cursor: pointer;
+}
 input::placeholder,
 textarea::placeholder {
   color: gray !important;
 }
 
+.form-control:focus {
+  box-shadow: none;
+}
 textarea {
   border: none;
-  outline: none !important;
+  outline: none;
   resize: none;
   max-height: 32px;
 }

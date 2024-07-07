@@ -142,15 +142,19 @@ class UserManager {
     }
   }
 
-  async getListOfUsernames(userID, searchingUsername, page) {
-    const userPerPage = 5;
-    page *= userPerPage;
+  //Users can search for other users by username or display name
+  async getListOfUsers(searchQuery, userPerPage, page) {
     //The apart of the username could be in the front, end or middle
     //This is to give a better result
-    searchingUsername = "%" + searchingUsername + "%";
+    searchQuery = "%" + searchQuery + "%";
     try {
-      const query = `SELECT Username,DisplayName,ProfileIconLink FROM instabun.Users where Username Like ? AND UserID !=  ? limit ${page},${userPerPage};`;
-      const result = await select(query, [searchingUsername, userID]);
+      const query = `SELECT Username,DisplayName,ProfileIconLink FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ${page},${userPerPage};`;
+      const result = await select(query, [
+        searchQuery,
+        searchQuery,
+        page,
+        userPerPage,
+      ]);
       return result;
     } catch (error) {
       return error;

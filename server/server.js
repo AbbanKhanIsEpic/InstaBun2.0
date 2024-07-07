@@ -210,19 +210,26 @@ app.get("/api/user/userID", (req, res) => {
 });
 
 app.get("/api/user/search", (req, res) => {
-  const { userID, searchUser, page } = req.query;
+  const { searchQuery, userPerPage, page } = req.query;
 
   const user = new UserManager();
 
-  user
-    .getListOfUsernames(userID, searchUser, page)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
+  page *= userPerPage;
+
+  try {
+    user
+      .getListOfUsers(searchQuery, userPerPage, page)
+      .then((jsonifiedResult) => {
+        res.status(200).send(jsonifiedResult);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send("Error occurred");
+      });
+  } catch (error) {
+    console.error("Synchronous error:", error);
+    res.status(500).send("Unexpected error occurred");
+  }
 });
 
 app.get("/api/user/profile", (req, res) => {

@@ -33,7 +33,6 @@
 }
 .user:hover {
   background: #1a1a1a;
-  cursor: pointer;
 }
 input::placeholder,
 textarea::placeholder {
@@ -53,4 +52,22 @@ textarea {
 .sendMessage,
 .recieveMessage {
   max-width: 50%;
+}
+
+.checkboxContainer > input {
+  width: 24px;
+  height: 24px;
+}
+
+.checkmark {
+  width: 24px;
+  height: 24px;
+}
+
+.checkboxContainer > input:hover {
+  cursor: pointer !important;
+}
+
+.checkboxContainer > input:checked ~ .checkmark {
+  background-color: white;
 }

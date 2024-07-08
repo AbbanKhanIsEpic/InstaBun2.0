@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
         mediaSrc:
           "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
         likeCount: 100000,
-        description: "Look at my beutifical cat :D",
+        description:
+          "Look at my beutifical cat :D wdweqwefqedfqwedwqdqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqd",
         commentCount: 9999,
         like: 1,
         bookmark: 0,
@@ -88,8 +89,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     //Typing a quick comment -> changing the span display value
     textarea.addEventListener("input", function () {
-      sendQuickComment.style.display =
-        this.value.trim() === "" ? "none" : "inline";
+      if (textarea.value.length == 0) {
+        sendQuickComment.classList.add("d-none");
+      } else {
+        sendQuickComment.classList.remove("d-none");
+      }
     });
   });
 });

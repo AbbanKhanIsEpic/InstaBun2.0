@@ -1,5 +1,8 @@
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
+const messageTextArea = document.querySelector("#messageTextArea");
+
+const sendMessage = document.querySelector("#sendMessage");
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
@@ -12,6 +15,14 @@ searchUsersInput.addEventListener("input", function () {
       displayUserList();
     }
   }, 500);
+});
+
+messageTextArea.addEventListener("input", function () {
+  if (messageTextArea.value.length == 0) {
+    sendMessage.classList.add("invisible");
+  } else {
+    sendMessage.classList.remove("invisible");
+  }
 });
 //Functions
 

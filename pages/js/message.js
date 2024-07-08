@@ -58,7 +58,12 @@ async function displayUserList() {
   const users = userList.getElementsByClassName("user");
 
   Array.from(users).forEach((user) => {
+    //const
+    const checkmark = user.getElementsByTagName("svg")[0];
+    const checkbox = user.getElementsByTagName("input")[0];
     //Event listerns
-    user.addEventListener("click", function () {});
+    checkbox.addEventListener("click", function () {
+      checkmark.classList.toggle("d-none");
+    });
   });
 }

@@ -67,7 +67,3 @@ textarea {
 .checkboxContainer > input:hover {
   cursor: pointer !important;
 }
-
-.checkboxContainer > input:checked ~ .checkmark {
-  background-color: white;
-}

@@ -42,6 +42,10 @@ hr {
   animation: beat 0.5s;
 }
 
+.interactions {
+  max-height: 700px;
+}
+
 @keyframes beat {
   50% {
     transform: scale(1.4);

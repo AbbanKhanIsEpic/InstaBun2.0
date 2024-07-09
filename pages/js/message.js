@@ -1,6 +1,7 @@
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const messageTextArea = document.querySelector("#messageTextArea");
+const userList = document.getElementById("userList");
 
 const sendMessage = document.querySelector("#sendMessage");
 
@@ -10,7 +11,7 @@ searchUsersInput.addEventListener("input", function () {
   //Only display the list after 500ms -> user stop typing
   setTimeout(function () {
     if (keywords.length > searchUsersInput.value) {
-      console.log("delete");
+      userList.innerHTML = "";
     } else if (keywords == searchUsersInput.value) {
       displayUserList();
     }
@@ -34,6 +35,8 @@ async function displayUserList() {
 
   // Compile the template
   const template = Handlebars.compile(templateSource);
+  console.log(searchUsersInput.value);
+  console.log(await getUserList(searchUsersInput.value));
 
   // Define the data
   const data = {
@@ -63,7 +66,6 @@ async function displayUserList() {
   const htmlOutput = template(data);
 
   // Insert the HTML into the DOM
-  const userList = document.getElementById("userList");
   userList.innerHTML = htmlOutput;
 
   const users = userList.getElementsByClassName("user");
@@ -77,4 +79,19 @@ async function displayUserList() {
       checkmark.classList.toggle("d-none");
     });
   });
+}
+
+async function getUserList(searchQuery) {
+  const server = "http://127.0.0.1:5000/api/user/search";
+  const query = `?searchQuery=${encodeURIComponent(
+    searchQuery
+  )}&userPerPage=${encodeURIComponent(4)}&page=${encodeURIComponent(1)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
 }

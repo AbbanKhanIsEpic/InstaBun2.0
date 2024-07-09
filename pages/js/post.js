@@ -23,8 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mediaSrc:
           "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
         likeCount: 100000,
-        description:
-          "Look at my beutifical cat :D wdweqwefqedfqwedwqdqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqd",
+        description: "Look at my beutifical cat :D",
         commentCount: 9999,
         like: 1,
         bookmark: 0,

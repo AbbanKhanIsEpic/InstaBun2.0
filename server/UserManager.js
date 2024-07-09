@@ -148,12 +148,12 @@ class UserManager {
     //This is to give a better result
     searchQuery = "%" + searchQuery + "%";
     try {
-      const query = `SELECT Username,DisplayName,ProfileIconLink FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ${page},${userPerPage};`;
+      const query = `SELECT Username,DisplayName,profileIcon FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ?,?;`;
       const result = await select(query, [
         searchQuery,
         searchQuery,
-        page,
-        userPerPage,
+        page * userPerPage,
+        int(userPerPage),
       ]);
       return result;
     } catch (error) {

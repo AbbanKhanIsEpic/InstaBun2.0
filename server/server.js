@@ -214,8 +214,6 @@ app.get("/api/user/search", (req, res) => {
 
   const user = new UserManager();
 
-  page *= userPerPage;
-
   try {
     user
       .getListOfUsers(searchQuery, userPerPage, page)

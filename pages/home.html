@@ -204,33 +204,32 @@
                   <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
                     <div class="d-flex justify-content-center align-items-center h-100">
                       {{#if isVideo}}
-                      <video controls src="{{url}}" class="d-block w-auto h-100"></video>
+                      <video controls src="{{url}}" class="d-block h-100 object-fit-cover"></video>
                       {{else}}
-                      <img src="{{url}}" class="d-block w-auto h-100">
+                      <img src="{{url}}" class="d-block h-100 object-fit-cover">
                       {{/if}}
                     </div>
                   </div>
                   {{/each}}
                 </div>
-                <button class="carousel-control-prev bg-white" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-                </button>
               </div>
+              <button class="carousel-control-prev bg-white" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next ms-5" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
             </div>
-            <div class="modal-footer bg-transparent border-0">
-              <form>
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  class="form-control rounded rounded-3 text-dark" 
-                />
-              </form>
+            <div class="modal-footer bg-transparent border-0 ps-0 pe-0 d-flex flex-row input-group">
+              <input
+              type="text"
+              name=""
+              id=""
+              class="form-control rounded rounded-3 text-dark m-0" 
+            />
+            <button class="btn bg-primary ms-2 rounded-3">Send</button> 
             </div>
           </div>
         </div>

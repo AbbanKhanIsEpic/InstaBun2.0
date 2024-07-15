@@ -234,6 +234,7 @@ async function login(userIdentifier, password) {
     body: JSON.stringify(data),
   })
     .then(async (response) => {
+      console.log(response);
       if (response.status == 401) {
         if (userIdentifier.includes("@")) {
           loginError.textContent = "Email address or password incorrect";
@@ -270,16 +271,18 @@ async function login(userIdentifier, password) {
           });
         document
           .querySelector("#verifyAuthBtn")
-          .addEventListener("click", function () {
+          .addEventListener("click", async function () {
             if (codeInput.value == code) {
+              await setRememberCookie(userIdentifier, 30);
               window.open("http://127.0.0.1:5500/pages/home.html", "_self");
             } else {
               verifyError.textContent = "Make sure to enter the code correctly";
               codeInput.style.borderColor = "red";
             }
           });
+      } else if (response.status == 200) {
+        await setRememberCookie(userIdentifier, 30);
       }
-      return response.json();
     })
     .catch((error) => {
       console.error("Login failed:", error.message);

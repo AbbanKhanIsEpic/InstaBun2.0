@@ -74,13 +74,23 @@ class UserManager {
   }
 
   //Get section
-  async getUserIDViaUsername(username) {
-    try {
-      const query = `SELECT UserID FROM instabun.Users where Username = ?`;
-      const [result] = await select(query, [username]);
-      return result["UserID"];
-    } catch (error) {
-      return error;
+  async getUserID(userIdentifier) {
+    if (userIdentifier.includes("@")) {
+      try {
+        const query = `SELECT userID FROM instabun.Users where Email = ?`;
+        const [result] = await select(query, [userIdentifier]);
+        return result;
+      } catch (error) {
+        return error;
+      }
+    } else {
+      try {
+        const query = `SELECT userID FROM instabun.Users where Username = ?`;
+        const [result] = await select(query, [userIdentifier]);
+        return result;
+      } catch (error) {
+        return error;
+      }
     }
   }
 

@@ -22,6 +22,8 @@ app.use(cors()); // Enable CORS for all routes
 
 app.use(express.json());
 
+app.set("trust proxy", true); //Allow server to get the IP address of user
+
 //Connect to MySQL server
 async function connectToDatabase() {
   try {
@@ -41,7 +43,6 @@ connectToDatabase();
 //User
 app.post("/api/user/login", async (req, res) => {
   const { userIdentifier, password } = req.body;
-
   try {
     const user = new UserManager();
     const loginResult = await user.userLogin(userIdentifier, password);
@@ -194,14 +195,15 @@ app.get("/api/user/username", (req, res) => {
 });
 
 app.get("/api/user/userID", (req, res) => {
-  const { username } = req.query;
+  const { userIdentifier } = req.query;
 
   const user = new UserManager();
 
   user
-    .getUserID(username)
-    .then((userID) => {
-      res.status(200).send({ UserID: userID });
+    .getUserID(userIdentifier)
+    .then((jsonifiedResult) => {
+      console.log(jsonifiedResult);
+      res.status(200).send(jsonifiedResult);
     })
     .catch((error) => {
       console.error(error);

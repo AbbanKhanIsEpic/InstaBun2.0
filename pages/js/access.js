@@ -17,6 +17,7 @@ changePasswordVis.addEventListener("click", function () {
   }
 });
 
+//THIS IS EXTREMELY BAD!!!
 async function getLocation() {
   let result;
   await fetch(

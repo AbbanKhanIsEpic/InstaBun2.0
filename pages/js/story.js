@@ -339,15 +339,50 @@ document.addEventListener("DOMContentLoaded", function () {
   const storiesModal = document.getElementsByClassName("modal");
   const stories = document.getElementsByClassName("story-icon");
 
+  let slideInterval = null;
+
+  rightArrow.addEventListener("click", function () {
+    if (
+      leftArrow.classList.contains("pointer") &&
+      rightArrow.classList.contains("pointer")
+    ) {
+      clearInterval(slideInterval);
+      rightArrow.classList.toggle("pointer");
+      leftArrow.classList.toggle("pointer");
+      const startingPosition = storyContainer.scrollLeft;
+      slideInterval = setInterval(function () {
+        if (storyContainer.scrollLeft - startingPosition >= 460) {
+          rightArrow.classList.toggle("pointer");
+          leftArrow.classList.toggle("pointer");
+          clearInterval(slideInterval);
+        } else {
+          storyContainer.scrollLeft += 1;
+        }
+      }, 0);
+    }
+  });
+
+  //Need to revamp it
+  //Poor use of logic here
   leftArrow.addEventListener("click", function () {
-    const startingPosition = storyContainer.scrollLeft;
-    const scrollLeft = setInterval(function () {
-      if (storyContainer.scrollLeft - startingPosition >= 460) {
-        clearInterval(scrollLeft);
-      } else {
-        storyContainer.scrollLeft += 1;
-      }
-    }, 0);
+    if (
+      leftArrow.classList.contains("pointer") &&
+      rightArrow.classList.contains("pointer")
+    ) {
+      clearInterval(slideInterval);
+      rightArrow.classList.toggle("pointer");
+      leftArrow.classList.toggle("pointer");
+      const startingPosition = storyContainer.scrollLeft;
+      slideInterval = setInterval(function () {
+        if (startingPosition - storyContainer.scrollLeft >= 460) {
+          rightArrow.classList.toggle("pointer");
+          leftArrow.classList.toggle("pointer");
+          clearInterval(slideInterval);
+        } else {
+          storyContainer.scrollLeft -= 1;
+        }
+      }, 0);
+    }
   });
 
   Array.from(storiesModal).forEach((modal) => {

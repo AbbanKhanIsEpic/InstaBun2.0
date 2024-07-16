@@ -37,7 +37,6 @@
   height: 400px;
 }
 
-#rightArrow > svg:not(.d-none),
-#leftArrow > svg:not(.d-none) {
+.pointer {
   cursor: pointer;
 }

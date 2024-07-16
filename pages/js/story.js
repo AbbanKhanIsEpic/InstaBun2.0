@@ -1,3 +1,6 @@
+const leftArrow = document.querySelector("#leftArrow");
+const rightArrow = document.querySelector("#rightArrow");
+
 document.addEventListener("DOMContentLoaded", function () {
   // Get the template source
   const templateSource = document.getElementById("story-template").innerHTML;
@@ -330,10 +333,22 @@ document.addEventListener("DOMContentLoaded", function () {
   // Render the template with data
   const htmlOutput = template(data);
 
-  // Insert the HTML into the DOM
-  document.getElementById("stories").innerHTML = htmlOutput;
+  const storyContainer = document.getElementById("stories");
+  storyContainer.innerHTML = htmlOutput;
 
   const storiesModal = document.getElementsByClassName("modal");
+  const stories = document.getElementsByClassName("story-icon");
+
+  leftArrow.addEventListener("click", function () {
+    const startingPosition = storyContainer.scrollLeft;
+    const scrollLeft = setInterval(function () {
+      if (storyContainer.scrollLeft - startingPosition >= 460) {
+        clearInterval(scrollLeft);
+      } else {
+        storyContainer.scrollLeft += 1;
+      }
+    }, 1);
+  });
 
   Array.from(storiesModal).forEach((modal) => {
     modal.addEventListener("hidden.bs.modal", function (event) {

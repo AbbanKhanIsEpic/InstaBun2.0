@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         storyContainer.scrollLeft += 1;
       }
-    }, 1);
+    }, 0);
   });
 
   Array.from(storiesModal).forEach((modal) => {

@@ -1,10 +1,9 @@
 let userID = null;
 
-document.addEventListener("DOMContentLoaded", checkUserSession());
+checkUserSession();
 
 async function createUserSession(userIdentifier, expirationDays) {
   try {
-    const name = "userID";
     const response = await fetch(
       `http://127.0.0.1:5000/api/user/userID?userIdentifier=${encodeURIComponent(
         userIdentifier
@@ -23,13 +22,13 @@ async function createUserSession(userIdentifier, expirationDays) {
     const path = "path=/"; // Cookie accessible from all paths
 
     document.cookie =
-      name + "=" + userID + ";" + expires + ";" + domain + ";" + path;
+      "userID" + "=" + userID + ";" + expires + ";" + domain + ";" + path;
   } catch (error) {
     console.log(error);
   }
 }
 
-async function checkUserSession() {
+function checkUserSession() {
   const cookies = document.cookie.split("; ");
   for (const cookie of cookies) {
     const [cookieName, cookieValue] = cookie.split("=");
@@ -37,5 +36,13 @@ async function checkUserSession() {
       userID = cookieValue;
       return;
     }
+  }
+  if (
+    !(
+      window.location.pathname == "/pages/login.html" ||
+      window.location.pathname == "/pages/signUp.html"
+    )
+  ) {
+    window.open("http://127.0.0.1:5500/pages/signUp.html", "_self");
   }
 }

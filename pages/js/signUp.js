@@ -162,7 +162,7 @@ registerButton.addEventListener("click", async function () {
     .addEventListener("click", async function () {
       if (codeInput.value == code) {
         await createAccount(username, emailAddress, password);
-        await setRememberCookie(username, 30);
+        await createUserSession(username, 30);
       } else {
         verifyError.textContent = "Make sure to enter the code correctly";
         codeInput.style.borderColor = "red";

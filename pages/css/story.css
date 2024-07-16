@@ -1,12 +1,12 @@
 #stories {
-  min-width: 100%;
   height: 120px;
-  gap: 10px;
+  gap: 13px;
 }
 
-#leftarrow {
-  width: 30px;
+#leftArrow,
+#rightArrow {
   height: 30px;
+  width: 30px;
 }
 
 .story-icon {
@@ -35,4 +35,9 @@
 
 .modal-body {
   height: 400px;
+}
+
+#rightArrow > svg:not(.d-none),
+#leftArrow > svg:not(.d-none) {
+  cursor: pointer;
 }

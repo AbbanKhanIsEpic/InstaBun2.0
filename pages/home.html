@@ -177,16 +177,16 @@
                     />
                   </svg>
                 </button>
-                <div class="carousel-indicators">
-                  {{#each stories}}
-                  <button type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}" {{#if @first}}class="active" {{/if}}
-                  aria-current="{{#if @first}}true{{/if}}" 
-                  aria-label="Slide {{@index}}+1"></button>
-                  {{/each}}
-                </div>
             </div>
             <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
               <div id="carouselStory-{{user.id}}" class="carousel carousel-dark slide w-100 h-100">
+                <div class="carousel-indicators top-0">
+                  {{#each stories}}
+                  <button type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class=" {{#if @first}} active {{/if}}"
+                  aria-current="{{#if @first}}true{{/if}}" 
+                  aria-label=`Slide {{@index}}`></button>
+                  {{/each}}
+                </div>
                 <div class="carousel-inner h-100 w-100">
                   {{#each stories}}
                   <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">

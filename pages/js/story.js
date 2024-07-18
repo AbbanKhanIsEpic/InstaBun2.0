@@ -342,9 +342,15 @@ document.addEventListener("DOMContentLoaded", function () {
   let slideInterval = null;
 
   rightArrow.addEventListener("click", function () {
+    console.log(
+      storyContainer.scrollLeft !=
+        storyContainer.scrollWidth - storyContainer.offsetWidth
+    );
     if (
       leftArrow.classList.contains("pointer") &&
-      rightArrow.classList.contains("pointer")
+      rightArrow.classList.contains("pointer") &&
+      storyContainer.scrollLeft !=
+        storyContainer.scrollWidth - storyContainer.offsetWidth
     ) {
       clearInterval(slideInterval);
       rightArrow.classList.toggle("pointer");
@@ -367,7 +373,8 @@ document.addEventListener("DOMContentLoaded", function () {
   leftArrow.addEventListener("click", function () {
     if (
       leftArrow.classList.contains("pointer") &&
-      rightArrow.classList.contains("pointer")
+      rightArrow.classList.contains("pointer") &&
+      storyContainer.scrollLeft != 0
     ) {
       clearInterval(slideInterval);
       rightArrow.classList.toggle("pointer");

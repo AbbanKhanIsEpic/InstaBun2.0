@@ -18,7 +18,9 @@
   <div class="row row-cols grid content">
     <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0" id="sideBar">
       <div class="d-flex flex-row justify-content-between mt-2 ms-4 me-2">
-        <span class="fs-3 d-flex name user-select-none align-self-end"> Instabun </span>
+        <span class="fs-3 d-flex name user-select-none align-self-end">
+          Instabun
+        </span>
         <!--When sidebar closes, the button does not really works for some reason-->
         <span class="d-flex align-self-end justify-content-end" role="button" id="toggleSideBar">
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-list"
@@ -29,7 +31,7 @@
         </span>
       </div>
       <hr />
-      <ul class=" d-flex flex-column mb-auto align-items-center row-gap-4 ps-4 pe-3">
+      <ul class="d-flex flex-column mb-auto align-items-center row-gap-4 ps-4 pe-3">
         <li class="fs-4 d-flex align-items-center justify-content-center w-100 rounded-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-house me-1"
             viewBox="0 -1 16 16">
@@ -94,9 +96,7 @@
               d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
           </svg>
         </div>
-        <div id="stories" class="col d-flex flex-row align-items-center overflow-x-hidden">
-
-        </div>
+        <div id="stories" class="col d-flex flex-row align-items-center overflow-x-hidden"></div>
         <div id="rightArrow" class="pointer">
           <svg xmlns=" http://www.w3.org/2000/svg" width="30" height="30" fill="#D3D3D3"
             class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
@@ -109,121 +109,123 @@
     </div>
   </div>
   <script type="text/x-handlebars-template" id="story-template">
-    {{#each users as |user|}}
-      <div class="story-icon" id={{id}}>
-          <div
-            class="rounded-circle story-icon-background {{#if closeFriend}} friend {{/if}} d-flex justify-content-center align-items-center"
-            data-bs-toggle="modal"
-            data-bs-target="#storyModal-{{user.id}}"
-          >
-            <img
-              src={{user.profileLink}}
-              alt=""
-              width="66"
-              height="66"
-              class="rounded-circle"
-            />
-          </div>
-      </div>
-      <div
-        class="modal fade overflow-hidden glassmorph"
-        id="storyModal-{{user.id}}"
-        tabindex="-1"
-        aria-hidden="true"
-        data-bs-backdrop="static"
-      >
-        <div class="modal-dialog modal-dialog-centered position-relative">
-          <div class="modal-content bg-transparent border-0">
-            <div class="modal-header border-0 d-flex flex-row justify-content-between">
-                <div>
-                  <img
-                    src={{user.profileLink}}
-                    alt=""
-                    width="32"
-                    height="32"
-                    class="rounded-circle"
-                  />
-                  <span>{{user.username}}</span>
-                  <span><svg
+      {{#each users as |user|}}
+        <div class="story-icon" id={{id}}>
+            <div
+              class="rounded-circle story-icon-background {{#if closeFriend}} friend {{/if}} d-flex justify-content-center align-items-center"
+              data-bs-toggle="modal"
+              data-bs-target="#storyModal-{{user.id}}"
+            >
+              <img
+                src={{user.profileLink}}
+                alt=""
+                width="66"
+                height="66"
+                class="rounded-circle"
+              />
+            </div>
+        </div>
+        <div
+          class="modal fade overflow-hidden glassmorph"
+          id="storyModal-{{user.id}}"
+          tabindex="-1"
+          aria-hidden="true"
+          data-bs-backdrop="static"
+        >
+          <div class="modal-dialog modal-dialog-centered position-relative">
+            <div class="modal-content bg-transparent border-0">
+              <div class="modal-header border-0 d-flex flex-column m-0 p-0">
+                <div class="d-flex flex-row justify-content-between w-100">
+                  <div>
+                    <img
+                      src={{user.profileLink}}
+                      alt=""
+                      width="32"
+                      height="32"
+                      class="rounded-circle"
+                    />
+                    <span>{{user.username}}</span>
+                    <span><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-dot"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                      </svg></span>
+                    <span>How old</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="bg-transparent border-0"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-dot"
+                      width="24"
+                      height="24"
+                      fill="white"
+                      class="bi bi-x-lg"
                       viewBox="0 0 16 16"
                     >
-                      <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-                    </svg></span>
-                  <span>How old</span>
+                      <path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                        stroke="white"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  class="bg-transparent border-0"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="white"
-                    class="bi bi-x-lg"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                      stroke="white"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-                </button>
-            </div>
-            <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
-              <div id="carouselStory-{{user.id}}" class="carousel carousel-dark slide w-100 h-100">
-                <div class="carousel-indicators top-0">
-                  {{#each stories}}
-                  <button type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class=" {{#if @first}} active {{/if}}"
-                  aria-current="{{#if @first}}true{{/if}}" 
-                  aria-label=`Slide {{@index}}`></button>
-                  {{/each}}
-                </div>
-                <div class="carousel-inner h-100 w-100">
-                  {{#each stories}}
-                  <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
-                    <div class="d-flex justify-content-center align-items-center h-100">
-                      {{#if isVideo}}
-                      <video controls src="{{url}}" class="d-block h-100 object-fit-cover"></video>
-                      {{else}}
-                      <img src="{{url}}" class="d-block h-100 object-fit-cover">
-                      {{/if}}
-                    </div>
-                  </div>
-                  {{/each}}
+                <div class="w-100 d-flex flex-row">
+                {{#with stories}}
+                <button type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class="{{#if @first}}active{{/if}}"
+                  aria-current="{{#if @first}}true{{/if}}"
+                  aria-label="Slide {{@index}}" width="{{../stories.length}}"></button>
+                  {{/with}}
                 </div>
               </div>
-              <button class="carousel-control-prev bg-white" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-              </button>
-              <button class="carousel-control-next ms-5" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-              </button>
-            </div>
-            <div class="modal-footer bg-transparent border-0 ps-0 pe-0 d-flex flex-row input-group">
-              <input
-              type="text"
-              name=""
-              id=""
-              class="form-control rounded rounded-3 text-dark m-0" 
-            />
-            <button class="btn bg-primary ms-2 rounded-3">Send</button> 
+              <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
+                <div id="carouselStory-{{user.id}}" class="carousel carousel-dark slide w-100 h-100">
+                  <div class="carousel-inner h-100 w-100">
+                    {{#each stories}}
+                    <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
+                      <div class="d-flex justify-content-center align-items-center h-100">
+                        {{#if isVideo}}
+                        <video controls src="{{url}}" class="d-block h-100 object-fit-cover"></video>
+                        {{else}}
+                        <img src="{{url}}" class="d-block h-100 object-fit-cover">
+                        {{/if}}
+                      </div>
+                    </div>
+                    {{/each}}
+                  </div>
+                </div>
+                <button class="carousel-control-prev bg-white" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next ms-5" type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+              <div class="modal-footer bg-transparent border-0 ps-0 pe-0 d-flex flex-row input-group">
+                <input
+                type="text"
+                name=""
+                id=""
+                class="form-control rounded rounded-3 text-dark m-0"
+              />
+              <button class="btn bg-primary ms-2 rounded-3">Send</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    {{/each}}
-  </script>
+      {{/each}}
+    </script>
   <script type="text/x-handlebars-template" id="post-template">
       {{#each post}}
         <div class="card bg-black post" data-post-id={{id}}>
@@ -395,7 +397,10 @@
               ></textarea>
             </form>
             <div class="d-flex flex-row">
-              <span class="me-2 text-primary sendQuickComment d-none" role="button">Post</span>
+              <span
+                class="me-2 text-primary sendQuickComment d-none"
+                role="button"
+              >Post</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"

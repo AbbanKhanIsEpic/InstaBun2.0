@@ -167,13 +167,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const carouselInner = modal.querySelector(".carousel-inner");
     const rightStory = modal.querySelector(".rightStory");
     const leftStory = modal.querySelector(".leftStory");
+    const lastIndex = carouselInner.childElementCount - 1;
+    const customCarouselIndicator = modal.getElementsByClassName(
+      "custom-carousel-indicator"
+    );
 
     rightStory.addEventListener("click", function () {
-      const lastIndex = carouselInner.childElementCount - 1;
       for (let index = 0; index < lastIndex; index++) {
         const currentStory = carouselInner.children[index];
         if (currentStory.classList.contains("active")) {
           carouselInner.children[index + 1].classList.toggle("active");
+          customCarouselIndicator[index + 1].classList.add("active");
           currentStory.classList.toggle("active");
           if (index == 0) {
             leftStory.classList.toggle("visually-hidden");
@@ -187,11 +191,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     leftStory.addEventListener("click", function () {
-      const lastIndex = carouselInner.childElementCount - 1;
       for (let index = 1; index <= lastIndex; index++) {
         const currentStory = carouselInner.children[index];
         if (currentStory.classList.contains("active")) {
           carouselInner.children[index - 1].classList.toggle("active");
+          customCarouselIndicator[index].classList.remove("active");
           currentStory.classList.toggle("active");
           if (index == 1) {
             leftStory.classList.toggle("visually-hidden");

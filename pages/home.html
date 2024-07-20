@@ -181,8 +181,7 @@
                 </div>
                 <div class="w-100 d-flex flex-row gap-1">
                 {{#each stories}}
-                <button type="button" data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class="border-0 custom-carousel-indicator mt-2 mb-2 {{#if @first}}active{{/if}}"
-                  aria-current="{{#if @first}}true{{/if}}"
+                <button data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class="border-0 custom-carousel-indicator mt-2 mb-2 {{#if @first}}active{{/if}}"
                   aria-label="Slide {{@index}}" style = "width : {{width ../stories.length}}"></button>
                   {{/each}}
                 </div>

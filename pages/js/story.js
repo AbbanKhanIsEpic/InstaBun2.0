@@ -5,8 +5,15 @@ document.addEventListener("DOMContentLoaded", function () {
   // Get the template source
   const templateSource = document.getElementById("story-template").innerHTML;
 
-  Handlebars.registerHelper("with", function (length) {
-    return length;
+  Handlebars.registerHelper("width", function (length) {
+    return 100 / length + "%";
+  });
+
+  Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
+    console.log(arg1);
+    console.log(arg2);
+    console.log(options);
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
   // Compile the template
@@ -43,10 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             isVideo: false,
             url: "https://cdn.theatlantic.com/thumbor/fWHNkP-IHxWP4gyI87XDAaiKPFU=/0x62:2000x1187/976x549/media/img/mt/2018/03/AP_325360162607/original.jpg",
-          },
-          {
-            isVideo: false,
-            url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
         ],
       },

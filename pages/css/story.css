@@ -41,5 +41,18 @@
   cursor: pointer;
 }
 
-.carousel-indicators > button.active {
+.custom-carousel-indicator:not(.active) {
+  background: gray;
+}
+
+.leftStory {
+  left: -60px !important;
+}
+
+.rightStory {
+  right: -60px !important;
+}
+
+.bi:hover {
+  fill: white;
 }

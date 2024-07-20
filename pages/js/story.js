@@ -10,9 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
-    console.log(arg1);
-    console.log(arg2);
-    console.log(options);
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
@@ -167,6 +164,46 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   Array.from(storiesModal).forEach((modal) => {
+    const carouselInner = modal.querySelector(".carousel-inner");
+    const rightStory = modal.querySelector(".rightStory");
+    const leftStory = modal.querySelector(".leftStory");
+
+    rightStory.addEventListener("click", function () {
+      const lastIndex = carouselInner.childElementCount - 1;
+      for (let index = 0; index < lastIndex; index++) {
+        const currentStory = carouselInner.children[index];
+        if (currentStory.classList.contains("active")) {
+          carouselInner.children[index + 1].classList.toggle("active");
+          currentStory.classList.toggle("active");
+          if (index == 0) {
+            leftStory.classList.toggle("visually-hidden");
+          }
+          if (index + 1 == lastIndex) {
+            rightStory.classList.toggle("visually-hidden");
+          }
+          break;
+        }
+      }
+    });
+
+    leftStory.addEventListener("click", function () {
+      const lastIndex = carouselInner.childElementCount - 1;
+      for (let index = 1; index <= lastIndex; index++) {
+        const currentStory = carouselInner.children[index];
+        if (currentStory.classList.contains("active")) {
+          carouselInner.children[index - 1].classList.toggle("active");
+          currentStory.classList.toggle("active");
+          if (index == 1) {
+            leftStory.classList.toggle("visually-hidden");
+          }
+          if (index == lastIndex) {
+            rightStory.classList.toggle("visually-hidden");
+          }
+          break;
+        }
+      }
+    });
+
     modal.addEventListener("hidden.bs.modal", function (event) {
       const videos = modal.querySelectorAll("video");
       for (const video of videos) {

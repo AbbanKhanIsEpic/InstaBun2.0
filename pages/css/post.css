@@ -16,8 +16,8 @@
 .contentContainer video,
 .contentContainer img {
   width: 470px;
-  height: auto;
-  max-height: 700px;
+  height: 500px;
+  object-fit: contain;
 }
 
 textarea {

@@ -56,3 +56,7 @@
 .bi:hover {
   fill: white;
 }
+
+.custom-carousel-indicator.active {
+  background-color: white;
+}

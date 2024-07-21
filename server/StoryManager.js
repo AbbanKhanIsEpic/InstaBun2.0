@@ -45,15 +45,14 @@ class StoryManager {
             instabun.Follows
             WHERE
               (FollowerID = ?
-              AND FollowingID = Users.UserID)
-              OR (FollowerID = Users.UserID
+              AND FollowingID = Users.userID)
+              OR (FollowerID = Users.userID
               AND FollowingID = ?))
           AS Status,
         Story.isVideo,
-        Story.UserID,
-        Story.idStory,
-        Story.StoryLink,
-        Story.Title,
+        Story.userID,
+        Story.storyID,
+        Story.storyLink,
         Users.ProfileIconLink
     FROM
         Story

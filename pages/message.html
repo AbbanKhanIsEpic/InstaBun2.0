@@ -343,7 +343,7 @@
                 <div class="modal-body d-flex w-100 flex-column m-0 p-0 overflow-y-scroll" id="hiddenMessageList">
                 </div>
                 <div class="modal-footer w-100 p-0 border-0">
-                    <button class="btn btn-primary w-100">Chat</button>
+                    <button class="btn btn-primary w-100 visually-hidden">Chat</button>
                 </div>
             </div>
         </div>
@@ -352,13 +352,13 @@
       {{#each users as |user|}}
       <div class="d-flex justify-content-between w-100 user">
         <div class="w-100 ps-4 d-flex flex-row align-items-center">
-            <img src="{{user.profileIcon}}" alt="" width="44" height="44"
+            <img src={{user.profileIcon}} alt="" width="44" height="44"
                 class="rounded-circle me-2" />
             <div class="d-flex flex-column">
                 <span>
-                    {{user.displayName}}
+                    {{user.DisplayName}}
                 </span>
-                <span class="text-white-50">{{user.username}}</span>
+                <span class="text-white-50">{{user.Username}}</span>
             </div>
         </div>
         <div class="checkboxContainer d-flex align-items-center position-relative me-3">

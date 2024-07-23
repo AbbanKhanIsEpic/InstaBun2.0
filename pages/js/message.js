@@ -36,31 +36,7 @@ async function displayUserList() {
   // Compile the template
   const template = Handlebars.compile(templateSource);
   console.log(searchUsersInput.value);
-  console.log(await getUserList(searchUsersInput.value));
-
-  // Define the data
-  const data = {
-    users: [
-      {
-        username: "King",
-        displayName: "Balls",
-        profileIcon:
-          "https://www.wfla.com/wp-content/uploads/sites/71/2023/05/GettyImages-1389862392.jpg?w=876&h=493&crop=1",
-      },
-      {
-        username: "King",
-        displayName: "Balls",
-        profileIcon:
-          "https://www.wfla.com/wp-content/uploads/sites/71/2023/05/GettyImages-1389862392.jpg?w=876&h=493&crop=1",
-      },
-      {
-        username: "King",
-        displayName: "Balls",
-        profileIcon:
-          "https://www.wfla.com/wp-content/uploads/sites/71/2023/05/GettyImages-1389862392.jpg?w=876&h=493&crop=1",
-      },
-    ],
-  };
+  const data = await getUserList(searchUsersInput.value);
 
   // Render the template with data
   const htmlOutput = template(data);
@@ -68,14 +44,12 @@ async function displayUserList() {
   // Insert the HTML into the DOM
   userList.innerHTML = htmlOutput;
 
-  const users = userList.getElementsByClassName("user");
+  const users = document.getElementsByClassName("user");
 
   Array.from(users).forEach((user) => {
-    //const
-    const checkmark = user.getElementsByTagName("svg")[0];
-    const checkbox = user.getElementsByTagName("input")[0];
-    //Event listerns
-    checkbox.addEventListener("click", function () {
+    const checkbox = user.querySelector("input[type=checkbox]");
+    const checkmark = user.querySelector(".checkmark > svg");
+    checkbox.addEventListener("change", function () {
       checkmark.classList.toggle("d-none");
     });
   });
@@ -85,12 +59,13 @@ async function getUserList(searchQuery) {
   const server = "http://127.0.0.1:5000/api/user/search";
   const query = `?searchQuery=${encodeURIComponent(
     searchQuery
-  )}&userPerPage=${encodeURIComponent(4)}&page=${encodeURIComponent(1)}`;
+  )}&userPerPage=${encodeURIComponent(4)}&page=${encodeURIComponent(0)}`;
 
   let result;
   await fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
+      console.log(data["users"]);
       result = data;
     });
   return result;

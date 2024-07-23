@@ -24,7 +24,8 @@
 #messageBar {
   height: 74px;
 }
-#userList {
+#userList,
+#hiddenMessageList {
   height: 240px;
 }
 .user {

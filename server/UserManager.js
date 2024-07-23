@@ -156,15 +156,19 @@ class UserManager {
   async getListOfUsers(searchQuery, userPerPage, page) {
     //The apart of the username could be in the front, end or middle
     //This is to give a better result
+    userPerPage = parseInt(userPerPage);
     searchQuery = "%" + searchQuery + "%";
+    console.log(searchQuery);
     try {
       const query = `SELECT Username,DisplayName,profileIcon FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ?,?;`;
       const result = await select(query, [
         searchQuery,
         searchQuery,
         page * userPerPage,
-        int(userPerPage),
+        userPerPage,
       ]);
+      console.log(query);
+      console.log(result);
       return result;
     } catch (error) {
       return error;

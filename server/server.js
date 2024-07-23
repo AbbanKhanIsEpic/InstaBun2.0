@@ -220,7 +220,7 @@ app.get("/api/user/search", (req, res) => {
     user
       .getListOfUsers(searchQuery, userPerPage, page)
       .then((jsonifiedResult) => {
-        res.status(200).send(jsonifiedResult);
+        res.status(200).send({ users: jsonifiedResult });
       })
       .catch((error) => {
         console.error(error);

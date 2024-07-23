@@ -2,15 +2,23 @@
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const messageTextArea = document.querySelector("#messageTextArea");
 const userList = document.getElementById("userList");
+const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
 
 const sendMessage = document.querySelector("#sendMessage");
+
+const selectedArray = [
+  { DisplayName: "balls" },
+  { DisplayName: "balls" },
+  { DisplayName: "balls" },
+  { DisplayName: "balls" },
+];
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
   const keywords = searchUsersInput.value;
   //Only display the list after 500ms -> user stop typing
   setTimeout(function () {
-    if (keywords.length > searchUsersInput.value) {
+    if (keywords !== searchUsersInput.value) {
       userList.innerHTML = "";
     } else if (keywords == searchUsersInput.value) {
       displayUserList();
@@ -47,10 +55,58 @@ async function displayUserList() {
   const users = document.getElementsByClassName("user");
 
   Array.from(users).forEach((user) => {
+    const displayName = user.querySelector(
+      '[aria-label="display name"]'
+    ).textContent;
+    console.log(displayName);
     const checkbox = user.querySelector("input[type=checkbox]");
     const checkmark = user.querySelector(".checkmark > svg");
     checkbox.addEventListener("change", function () {
+      const isSelected = user.classList.contains("selected");
+      if (isSelected) {
+        user.classList.remove("selected");
+        selectedArray.pop(displayName);
+      } else {
+        user.classList.add("selected");
+        selectedArray.push({ DisplayName: displayName });
+      }
+      console.log(selectedArray);
+      displaySelectedUsers(selectedArray);
       checkmark.classList.toggle("d-none");
+    });
+  });
+}
+
+function displaySelectedUsers(selectedArray) {
+  // Get the template source
+  const templateSource = document.getElementById(
+    "selected-user-template"
+  ).innerHTML;
+
+  // Compile the template
+  const template = Handlebars.compile(templateSource);
+  console.log(searchUsersInput.value);
+  const data = { users: selectedArray };
+
+  console.log(data);
+
+  // Render the template with data
+  const htmlOutput = template(data);
+
+  // Insert the HTML into the DOM
+  showcaseSelectedUsers.innerHTML = htmlOutput;
+
+  const selectedUsers =
+    showcaseSelectedUsers.getElementsByClassName("selectedUser");
+
+  Array.from(selectedUsers).forEach((selectedUser) => {
+    const closeButton = selectedUser.querySelector(".btn-close");
+    const displayName = selectedUser.querySelector(
+      'span[aria-label="display name"]'
+    ).textContent;
+    closeButton.addEventListener("click", function () {
+      selectedArray.pop(displayName);
+      displaySelectedUsers(selectedArray);
     });
   });
 }
@@ -65,7 +121,6 @@ async function getUserList(searchQuery) {
   await fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data["users"]);
       result = data;
     });
   return result;

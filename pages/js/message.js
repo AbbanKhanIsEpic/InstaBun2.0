@@ -6,19 +6,38 @@ const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
 
 const sendMessage = document.querySelector("#sendMessage");
 
+const startConversationButton = document.querySelector(
+  "#startConversationButton"
+);
+
 const selectedArray = [];
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
-  const keywords = searchUsersInput.value;
+  const keywords = searchUsersInput.value.trim();
   //Only display the list after 500ms -> user stop typing
   setTimeout(function () {
-    if (keywords !== searchUsersInput.value) {
+    if (keywords !== searchUsersInput.value || keywords.length == 0) {
       userList.innerHTML = "";
     } else if (keywords == searchUsersInput.value) {
       displayUserList();
     }
   }, 500);
+});
+
+startConversationButton.addEventListener("click", function () {
+  const numSelected = selectedArray.length;
+  const hasSelectedSelf =
+    selectedArray.findIndex(function (selected) {
+      return selected.id == userID;
+    }) != -1;
+  if (numSelected == 0) {
+    alert("You need to select someone to message to");
+  } else if (numSelected == 1) {
+  } else if (hasSelectedSelf) {
+    alert("You can not select yourself as another member in a group");
+  } else {
+  }
 });
 
 messageTextArea.addEventListener("input", function () {

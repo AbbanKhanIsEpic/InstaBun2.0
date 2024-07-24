@@ -43,7 +43,7 @@ hr {
 }
 
 .interactions {
-  max-height: 700px;
+  height: 500px;
 }
 
 @keyframes beat {

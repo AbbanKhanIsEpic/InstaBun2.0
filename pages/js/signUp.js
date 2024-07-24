@@ -163,6 +163,8 @@ registerButton.addEventListener("click", async function () {
       if (codeInput.value == code) {
         await createAccount(username, emailAddress, password);
         await createUserSession(username, 30);
+        window.open("http://127.0.0.1:5500/pages/home.html", "_self");
+        
       } else {
         verifyError.textContent = "Make sure to enter the code correctly";
         codeInput.style.borderColor = "red";

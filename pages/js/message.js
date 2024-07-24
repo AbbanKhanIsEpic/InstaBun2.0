@@ -6,12 +6,7 @@ const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
 
 const sendMessage = document.querySelector("#sendMessage");
 
-const selectedArray = [
-  { DisplayName: "balls" },
-  { DisplayName: "balls" },
-  { DisplayName: "balls" },
-  { DisplayName: "balls" },
-];
+const selectedArray = [];
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
@@ -55,9 +50,10 @@ async function displayUserList() {
   const users = document.getElementsByClassName("user");
 
   Array.from(users).forEach((user) => {
-    const displayName = user.querySelector(
-      '[aria-label="display name"]'
-    ).textContent;
+    const id = user.id;
+    const displayName = user
+      .querySelector('[aria-label="display name"]')
+      .textContent.trim();
     console.log(displayName);
     const checkbox = user.querySelector("input[type=checkbox]");
     const checkmark = user.querySelector(".checkmark > svg");
@@ -65,10 +61,14 @@ async function displayUserList() {
       const isSelected = user.classList.contains("selected");
       if (isSelected) {
         user.classList.remove("selected");
-        selectedArray.pop(displayName);
+        const index = selectedArray.findIndex(function (selected) {
+          return selected.id == id;
+        });
+        selectedArray.splice(index, 1);
       } else {
         user.classList.add("selected");
-        selectedArray.push({ DisplayName: displayName });
+        selectedArray.push({ id: id, DisplayName: displayName });
+        console.log(selectedArray);
       }
       console.log(selectedArray);
       displaySelectedUsers(selectedArray);
@@ -85,7 +85,6 @@ function displaySelectedUsers(selectedArray) {
 
   // Compile the template
   const template = Handlebars.compile(templateSource);
-  console.log(searchUsersInput.value);
   const data = { users: selectedArray };
 
   console.log(data);
@@ -101,11 +100,14 @@ function displaySelectedUsers(selectedArray) {
 
   Array.from(selectedUsers).forEach((selectedUser) => {
     const closeButton = selectedUser.querySelector(".btn-close");
-    const displayName = selectedUser.querySelector(
-      'span[aria-label="display name"]'
-    ).textContent;
+    const id = selectedUser.id;
+    console.log(id);
     closeButton.addEventListener("click", function () {
-      selectedArray.pop(displayName);
+      const index = selectedArray.findIndex(function (selected) {
+        return selected.id == id;
+      });
+      selectedArray.splice(index, 1);
+      console.log(selectedArray);
       displaySelectedUsers(selectedArray);
     });
   });

@@ -160,7 +160,7 @@ class UserManager {
     searchQuery = "%" + searchQuery + "%";
     console.log(searchQuery);
     try {
-      const query = `SELECT Username,DisplayName,profileIcon FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ?,?;`;
+      const query = `SELECT userID,Username,DisplayName,profileIcon FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ?,?;`;
       const result = await select(query, [
         searchQuery,
         searchQuery,

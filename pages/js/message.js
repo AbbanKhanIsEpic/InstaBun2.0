@@ -50,13 +50,24 @@ async function displayUserList() {
   const users = document.getElementsByClassName("user");
 
   Array.from(users).forEach((user) => {
-    const id = user.id;
+    const id = user.id.split("-")[1];
     const displayName = user
       .querySelector('[aria-label="display name"]')
       .textContent.trim();
-    console.log(displayName);
     const checkbox = user.querySelector("input[type=checkbox]");
     const checkmark = user.querySelector(".checkmark > svg");
+
+    const isAlreadySelected =
+      selectedArray.findIndex(function (selected) {
+        return selected.id == id;
+      }) != -1;
+
+    if (isAlreadySelected) {
+      user.classList.add("selected");
+      checkmark.classList.toggle("d-none");
+      checkbox.value = "on";
+    }
+
     checkbox.addEventListener("change", function () {
       const isSelected = user.classList.contains("selected");
       if (isSelected) {
@@ -68,9 +79,7 @@ async function displayUserList() {
       } else {
         user.classList.add("selected");
         selectedArray.push({ id: id, DisplayName: displayName });
-        console.log(selectedArray);
       }
-      console.log(selectedArray);
       displaySelectedUsers(selectedArray);
       checkmark.classList.toggle("d-none");
     });
@@ -100,14 +109,21 @@ function displaySelectedUsers(selectedArray) {
 
   Array.from(selectedUsers).forEach((selectedUser) => {
     const closeButton = selectedUser.querySelector(".btn-close");
-    const id = selectedUser.id;
-    console.log(id);
+    const id = selectedUser.id.split("-")[1];
+
     closeButton.addEventListener("click", function () {
       const index = selectedArray.findIndex(function (selected) {
         return selected.id == id;
       });
       selectedArray.splice(index, 1);
-      console.log(selectedArray);
+
+      const deSelectedUser = document.querySelector(`#user-${id}`);
+      const checkbox = deSelectedUser.querySelector("input[type=checkbox]");
+      const checkmark = deSelectedUser.querySelector(".checkmark > svg");
+      deSelectedUser.classList.remove("selected");
+      checkmark.classList.toggle("d-none");
+      checkbox.value = "off";
+
       displaySelectedUsers(selectedArray);
     });
   });

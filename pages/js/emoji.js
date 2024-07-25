@@ -1,8 +1,6 @@
-const emojiMap = new Map();
-
 getEmoji();
 
-function displayEmojies() {
+function displayEmojies(data) {
   // Get the template source
   const templateSource = document.getElementById(
     "emoji-button-template"
@@ -11,7 +9,7 @@ function displayEmojies() {
   // Compile the template
   const template = Handlebars.compile(templateSource);
 
-  const data = Object.fromEntries(emojiMap);
+  data = Object.fromEntries(data);
 
   // Render the template with data
   const htmlOutput = template({ emojiObject: data });
@@ -23,7 +21,7 @@ function displayEmojies() {
 }
 
 async function getEmoji() {
-  fetch("https://emoji.gg/api/")
+  fetch("https://api.emojisworld.fr/v1/popular")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -31,13 +29,13 @@ async function getEmoji() {
       return response.json();
     })
     .then((emojis) => {
-      Object.entries(emojis).map((emoji) => {
-        const key = emoji[1]["title"];
-        const value = emoji[1]["image"];
+      const emojiMap = new Map();
+      Object.entries(emojis["results"]).map((emoji) => {
+        const key = emoji[1]["name"];
+        const value = emoji[1]["emoji"];
         emojiMap.set(key, value);
       });
-      console.log(emojiMap);
-      displayEmojies();
+      displayEmojies(emojiMap);
     })
     .catch((error) => {
       console.error("Error:", error);

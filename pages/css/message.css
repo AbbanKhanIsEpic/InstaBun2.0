@@ -32,6 +32,11 @@
 .bi-emoji-smile {
   cursor: pointer;
 }
+.emoji {
+  font-size: 30px;
+  vertical-align: middle;
+  line-height: 2;
+}
 .user {
   min-height: 60px;
   max-height: 60px;

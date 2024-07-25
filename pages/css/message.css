@@ -25,8 +25,12 @@
   height: 74px;
 }
 #userList,
+#emojiList,
 #hiddenMessageList {
   height: 240px;
+}
+.bi-emoji-smile {
+  cursor: pointer;
 }
 .user {
   min-height: 60px;

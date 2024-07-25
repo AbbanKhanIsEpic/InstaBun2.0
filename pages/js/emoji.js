@@ -1,6 +1,12 @@
 getEmoji();
 
 function displayEmojies(data) {
+  let emojis = document.querySelectorAll(".emoji");
+  Array.from(emojis).forEach((emoji) => {
+    emoji.removeEventListener("click", function () {
+      messageTextArea.innerHTML += emoji.innerHTML;
+    });
+  });
   // Get the template source
   const templateSource = document.getElementById(
     "emoji-button-template"
@@ -18,6 +24,13 @@ function displayEmojies(data) {
 
   // Insert the HTML into the DOM
   document.getElementById("emojiList").innerHTML = htmlOutput;
+
+  emojis = document.querySelectorAll(".emoji");
+  Array.from(emojis).forEach((emoji) => {
+    emoji.addEventListener("click", function () {
+      messageTextArea.innerHTML += emoji.innerHTML;
+    });
+  });
 }
 
 async function getEmoji() {

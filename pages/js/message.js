@@ -37,6 +37,7 @@ startConversationButton.addEventListener("click", function () {
   } else if (hasSelectedSelf) {
     alert("You can not select yourself as another member in a group");
   } else {
+    createGroup(userID, selectedArray);
   }
 });
 
@@ -137,11 +138,13 @@ function displaySelectedUsers(selectedArray) {
       selectedArray.splice(index, 1);
 
       const deSelectedUser = document.querySelector(`#user-${id}`);
-      const checkbox = deSelectedUser.querySelector("input[type=checkbox]");
-      const checkmark = deSelectedUser.querySelector(".checkmark > svg");
-      deSelectedUser.classList.remove("selected");
-      checkmark.classList.toggle("d-none");
-      checkbox.value = "off";
+      if (deSelectedUser !== null) {
+        const checkbox = deSelectedUser.querySelector("input[type=checkbox]");
+        const checkmark = deSelectedUser.querySelector(".checkmark > svg");
+        deSelectedUser.classList.remove("selected");
+        checkmark.classList.toggle("d-none");
+        checkbox.value = "off";
+      }
 
       displaySelectedUsers(selectedArray);
     });
@@ -161,4 +164,23 @@ async function getUserList(searchQuery) {
       result = data;
     });
   return result;
+}
+
+function createGroup(userID, groupMembers) {
+  const server = "http://127.0.0.1:5000/api/group/create";
+  const data = { userID, groupMembers };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Login failed:", error.message);
+    });
 }

@@ -42,10 +42,13 @@ class GroupManager {
   }
 
   //Create a new group
-  async createGroup(createrUserID, groupName, groupIcon, groupMembers) {
+  async createGroup(createrUserID, groupMembers) {
+    console.log(groupMembers["DisplayName"]);
+    console.log(JSON.stringify(groupMembers));
+    return;
     try {
-      const query = `INSERT INTO Collective (OwnerID,GroupName, GroupIconLink) VALUES (?,?, ?);`;
-      await update(query, [createrUserID, groupName, groupIcon]);
+      const query = `INSERT INTO instabun.group (ownerID,groupName) VALUES (?,?);`;
+      await update(query, [createrUserID, groupMembers.toString()]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
       const groupID = await this.#getLatestGroupID(createrUserID);
@@ -60,7 +63,7 @@ class GroupManager {
   //Add member to the group
   async addMember(groupID, groupMemberID) {
     try {
-      const query = `INSERT INTO GroupMembers (GroupID, UserID) VALUES (?, ?);`;
+      const query = `INSERT INTO groupMembers (groupID, userID) VALUES (?, ?);`;
       await update(query, [groupID, groupMemberID]);
       return "Add member operation successful";
     } catch (error) {
@@ -82,9 +85,9 @@ class GroupManager {
   //Get the latest group's id
   async #getLatestGroupID(createrUserID) {
     try {
-      const query = `SELECT GroupID FROM instabun.Collective WHERE OwnerID = ? Order by GroupID DESC LIMIT 1;`;
+      const query = `SELECT GroupID FROM instabun.group WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
-      return result.GroupID;
+      return result.groupID;
     } catch (error) {
       return error;
     }

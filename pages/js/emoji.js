@@ -1,6 +1,7 @@
 getPopularEmoji();
 
 const emojiSearch = document.querySelector("#emojiSearch");
+const emojiSelector = document.querySelector("#emojiSelector");
 
 emojiSearch.addEventListener("input", function () {
   const keywords = emojiSearch.value.trim();
@@ -46,6 +47,7 @@ function displayEmojies(data) {
   emojis = document.querySelectorAll(".emoji");
   Array.from(emojis).forEach((emoji) => {
     emoji.addEventListener("click", function () {
+      console.log(messageTextArea);
       messageTextArea.innerHTML += emoji.innerHTML;
     });
   });

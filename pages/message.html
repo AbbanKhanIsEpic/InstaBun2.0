@@ -286,7 +286,8 @@
                             </svg>
                         </div>
                         <textarea name="text" id="messageTextArea" rows="1"
-                            class="text-white bg-black border-0 d-flex form-control" placeholder="Message"></textarea>
+                            class="text-white bg-black border-0 d-flex form-control ps-0 pe-0 me-0 ms-0"
+                            placeholder="Message"></textarea>
                         <div class="input-group-text bg-transparent border-0 d-flex text-primary invisible"
                             id="sendMessage">
                             Post
@@ -407,7 +408,8 @@
     </script>
     <script type="text/x-handlebars-template" id="emoji-button-template">
         {{#each emojiObject}}
-        <div class="btn d-flex"><span class="emoji">{{this}}</span></div>
+        <div class="emojiBtn d-flex justify-content-center align-items-center user-select-none"><div class="emoji d-flex rounded-2" data-bs-dismiss="modal"
+            data-bs-target="#emojiSelector">{{this}}</div></div>
         {{/each}}
     </script>
     <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

@@ -37,7 +37,18 @@ startConversationButton.addEventListener("click", function () {
   } else if (hasSelectedSelf) {
     alert("You can not select yourself as another member in a group");
   } else {
-    createGroup(userID, selectedArray);
+    const selectedUserID = [];
+    let groupName = "";
+    selectedArray.forEach((selectedUser, index) => {
+      console.log(selectedUser);
+      selectedUserID.push(selectedUser["id"]);
+      groupName +=
+        index == selectedArray.length - 1
+          ? selectedUser["DisplayName"]
+          : selectedUser["DisplayName"] + ", ";
+    });
+    selectedUserID.push(userID);
+    createGroup(userID, groupName, selectedUserID);
   }
 });
 
@@ -166,9 +177,9 @@ async function getUserList(searchQuery) {
   return result;
 }
 
-function createGroup(userID, groupMembers) {
+function createGroup(userID, groupName, groupMembers) {
   const server = "http://127.0.0.1:5000/api/group/create";
-  const data = { userID, groupMembers };
+  const data = { userID, groupName, groupMembers };
 
   fetch(server, {
     method: "POST",

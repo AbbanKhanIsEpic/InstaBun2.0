@@ -879,10 +879,11 @@ app.post("/api/group/delete", (req, res) => {
 
 app.post("/api/group/create", (req, res) => {
   const userID = req.body.userID;
+  const groupName = req.body.groupName;
   const groupMembers = req.body.groupMembers;
 
   const groupManager = new GroupManager();
-  groupManager.createGroup(userID, groupMembers);
+  groupManager.createGroup(userID, groupName, groupMembers);
   res.json({ message: "Data received and processed successfully" });
 });
 

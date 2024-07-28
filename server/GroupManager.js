@@ -1,6 +1,8 @@
 //Imports
 const { select, update } = require("./DB");
 const GroupMessage = require("./GroupMessage");
+const defaultGroupIcon =
+  "https://i.pinimg.com/564x/46/db/9e/46db9ee3d4b3323457222bb8db7f3b42.jpg";
 
 class GroupManager {
   //Return a list of groups that the user(userID) is in
@@ -11,7 +13,7 @@ class GroupManager {
     INNER JOIN 
     Collective ON Collective.GroupID = GroupMembers.GroupID
     WHERE
-        GroupMembers.UserID = ?;`;
+        GroupMembers.memberID = ?;`;
       const result = await select(query, [userID]);
       return result;
     } catch (error) {
@@ -42,13 +44,10 @@ class GroupManager {
   }
 
   //Create a new group
-  async createGroup(createrUserID, groupMembers) {
-    console.log(groupMembers["DisplayName"]);
-    console.log(JSON.stringify(groupMembers));
-    return;
+  async createGroup(createrUserID, groupName, groupMembers) {
     try {
-      const query = `INSERT INTO instabun.group (ownerID,groupName) VALUES (?,?);`;
-      await update(query, [createrUserID, groupMembers.toString()]);
+      const query = `INSERT INTO instabun.group (ownerID,groupName,groupProfileIcon) VALUES (?,?,?);`;
+      await update(query, [createrUserID, groupName, defaultGroupIcon]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
       const groupID = await this.#getLatestGroupID(createrUserID);
@@ -63,7 +62,7 @@ class GroupManager {
   //Add member to the group
   async addMember(groupID, groupMemberID) {
     try {
-      const query = `INSERT INTO groupMembers (groupID, userID) VALUES (?, ?);`;
+      const query = `INSERT INTO groupMembers (groupID, memberID) VALUES (?, ?);`;
       await update(query, [groupID, groupMemberID]);
       return "Add member operation successful";
     } catch (error) {
@@ -85,9 +84,9 @@ class GroupManager {
   //Get the latest group's id
   async #getLatestGroupID(createrUserID) {
     try {
-      const query = `SELECT GroupID FROM instabun.group WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
+      const query = `SELECT groupID FROM instabun.group WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
-      return result.groupID;
+      return result["groupID"];
     } catch (error) {
       return error;
     }

@@ -36,6 +36,9 @@
   font-size: 32px;
   vertical-align: middle !important;
 }
+#messageTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
+  content: attr(data-placeholder);
+}
 .emojiBtn {
   cursor: pointer;
   width: 48px;

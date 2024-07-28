@@ -53,7 +53,7 @@ startConversationButton.addEventListener("click", function () {
 });
 
 messageTextArea.addEventListener("input", function () {
-  if (messageTextArea.value.length == 0) {
+  if (messageTextArea.childNodes.length == 0) {
     sendMessage.classList.add("invisible");
   } else {
     sendMessage.classList.remove("invisible");

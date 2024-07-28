@@ -47,8 +47,8 @@ function displayEmojies(data) {
   emojis = document.querySelectorAll(".emoji");
   Array.from(emojis).forEach((emoji) => {
     emoji.addEventListener("click", function () {
-      console.log(messageTextArea);
       messageTextArea.innerHTML += emoji.innerHTML;
+      sendMessage.classList.remove("invisible");
     });
   });
 }

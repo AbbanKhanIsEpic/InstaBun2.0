@@ -84,6 +84,7 @@ async function getSearchedEmoji(query) {
       return response.json();
     })
     .then((emojis) => {
+      console.log(emojis)
       const emojiMap = new Map();
       Object.entries(emojis["results"]).map((emoji) => {
         const key = emoji[1]["name"];

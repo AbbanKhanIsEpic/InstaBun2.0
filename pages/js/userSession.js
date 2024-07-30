@@ -1,6 +1,6 @@
 let userID = null;
 
-checkUserSession();
+//checkUserSession();
 
 async function createUserSession(userIdentifier, expirationDays) {
   try {

@@ -12,7 +12,7 @@ const startConversationButton = document.querySelector(
 
 const selectedArray = [];
 
-displayMessageLists(userID);
+document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
@@ -209,15 +209,28 @@ async function displayMessageLists(userID) {
 
   const data = { messageList: await getMessageLists(userID) };
 
-  console.log(data);
-
   // Render the template with data
   const htmlOutput = template(data);
 
-  console.log(htmlOutput);
-
   // Insert the HTML into the DOM
   document.getElementById("messageColumn").innerHTML += htmlOutput;
+
+  const messageSelections = document.querySelectorAll(".message");
+
+  let selectedMessage;
+
+  Array.from(messageSelections).forEach((messageSelection) => {
+    //Kinda weird that these variables are created again when I click the addEventListener
+    let x = 5;
+    messageSelection.addEventListener("click", function () {
+      console.log(x);
+      if (selectedMessage != undefined) {
+        selectedMessage.classList.remove("selected");
+      }
+      messageSelection.classList.add("selected");
+      selectedMessage = messageSelection;
+    });
+  });
 }
 
 async function getMessageLists(userID) {

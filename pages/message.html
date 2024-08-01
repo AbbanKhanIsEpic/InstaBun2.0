@@ -86,7 +86,7 @@
             </div>
         </div>
         <div id="contentPage" class="col vh-100 w-100 d-flex flex-row">
-            <div id="messageColumn" class="border-end border-dark overflow-y-auto user-select-none">
+            <div id="messageColumn" class="border-end border-dark overflow-y-auto user-select-none overflow-x-hidden">
                 <div class="border-bottom border-dark pt-2 ps-2 pb-2" data-bs-toggle="modal"
                     data-bs-target="#newMessageModal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -349,20 +349,20 @@
     </script>
     <script type="text/x-handlebars-template" id="message-selection-template">
        {{#each messageList}}
-       <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-        <img src="https://i.pinimg.com/originals/1f/17/ad/1f17ad2c6a5b1ba8918b80871aac5f9a.jpg" alt=""
+       <div class="message ps-2 d-flex flex-row align-items-center">
+        <img src="{{profileIcon}}" alt="profile icon"
             width="56" height="56" class="rounded-circle me-2" />
-        <div class="d-flex flex-column">
-            <span class="ellipsis">
+        <div class="d-flex flex-column w-100">
+            <div class="ellipsis">
                 {{#if groupName}}
                 {{groupName}}
                 {{else}}
                 {{DisplayName}}
                 {{/if}}
-            </span>
-            <span class="text-white-50 ellipsis w">   {{#if DisplayName}}
+            </div>
+            <div class="text-white-50 ellipsis"> {{#if DisplayName}}
                 {{DisplayName}} said: {{message}}
-                {{/if}}</span>
+                {{/if}}</div>
         </div>
         </div>
        {{/each}}

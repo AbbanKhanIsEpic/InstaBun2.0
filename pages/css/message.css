@@ -1,10 +1,17 @@
 .message {
   height: 72px;
+  width: 100%;
+}
+.ellipsis {
+  width: 250px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis !important;
 }
 #messageColumn {
   width: 500px;
 }
-#messageColumn > :hover {
+#messageColumn > :hover:not(.selected) {
   background: #1a1a1a;
   cursor: pointer;
 }

@@ -39,7 +39,7 @@
 #messageTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
   content: attr(data-placeholder);
 }
-#messageTextArea{
+#messageTextArea {
   height: 36px;
 }
 .emojiBtn {
@@ -66,12 +66,12 @@ textarea::placeholder {
   box-shadow: none;
 }
 
-.sendMessageDirect,
-.recieveMessageDirect {
+.sendMessage,
+.recieveMessage {
   max-width: 50%;
 }
 
-#sendMessageBtn{
+#sendMessageBtn {
   cursor: pointer;
 }
 

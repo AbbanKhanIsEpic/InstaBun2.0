@@ -12,6 +12,8 @@ const startConversationButton = document.querySelector(
 
 const selectedArray = [];
 
+displayMessageLists(userID);
+
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
   const keywords = searchUsersInput.value.trim();
@@ -194,4 +196,39 @@ function createGroup(userID, groupName, groupMembers) {
     .catch((error) => {
       console.error("Login failed:", error.message);
     });
+}
+
+async function displayMessageLists(userID) {
+  // Get the template source
+  const templateSource = document.getElementById(
+    "message-selection-template"
+  ).innerHTML;
+
+  // Compile the template
+  const template = Handlebars.compile(templateSource);
+
+  const data = { messageList: await getMessageLists(userID) };
+
+  console.log(data);
+
+  // Render the template with data
+  const htmlOutput = template(data);
+
+  console.log(htmlOutput);
+
+  // Insert the HTML into the DOM
+  document.getElementById("messageColumn").innerHTML += htmlOutput;
+}
+
+async function getMessageLists(userID) {
+  const server = "http://127.0.0.1:5000/api/message/list";
+  const query = `?userID=${encodeURIComponent(userID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
 }

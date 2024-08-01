@@ -17,6 +17,7 @@ const GroupManager = require("./GroupManager");
 const GroupMessage = require("./GroupMessage");
 const CommentManager = require("./CommentManager");
 const EmailManager = require("./EmailManager");
+const MessageManager = require("./MessageManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -669,7 +670,25 @@ app.post("/api/story/createStory", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-//Direct
+//Message
+
+app.get("/api/message/list", (req, res) => {
+  const { userID } = req.query;
+
+  console.log("Hi");
+
+  const messageManager = new MessageManager();
+
+  messageManager
+    .getMessageList(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
 
 app.get("/api/direct/permission", (req, res) => {
   const { senderID, receiverID } = req.query;
@@ -886,6 +905,8 @@ app.post("/api/group/create", (req, res) => {
   groupManager.createGroup(userID, groupName, groupMembers);
   res.json({ message: "Data received and processed successfully" });
 });
+
+//Comment
 
 app.post("/api/comment/like", (req, res) => {
   const userID = req.body.userID;

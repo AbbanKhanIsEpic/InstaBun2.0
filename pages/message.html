@@ -15,7 +15,8 @@
 
 <body class="container-fluid min-vh-100 min-vw-100 overflow-hidden m-0 p-0 text-white text-decoration-none">
     <div class="row row-cols grid content">
-        <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0 user-select-none" id="sideBar">
+        <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0 user-select-none"
+            id="sideBar">
             <div class="d-flex flex-row justify-content-between mt-2 ms-4 me-2">
                 <span class="fs-3 d-flex name user-select-none align-self-end"> Instabun </span>
                 <!--When sidebar closes, the button does not really works for some reason-->
@@ -114,99 +115,8 @@
                     </svg>
                     <span>View hidden messages</span>
                 </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Father Goblin
-                        </span>
-                        <span class="text-white-50">You said: HELLO!!</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center selected">
-                    <img src="https://i.pinimg.com/originals/1f/17/ad/1f17ad2c6a5b1ba8918b80871aac5f9a.jpg" alt=""
-                        width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            King of CRIMSON
-                        </span>
-                        <span class="text-white-50">You said: HELLO!!</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
-                <div class="w-100 message ps-2 d-flex flex-row align-items-center">
-                    <img src="https://github.com/mdo.png" alt="" width="56" height="56" class="rounded-circle me-2" />
-                    <div class="d-flex flex-column">
-                        <span>
-                            Goblin clan
-                        </span>
-                        <span class="text-white-50">5 members</span>
-                    </div>
-                </div>
             </div>
-            <div class="w-100 h-100 d-flex flex-column">
+            <div class="w-100 h-100 d-flex flex-column" id="conversationContainer">
                 <div
                     class="w-100 pt-3 ps-3 pb-3 border-bottom d-flex flex-row align-items-center justify-content-between border-dark user-select-none">
                     <div>
@@ -223,73 +133,79 @@
                 </div>
                 <div id="messageOutput" class="d-flex flex-column w-100 overflow-y-auto h-100">
                     <div class="w-100 d-flex justify-content-end pb-3">
-                        <div class="sendMessageDirect rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2">
-                           <span> Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
-                            sint fugiat nihil. &#1f44d; Cum labore officia culpa aut dolorem quisquam, unde molestias
-                            eum,
-                            obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
-                            Numquam dignissimos, atque libero ducimus, minus ullam pariatur perferendis iste
-                            obcaecati, quo ut. Ex fuga illo doloremque perspiciatis inventore! Eligendi qui
-                            voluptate accusantium, architecto rem molestias optio ad veniam ut.
-                            Iusto, quidem quod fugit minima, velit eius, delectus non error assumenda adipisci sint
-                            sed voluptatum deserunt quis vero nobis iure placeat facilis magnam animi aperiam nemo.
-                            Exercitationem optio in excepturi.
-                            Accusantium, nisi dolorem. Soluta eum natus vitae harum est consectetur ab quis,
-                            sapiente repudiandae pariatur eveniet voluptatum ipsa illo distinctio, velit numquam
-                            fugit sequi debitis maiores, inventore expedita sint non.
-                            Corporis deleniti esse pariatur quisquam alias voluptates perferendis. Quasi voluptates
-                            quos dolor maiores id quidem incidunt debitis doloremque vitae sapiente quaerat
-                            molestiae inventore architecto explicabo recusandae, velit ipsam laudantium ipsa.
-                            Molestiae laborum laboriosam obcaecati cum porro architecto corporis inventore corrupti
-                            quia! Iure eum nemo error commodi beatae voluptate doloribus veritatis quod minus facere
-                            nisi, doloremque laborum aperiam consequuntur omnis cum.
-                            Aut molestiae quia accusantium esse laboriosam recusandae obcaecati dignissimos velit
-                            aliquid. Molestias necessitatibus laudantium ullam voluptas consequatur possimus odit
-                            impedit aliquid iure voluptatibus quia maxime tempore autem, quo laboriosam odio.
-                            Incidunt odit non natus molestias doloremque commodi sint totam ea vero, maxime possimus
-                            saepe facere magnam? Delectus aut culpa quaerat repellat accusamus reiciendis, dolore
-                            qui, eius ratione dicta harum reprehenderit.
-                            Tenetur hic, voluptatibus vitae dolorum ipsum accusantium odit voluptates doloribus
-                            eligendi reprehenderit alias laudantium perferendis exercitationem eius nobis debitis
-                            eveniet aperiam cum numquam ut tempore culpa corrupti? Dolore, aperiam facilis?
-                            Suscipit consequuntur temporibus illum ab adipisci similique alias vitae ut asperiores
-                            beatae culpa est voluptatibus recusandae optio quis perspiciatis dolorem aut, ipsam,
-                            quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.</span>
+                        <div class="sendMessage rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2 me-3">
+                            <span class="message"> Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat
+                                perspiciatis ipsam
+                                sint fugiat nihil. &#1f44d; Cum labore officia culpa aut dolorem quisquam, unde
+                                molestias
+                                eum,
+                                obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
+                                Numquam dignissimos, atque libero ducimus, minus ullam pariatur perferendis iste
+                                obcaecati, quo ut. Ex fuga illo doloremque perspiciatis inventore! Eligendi qui
+                                voluptate accusantium, architecto rem molestias optio ad veniam ut.
+                                Iusto, quidem quod fugit minima, velit eius, delectus non error assumenda adipisci sint
+                                sed voluptatum deserunt quis vero nobis iure placeat facilis magnam animi aperiam nemo.
+                                Exercitationem optio in excepturi.
+                                Accusantium, nisi dolorem. Soluta eum natus vitae harum est consectetur ab quis,
+                                sapiente repudiandae pariatur eveniet voluptatum ipsa illo distinctio, velit numquam
+                                fugit sequi debitis maiores, inventore expedita sint non.
+                                Corporis deleniti esse pariatur quisquam alias voluptates perferendis. Quasi voluptates
+                                quos dolor maiores id quidem incidunt debitis doloremque vitae sapiente quaerat
+                                molestiae inventore architecto explicabo recusandae, velit ipsam laudantium ipsa.
+                                Molestiae laborum laboriosam obcaecati cum porro architecto corporis inventore corrupti
+                                quia! Iure eum nemo error commodi beatae voluptate doloribus veritatis quod minus facere
+                                nisi, doloremque laborum aperiam consequuntur omnis cum.
+                                Aut molestiae quia accusantium esse laboriosam recusandae obcaecati dignissimos velit
+                                aliquid. Molestias necessitatibus laudantium ullam voluptas consequatur possimus odit
+                                impedit aliquid iure voluptatibus quia maxime tempore autem, quo laboriosam odio.
+                                Incidunt odit non natus molestias doloremque commodi sint totam ea vero, maxime possimus
+                                saepe facere magnam? Delectus aut culpa quaerat repellat accusamus reiciendis, dolore
+                                qui, eius ratione dicta harum reprehenderit.
+                                Tenetur hic, voluptatibus vitae dolorum ipsum accusantium odit voluptates doloribus
+                                eligendi reprehenderit alias laudantium perferendis exercitationem eius nobis debitis
+                                eveniet aperiam cum numquam ut tempore culpa corrupti? Dolore, aperiam facilis?
+                                Suscipit consequuntur temporibus illum ab adipisci similique alias vitae ut asperiores
+                                beatae culpa est voluptatibus recusandae optio quis perspiciatis dolorem aut, ipsam,
+                                quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.</span>
                             <div class="pt-2 pb-2 pe-2 text-end w-100">02:29 PM</div>
                         </div>
                     </div>
                     <div class="w-100 d-flex justify-content-start pb-3">
-                        <div class="recieveMessageDirect rounded-4 bg-dark pt-1 ps-2 pb-1 pe-2 ms-2">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
-                            sint fugiat nihil. Cum labore officia culpa aut dolorem quisquam, unde molestias eum,
-                            obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
-                            Numquam dignissimos, atque libero ducimus, minus ullam pariatur perferendis iste
-                            obcaecati, quo ut. Ex fuga illo doloremque perspiciatis inventore! Eligendi qui
-                            voluptate accusantium, architecto rem molestias optio ad veniam ut.
-                            Iusto, quidem quod fugit minima, velit eius, delectus non error assumenda adipisci sint
-                            sed voluptatum deserunt quis vero nobis iure placeat facilis magnam animi aperiam nemo.
-                            Exercitationem optio in excepturi.
-                            Accusantium, nisi dolorem. Soluta eum natus vitae harum est consectetur ab quis,
-                            sapiente repudiandae pariatur eveniet voluptatum ipsa illo distinctio, velit numquam
-                            fugit sequi debitis maiores, inventore expedita sint non.
-                            Corporis deleniti esse pariatur quisquam alias voluptates perferendis. Quasi voluptates
-                            quos dolor maiores id quidem incidunt debitis doloremque vitae sapiente quaerat
-                            molestiae inventore architecto explicabo recusandae, velit ipsam laudantium ipsa.
-                            Molestiae laborum laboriosam obcaecati cum porro architecto corporis inventore corrupti
-                            quia! Iure eum nemo error commodi beatae voluptate doloribus veritatis quod minus facere
-                            nisi, doloremque laborum aperiam consequuntur omnis cum.
-                            Aut molestiae quia accusantium esse laboriosam recusandae obcaecati dignissimos velit
-                            aliquid. Molestias necessitatibus laudantium ullam voluptas consequatur possimus odit
-                            impedit aliquid iure voluptatibus quia maxime tempore autem, quo laboriosam odio.
-                            Incidunt odit non natus molestias doloremque commodi sint totam ea vero, maxime possimus
-                            saepe facere magnam? Delectus aut culpa quaerat repellat accusamus reiciendis, dolore
-                            qui, eius ratione dicta harum reprehenderit.
-                            Tenetur hic, voluptatibus vitae dolorum ipsum accusantium odit voluptates doloribus
-                            eligendi reprehenderit alias laudantium perferendis exercitationem eius nobis debitis
-                            eveniet aperiam cum numquam ut tempore culpa corrupti? Dolore, aperiam facilis?
-                            Suscipit consequuntur temporibus illum ab adipisci similique alias vitae ut asperiores
-                            beatae culpa est voluptatibus recusandae optio quis perspiciatis dolorem aut, ipsam,
-                            quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.
+                        <div class="recieveMessage rounded-4 bg-dark pt-1 ps-2 pb-1 pe-2 ms-3">
+                            <span class="message"> Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat
+                                perspiciatis ipsam
+                                sint fugiat nihil. &#1f44d; Cum labore officia culpa aut dolorem quisquam, unde
+                                molestias
+                                eum,
+                                obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
+                                Numquam dignissimos, atque libero ducimus, minus ullam pariatur perferendis iste
+                                obcaecati, quo ut. Ex fuga illo doloremque perspiciatis inventore! Eligendi qui
+                                voluptate accusantium, architecto rem molestias optio ad veniam ut.
+                                Iusto, quidem quod fugit minima, velit eius, delectus non error assumenda adipisci sint
+                                sed voluptatum deserunt quis vero nobis iure placeat facilis magnam animi aperiam nemo.
+                                Exercitationem optio in excepturi.
+                                Accusantium, nisi dolorem. Soluta eum natus vitae harum est consectetur ab quis,
+                                sapiente repudiandae pariatur eveniet voluptatum ipsa illo distinctio, velit numquam
+                                fugit sequi debitis maiores, inventore expedita sint non.
+                                Corporis deleniti esse pariatur quisquam alias voluptates perferendis. Quasi voluptates
+                                quos dolor maiores id quidem incidunt debitis doloremque vitae sapiente quaerat
+                                molestiae inventore architecto explicabo recusandae, velit ipsam laudantium ipsa.
+                                Molestiae laborum laboriosam obcaecati cum porro architecto corporis inventore corrupti
+                                quia! Iure eum nemo error commodi beatae voluptate doloribus veritatis quod minus facere
+                                nisi, doloremque laborum aperiam consequuntur omnis cum.
+                                Aut molestiae quia accusantium esse laboriosam recusandae obcaecati dignissimos velit
+                                aliquid. Molestias necessitatibus laudantium ullam voluptas consequatur possimus odit
+                                impedit aliquid iure voluptatibus quia maxime tempore autem, quo laboriosam odio.
+                                Incidunt odit non natus molestias doloremque commodi sint totam ea vero, maxime possimus
+                                saepe facere magnam? Delectus aut culpa quaerat repellat accusamus reiciendis, dolore
+                                qui, eius ratione dicta harum reprehenderit.
+                                Tenetur hic, voluptatibus vitae dolorum ipsum accusantium odit voluptates doloribus
+                                eligendi reprehenderit alias laudantium perferendis exercitationem eius nobis debitis
+                                eveniet aperiam cum numquam ut tempore culpa corrupti? Dolore, aperiam facilis?
+                                Suscipit consequuntur temporibus illum ab adipisci similique alias vitae ut asperiores
+                                beatae culpa est voluptatibus recusandae optio quis perspiciatis dolorem aut, ipsam,
+                                quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.</span>
+                            <div class="pt-2 pb-2 pe-2 text-end w-100">02:29 PM</div>
                         </div>
                     </div>
                 </div>
@@ -430,6 +346,26 @@
         <div class="emojiBtn d-flex justify-content-center align-items-center user-select-none"><div class="emoji d-flex rounded-2" data-bs-dismiss="modal"
             data-bs-target="#emojiSelector">{{this}}</div></div>
         {{/each}}
+    </script>
+    <script type="text/x-handlebars-template" id="message-selection-template">
+       {{#each messageList}}
+       <div class="w-100 message ps-2 d-flex flex-row align-items-center">
+        <img src="https://i.pinimg.com/originals/1f/17/ad/1f17ad2c6a5b1ba8918b80871aac5f9a.jpg" alt=""
+            width="56" height="56" class="rounded-circle me-2" />
+        <div class="d-flex flex-column">
+            <span class="ellipsis">
+                {{#if groupName}}
+                {{groupName}}
+                {{else}}
+                {{DisplayName}}
+                {{/if}}
+            </span>
+            <span class="text-white-50 ellipsis w">   {{#if DisplayName}}
+                {{DisplayName}} said: {{message}}
+                {{/if}}</span>
+        </div>
+        </div>
+       {{/each}}
     </script>
     <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

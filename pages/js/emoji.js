@@ -39,8 +39,6 @@ function displayEmojies(data) {
   // Render the template with data
   const htmlOutput = template({ emojiObject: data });
 
-  console.log(data);
-
   // Insert the HTML into the DOM
   document.getElementById("emojiList").innerHTML = htmlOutput;
 
@@ -84,7 +82,7 @@ async function getSearchedEmoji(query) {
       return response.json();
     })
     .then((emojis) => {
-      console.log(emojis)
+      console.log(emojis);
       const emojiMap = new Map();
       Object.entries(emojis["results"]).map((emoji) => {
         const key = emoji[1]["name"];

@@ -65,16 +65,14 @@ textarea::placeholder {
 .form-control:focus {
   box-shadow: none;
 }
-textarea {
-  border: none;
-  outline: none;
-  resize: none;
-  max-height: 32px;
+
+.sendMessageDirect,
+.recieveMessageDirect {
+  max-width: 50%;
 }
 
-.sendMessage,
-.recieveMessage {
-  max-width: 50%;
+#sendMessageBtn{
+  cursor: pointer;
 }
 
 .checkboxContainer > input {

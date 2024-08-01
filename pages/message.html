@@ -15,7 +15,7 @@
 
 <body class="container-fluid min-vh-100 min-vw-100 overflow-hidden m-0 p-0 text-white text-decoration-none">
     <div class="row row-cols grid content">
-        <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0" id="sideBar">
+        <div class="col d-flex flex-column position-absolute h-100 border-end border-dark m-0 p-0 user-select-none" id="sideBar">
             <div class="d-flex flex-row justify-content-between mt-2 ms-4 me-2">
                 <span class="fs-3 d-flex name user-select-none align-self-end"> Instabun </span>
                 <!--When sidebar closes, the button does not really works for some reason-->
@@ -85,7 +85,7 @@
             </div>
         </div>
         <div id="contentPage" class="col vh-100 w-100 d-flex flex-row">
-            <div id="messageColumn" class="border-end border-dark overflow-y-auto">
+            <div id="messageColumn" class="border-end border-dark overflow-y-auto user-select-none">
                 <div class="border-bottom border-dark pt-2 ps-2 pb-2" data-bs-toggle="modal"
                     data-bs-target="#newMessageModal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -208,7 +208,7 @@
             </div>
             <div class="w-100 h-100 d-flex flex-column">
                 <div
-                    class="w-100 pt-3 ps-3 pb-3 border-bottom d-flex flex-row align-items-center justify-content-between border-dark">
+                    class="w-100 pt-3 ps-3 pb-3 border-bottom d-flex flex-row align-items-center justify-content-between border-dark user-select-none">
                     <div>
                         <img src="https://i.pinimg.com/originals/1f/17/ad/1f17ad2c6a5b1ba8918b80871aac5f9a.jpg" alt=""
                             width="56" height="56" class="rounded-circle me-2" />
@@ -223,8 +223,8 @@
                 </div>
                 <div id="messageOutput" class="d-flex flex-column w-100 overflow-y-auto h-100">
                     <div class="w-100 d-flex justify-content-end pb-3">
-                        <div class="sendMessage rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
+                        <div class="sendMessageDirect rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2">
+                           <span> Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
                             sint fugiat nihil. &#1f44d; Cum labore officia culpa aut dolorem quisquam, unde molestias
                             eum,
                             obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
@@ -254,11 +254,12 @@
                             eveniet aperiam cum numquam ut tempore culpa corrupti? Dolore, aperiam facilis?
                             Suscipit consequuntur temporibus illum ab adipisci similique alias vitae ut asperiores
                             beatae culpa est voluptatibus recusandae optio quis perspiciatis dolorem aut, ipsam,
-                            quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.
+                            quas accusantium sunt eaque aspernatur porro. Aliquam, maiores.</span>
+                            <div class="pt-2 pb-2 pe-2 text-end w-100">02:29 PM</div>
                         </div>
                     </div>
                     <div class="w-100 d-flex justify-content-start pb-3">
-                        <div class="recieveMessage rounded-4 bg-dark pt-1 ps-2 pb-1 pe-2">
+                        <div class="recieveMessageDirect rounded-4 bg-dark pt-1 ps-2 pb-1 pe-2 ms-2">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat perspiciatis ipsam
                             sint fugiat nihil. Cum labore officia culpa aut dolorem quisquam, unde molestias eum,
                             obcaecati reiciendis consequuntur reprehenderit adipisci facilis.
@@ -307,7 +308,7 @@
                             class="text-white bg-black border-0 d-flex form-control ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break"
                             data-placeholder="Message..." contenteditable="true"></div>
                         <div class="input-group-text bg-transparent border-0 d-flex text-primary invisible"
-                            id="sendMessage">
+                            id="sendMessageBtn">
                             Post
                         </div>
                     </form>

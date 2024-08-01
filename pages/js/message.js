@@ -4,7 +4,7 @@ const messageTextArea = document.querySelector("#messageTextArea");
 const userList = document.getElementById("userList");
 const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
 
-const sendMessage = document.querySelector("#sendMessage");
+const sendMessageBtn = document.querySelector("#sendMessageBtn");
 
 const startConversationButton = document.querySelector(
   "#startConversationButton"
@@ -54,9 +54,9 @@ startConversationButton.addEventListener("click", function () {
 
 messageTextArea.addEventListener("input", function () {
   if (messageTextArea.childNodes.length == 0) {
-    sendMessage.classList.add("invisible");
+    sendMessageBtn.classList.add("invisible");
   } else {
-    sendMessage.classList.remove("invisible");
+    sendMessageBtn.classList.remove("invisible");
   }
 });
 //Functions

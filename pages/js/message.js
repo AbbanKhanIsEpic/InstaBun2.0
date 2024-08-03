@@ -255,7 +255,45 @@ async function setMessageContainer(
       return senderID == userID;
     });
 
+    Handlebars.registerHelper("isNewDay", function (index) {
+      if (index == 0) {
+        return true;
+      } else {
+        let currentMessageTime = new Date(
+          directMessageData[index].time
+        ).toDateString();
+        let previousMessageTime = new Date(
+          directMessageData[index - 1].time
+        ).toDateString();
+        if (currentMessageTime === previousMessageTime) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    });
+
+    Handlebars.registerHelper("convertToDate", function (timestamp) {
+      return new Date(timestamp).toDateString();
+    });
+
+    Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
+      let time = timestamp.substring(11, 16);
+      switch (time.charAt(0)) {
+        case "1":
+          time =
+            Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
+          break;
+        case "0":
+          time += "am";
+          break;
+      }
+
+      return time;
+    });
+
     const directMessageData = await getDirectMessage(userID, toID);
+
     // Get the template source
     const messageTemplateSource =
       document.getElementById("message-template").innerHTML;
@@ -271,6 +309,63 @@ async function setMessageContainer(
     // Insert the HTML into the DOM
     document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
   } else {
+    Handlebars.registerHelper("isSendMessage", function (senderID) {
+      return senderID == userID;
+    });
+
+    Handlebars.registerHelper("isNewDay", function (index) {
+      if (index == 0) {
+        return true;
+      } else {
+        let currentMessageTime = new Date(
+          groupMessageData[index].time
+        ).toDateString();
+        let previousMessageTime = new Date(
+          groupMessageData[index - 1].time
+        ).toDateString();
+        if (currentMessageTime === previousMessageTime) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    });
+
+    Handlebars.registerHelper("convertToDate", function (timestamp) {
+      return new Date(timestamp).toDateString();
+    });
+
+    Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
+      let time = timestamp.substring(11, 16);
+      switch (time.charAt(0)) {
+        case "1":
+          time =
+            Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
+          break;
+        case "0":
+          time += "am";
+          break;
+      }
+
+      return time;
+    });
+
+    const groupMessageData = await getGroupMessage(userID, toID);
+
+    // Get the template source
+    const messageTemplateSource =
+      document.getElementById("message-template").innerHTML;
+
+    // Compile the template
+    const messageTemplate = Handlebars.compile(messageTemplateSource);
+
+    const data = { messages: groupMessageData };
+
+    // Render the template with data
+    const messageHtmlOutput = messageTemplate(data);
+
+    // Insert the HTML into the DOM
+    document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
   }
 
   messageTextArea.addEventListener("input", function () {
@@ -299,17 +394,27 @@ async function getDirectMessage(currentUserID, selectedUserID) {
   const server = "http://127.0.0.1:5000/api/message/direct";
   const query = `?senderID=${encodeURIComponent(
     currentUserID
-  )}&receiverID=${encodeURIComponent(selectedUserID)}&page=${encodeURIComponent(
-    1
-  )}`;
+  )}&receiverID=${encodeURIComponent(selectedUserID)}`;
 
   let result;
   await fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
-      console.log(currentUserID);
-      console.log(selectedUserID);
+      result = data;
+    });
+  return result;
+}
+
+async function getGroupMessage(userID, groupID) {
+  const server = "http://127.0.0.1:5000/api/message/group";
+  const query = `?userID=${encodeURIComponent(
+    userID
+  )}&groupID=${encodeURIComponent(groupID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
       result = data;
     });
   return result;

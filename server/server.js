@@ -691,14 +691,28 @@ app.get("/api/message/list", (req, res) => {
 });
 
 app.get("/api/message/direct", (req, res) => {
-  const { senderID, receiverID, page } = req.query;
-
-  console.log("Hi");
+  const { senderID, receiverID } = req.query;
 
   const messageManager = new MessageManager();
 
   messageManager
-    .getDirectMessage(senderID, receiverID, page)
+    .getDirectMessage(senderID, receiverID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/message/group", (req, res) => {
+  const { userID, groupID } = req.query;
+
+  const messageManager = new MessageManager();
+
+  messageManager
+    .getGroupMessage(userID, groupID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

@@ -1,15 +1,13 @@
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
-const messageTextArea = document.querySelector("#messageTextArea");
 const userList = document.getElementById("userList");
 const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
-
-const sendMessageBtn = document.querySelector("#sendMessageBtn");
 
 const startConversationButton = document.querySelector(
   "#startConversationButton"
 );
 
+const createGroupModal = document.querySelector("#createGroup");
 const selectedArray = [];
 
 document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
@@ -40,27 +38,15 @@ startConversationButton.addEventListener("click", function () {
     alert("You can not select yourself as another member in a group");
   } else {
     const selectedUserID = [];
-    let groupName = "";
-    selectedArray.forEach((selectedUser, index) => {
+    selectedArray.forEach((selectedUser) => {
       console.log(selectedUser);
       selectedUserID.push(selectedUser["id"]);
-      groupName +=
-        index == selectedArray.length - 1
-          ? selectedUser["DisplayName"]
-          : selectedUser["DisplayName"] + ", ";
     });
     selectedUserID.push(userID);
-    createGroup(userID, groupName, selectedUserID);
+    createGroupModal.style.display = "block";
   }
 });
 
-messageTextArea.addEventListener("input", function () {
-  if (messageTextArea.childNodes.length == 0) {
-    sendMessageBtn.classList.add("invisible");
-  } else {
-    sendMessageBtn.classList.remove("invisible");
-  }
-});
 //Functions
 
 async function displayUserList() {
@@ -179,9 +165,9 @@ async function getUserList(searchQuery) {
   return result;
 }
 
-function createGroup(userID, groupName, groupMembers) {
+function createGroup(userID, groupName, groupProfileIcon, groupMembers) {
   const server = "http://127.0.0.1:5000/api/group/create";
-  const data = { userID, groupName, groupMembers };
+  const data = { userID, groupName, groupProfileIcon, groupMembers };
 
   fetch(server, {
     method: "POST",
@@ -220,16 +206,79 @@ async function displayMessageLists(userID) {
   let selectedMessage;
 
   Array.from(messageSelections).forEach((messageSelection) => {
-    //Kinda weird that these variables are created again when I click the addEventListener
-    let x = 5;
     messageSelection.addEventListener("click", function () {
-      console.log(x);
+      const id = messageSelection.id;
+      const isDirect = messageSelection.classList.contains("direct");
+      const icon = messageSelection.querySelector("img").src;
+      const name = messageSelection.querySelector(
+        '[aria-label="name"]'
+      ).innerHTML;
       if (selectedMessage != undefined) {
         selectedMessage.classList.remove("selected");
       }
+      setMessageContainer(userID, isDirect, id, name, icon);
       messageSelection.classList.add("selected");
       selectedMessage = messageSelection;
     });
+  });
+}
+
+async function setMessageContainer(
+  userID,
+  isDirect,
+  toID,
+  toName,
+  toProfileIcon
+) {
+  // Get the template source
+  const templateSource = document.getElementById(
+    "conversation-container-template"
+  ).innerHTML;
+
+  // Compile the template
+  const template = Handlebars.compile(templateSource);
+
+  const data = { name: toName, profileIcon: toProfileIcon };
+
+  // Render the template with data
+  const htmlOutput = template(data);
+
+  // Insert the HTML into the DOM
+  document.getElementById("conversationContainer").innerHTML = htmlOutput;
+
+  const messageTextArea = document.querySelector("#messageTextArea");
+
+  const sendMessageBtn = document.querySelector("#sendMessageBtn");
+
+  if (isDirect) {
+    Handlebars.registerHelper("isSendMessage", function (senderID) {
+      return senderID == userID;
+    });
+
+    const directMessageData = await getDirectMessage(userID, toID);
+    // Get the template source
+    const messageTemplateSource =
+      document.getElementById("message-template").innerHTML;
+
+    // Compile the template
+    const messageTemplate = Handlebars.compile(messageTemplateSource);
+
+    const data = { messages: directMessageData };
+
+    // Render the template with data
+    const messageHtmlOutput = messageTemplate(data);
+
+    // Insert the HTML into the DOM
+    document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+  } else {
+  }
+
+  messageTextArea.addEventListener("input", function () {
+    if (messageTextArea.childNodes.length == 0) {
+      sendMessageBtn.classList.add("invisible");
+    } else {
+      sendMessageBtn.classList.remove("invisible");
+    }
   });
 }
 
@@ -241,6 +290,26 @@ async function getMessageLists(userID) {
   await fetch(server + query)
     .then((response) => response.json())
     .then((data) => {
+      result = data;
+    });
+  return result;
+}
+
+async function getDirectMessage(currentUserID, selectedUserID) {
+  const server = "http://127.0.0.1:5000/api/message/direct";
+  const query = `?senderID=${encodeURIComponent(
+    currentUserID
+  )}&receiverID=${encodeURIComponent(selectedUserID)}&page=${encodeURIComponent(
+    1
+  )}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      console.log(currentUserID);
+      console.log(selectedUserID);
       result = data;
     });
   return result;

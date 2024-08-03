@@ -76,6 +76,7 @@ textarea::placeholder {
 .sendMessage,
 .recieveMessage {
   max-width: 50%;
+  min-width: 200px;
 }
 
 #sendMessageBtn {

@@ -690,72 +690,15 @@ app.get("/api/message/list", (req, res) => {
     });
 });
 
-app.get("/api/direct/permission", (req, res) => {
-  const { senderID, receiverID } = req.query;
+app.get("/api/message/direct", (req, res) => {
+  const { senderID, receiverID, page } = req.query;
 
-  const directMessage = new DirectMessage();
+  console.log("Hi");
 
-  directMessage
-    .hasAbilityToSend(senderID, receiverID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
+  const messageManager = new MessageManager();
 
-app.post("/api/direct/message", (req, res) => {
-  const senderID = req.body.senderID;
-  const receiverID = req.body.receiverID;
-  const message = req.body.message;
-
-  const directMessage = new DirectMessage();
-  directMessage.sendMessage(senderID, receiverID, message);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.post("/api/direct/deleteMessage", (req, res) => {
-  const messageID = req.body.messageID;
-
-  const directMessage = new DirectMessage();
-  directMessage.deleteMessage(messageID);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.post("/api/direct/clearMessage", (req, res) => {
-  const senderID = req.body.senderID;
-  const receiverID = req.body.receiverID;
-
-  const directMessage = new DirectMessage();
-  directMessage.clearMessage(senderID, receiverID);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.get("/api/direct/list", (req, res) => {
-  const { userID } = req.query;
-
-  const directMessage = new DirectMessage();
-
-  directMessage
-    .getDirectList(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.get("/api/direct/message", (req, res) => {
-  const { senderID, receiverID, messageID } = req.query;
-
-  const directMessage = new DirectMessage();
-
-  directMessage
-    .getMessage(senderID, receiverID, messageID)
+  messageManager
+    .getDirectMessage(senderID, receiverID, page)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -767,70 +710,12 @@ app.get("/api/direct/message", (req, res) => {
 
 //Group
 
-app.get("/api/group/groupList", (req, res) => {
-  const { userID } = req.query;
-
-  const groupManager = new GroupManager();
-  groupManager
-    .getGroupList(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
 app.get("/api/group/groupMembers", (req, res) => {
   const { groupID } = req.query;
 
   const groupManager = new GroupManager();
   groupManager
     .getGroupMembers(groupID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.post("/api/group/message", (req, res) => {
-  const senderID = req.body.senderID;
-  const groupID = req.body.groupID;
-  const message = req.body.message;
-
-  const groupMessage = new GroupMessage();
-  groupMessage.sendMessage(senderID, groupID, message);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.post("/api/group/deleteMessage", (req, res) => {
-  const messageID = req.body.messageID;
-
-  const groupMessage = new GroupMessage();
-  groupMessage.deleteMessage(messageID);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.post("/api/group/clearMessage", (req, res) => {
-  const userID = req.body.userID;
-  const groupID = req.body.groupID;
-
-  const groupMessage = new GroupMessage();
-  groupMessage.clearMessage(userID, groupID);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.get("/api/group/message", (req, res) => {
-  const { userID, groupID, messageID } = req.query;
-
-  const groupMessage = new GroupMessage();
-
-  groupMessage
-    .getMessage(userID, groupID, messageID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -867,26 +752,6 @@ app.post("/api/group/removeMember", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-app.post("/api/group/groupProfileIcon", (req, res) => {
-  const groupID = req.body.groupID;
-  const groupIcon = req.body.groupIcon;
-
-  console.log(groupIcon);
-
-  const groupManager = new GroupManager();
-  groupManager.updateGroupIcon(groupID, groupIcon);
-  res.json({ message: "Data received and processed successfully" });
-});
-
-app.post("/api/group/groupName", (req, res) => {
-  const groupID = req.body.groupID;
-  const groupName = req.body.groupName;
-
-  const groupManager = new GroupManager();
-  groupManager.updateGroupName(groupID, groupName);
-  res.json({ message: "Data received and processed successfully" });
-});
-
 app.post("/api/group/delete", (req, res) => {
   const groupID = req.body.groupID;
   const groupMembers = req.body.groupMembers;
@@ -899,10 +764,11 @@ app.post("/api/group/delete", (req, res) => {
 app.post("/api/group/create", (req, res) => {
   const userID = req.body.userID;
   const groupName = req.body.groupName;
+  const groupProfileIcon = req.body.groupProfileIcon;
   const groupMembers = req.body.groupMembers;
 
   const groupManager = new GroupManager();
-  groupManager.createGroup(userID, groupName, groupMembers);
+  groupManager.createGroup(userID, groupName, groupProfileIcon, groupMembers);
   res.json({ message: "Data received and processed successfully" });
 });
 

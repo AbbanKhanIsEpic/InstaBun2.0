@@ -1,53 +1,13 @@
 //Imports
 const { select, update } = require("./DB");
 const GroupMessage = require("./GroupMessage");
-const defaultGroupIcon =
-  "https://i.pinimg.com/564x/46/db/9e/46db9ee3d4b3323457222bb8db7f3b42.jpg";
 
 class GroupManager {
-  //Return a list of groups that the user(userID) is in
-  async getGroupList(userID) {
-    try {
-      const query = `
-    SELECT Collective.OwnerID, Collective.GroupID,Collective.GroupName, Collective.GroupIconLink FROM GroupMembers
-    INNER JOIN 
-    Collective ON Collective.GroupID = GroupMembers.GroupID
-    WHERE
-        GroupMembers.memberID = ?;`;
-      const result = await select(query, [userID]);
-      return result;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Update the group's group icon
-  async updateGroupIcon(groupID, groupIcon) {
-    try {
-      const query = `UPDATE Collective SET GroupIconLink = ? WHERE GroupID = ?;`;
-      update(query, [groupIcon, groupID]);
-      return "Update the group's icon operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Update the group's group name
-  async updateGroupName(groupID, groupName) {
-    try {
-      const query = `UPDATE Collective SET GroupName = ? WHERE GroupID = ?;`;
-      update(query, [groupName, groupID]);
-      return "Update the group's name operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
   //Create a new group
-  async createGroup(createrUserID, groupName, groupMembers) {
+  async createGroup(createrUserID, groupName, groupProfileIcon, groupMembers) {
     try {
-      const query = `INSERT INTO instabun.group (ownerID,groupName,groupProfileIcon) VALUES (?,?,?);`;
-      await update(query, [createrUserID, groupName, defaultGroupIcon]);
+      const query = `INSERT INTO instabun.community (ownerID groupName,groupProfileIcon) VALUES (?,?,?);`;
+      await update(query, [createrUserID, groupName, groupProfileIcon]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
       const groupID = await this.#getLatestGroupID(createrUserID);
@@ -84,7 +44,7 @@ class GroupManager {
   //Get the latest group's id
   async #getLatestGroupID(createrUserID) {
     try {
-      const query = `SELECT groupID FROM instabun.group WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
+      const query = `SELECT groupID FROM instabun.community WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
       return result["groupID"];
     } catch (error) {
@@ -112,7 +72,7 @@ class GroupManager {
   //Transfer the ownership of the group(groupID) to the user(newOwnerID)
   async transferOwnership(groupID, newOwnerID) {
     try {
-      const query = `UPDATE Collective SET OwnerID = ? WHERE (GroupID = ?);`;
+      const query = `UPDATE community SET OwnerID = ? WHERE (GroupID = ?);`;
       await update(query, [newOwnerID, groupID]);
       return "Transfer ownership operation successful";
     } catch (error) {
@@ -129,7 +89,7 @@ class GroupManager {
       for (const groupMember of groupMembers) {
         await this.removeMemeber(groupID, groupMember);
       }
-      const query = `DELETE FROM Collective WHERE (GroupID = ?);`;
+      const query = `DELETE FROM community WHERE (GroupID = ?);`;
       await update(query, [groupID]);
       return "Delete group operation successful";
     } catch (error) {

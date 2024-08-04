@@ -3,25 +3,34 @@ const searchUsersInput = document.querySelector("#searchUsersInput");
 const userList = document.getElementById("userList");
 const showcaseSelectedUsers = document.getElementById("showcaseSelectedUsers");
 
+const newMessageModal = document.querySelector("#newMessageModal");
+
 const startConversationButton = document.querySelector(
   "#startConversationButton"
 );
 
 const createGroupModal = document.querySelector("#createGroup");
+const groupIconInput = document.querySelector("#groupIconInput");
+const createGroupModalClose =
+  createGroupModal.querySelector(`[aria-label="Close"]`);
 
 const deleteMessageConfirmation = document.querySelector(
   "#deleteMessageConfirmation"
 );
 const cancelDeleteMessage = document.querySelector("#cancelDeleteMessage");
 const confirmDeleteMessage = document.querySelector("#confirmDeleteMessage");
-
-const selectedArray = [];
-
-document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
+const showCaseMemberNewGroup = document.querySelector(
+  "#showCaseMemberNewGroup"
+);
+const createGroupBtn = document.querySelector("#createGroupBtn");
 
 let isGroup;
 let deleteMessageID;
 let communicatingToID;
+
+const selectedArray = [];
+
+document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
@@ -34,6 +43,34 @@ searchUsersInput.addEventListener("input", function () {
       displayUserList();
     }
   }, 500);
+});
+
+createGroupModalClose.addEventListener("click", function () {
+  //createGroupModal.style.display = "none"; -> no work D:
+  window.open("http://127.0.0.1:5500/pages/message.html", "_self");
+});
+
+createGroupBtn.addEventListener("click", function () {
+  window.open("http://127.0.0.1:5500/pages/message.html", "_self");
+});
+
+groupIconInput.addEventListener("change", function (event) {
+  selectedFile = event.target.files[0];
+  if (selectedFile.type.match("image.*")) {
+    const reader = new FileReader();
+    reader.addEventListener("load", (event) => {
+      const showUpload = document.querySelector("#showUpload");
+      showUpload.src = event.target.result;
+      console.log(event.target.result);
+      const sizeInMB = selectedFile.size / 1024 / 1024;
+      if (sizeInMB > 15) {
+        alert("Image size is too large. 5MB max");
+      }
+    });
+    reader.readAsDataURL(selectedFile);
+  } else {
+    alert("You can only upload an img for the group icon");
+  }
 });
 
 cancelDeleteMessage.addEventListener("click", function () {
@@ -62,10 +99,10 @@ startConversationButton.addEventListener("click", function () {
   } else {
     const selectedUserID = [];
     selectedArray.forEach((selectedUser) => {
-      console.log(selectedUser);
       selectedUserID.push(selectedUser["id"]);
     });
     selectedUserID.push(userID);
+    newMessageModal.style.display = "none";
     createGroupModal.style.display = "block";
   }
 });
@@ -118,8 +155,18 @@ async function displayUserList() {
           return selected.id == id;
         });
         selectedArray.splice(index, 1);
+        const copy = user.childNodes[1].cloneNode(true);
+        for (i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
+          const childNode = showCaseMemberNewGroup.childNodes[i];
+          if (childNode.isEqualNode(copy)) {
+            showCaseMemberNewGroup.removeChild(childNode);
+            break;
+          }
+        }
       } else {
         user.classList.add("selected");
+        const copy = user.childNodes[1].cloneNode(true);
+        showCaseMemberNewGroup.appendChild(copy);
         selectedArray.push({ id: id, DisplayName: displayName });
       }
       displaySelectedUsers(selectedArray);
@@ -166,6 +213,14 @@ function displaySelectedUsers(selectedArray) {
         deSelectedUser.classList.remove("selected");
         checkmark.classList.toggle("d-none");
         checkbox.value = "off";
+        const copy = deSelectedUser.childNodes[1].cloneNode(true);
+        for (i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
+          const childNode = showCaseMemberNewGroup.childNodes[i];
+          if (childNode.isEqualNode(copy)) {
+            showCaseMemberNewGroup.removeChild(childNode);
+            break;
+          }
+        }
       }
 
       displaySelectedUsers(selectedArray);

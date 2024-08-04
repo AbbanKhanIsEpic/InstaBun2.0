@@ -33,7 +33,8 @@
 }
 #userList,
 #emojiList,
-#hiddenMessageList {
+#hiddenMessageList,
+#showCaseMemberNewGroup {
   height: 240px;
 }
 .bi-emoji-smile {

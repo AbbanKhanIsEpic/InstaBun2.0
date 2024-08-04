@@ -117,6 +117,17 @@
                 </div>
             </div>
             <div class="w-100 h-100 d-flex flex-column" id="conversationContainer">
+                <div class="w-100 h-100 d-flex justify-content-center align-items-center flex-column">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                        class="bi bi-chat-text-fill" viewBox="0 0 16 16">
+                        <path
+                            d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M4.5 5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1z" />
+                    </svg>
+                    <h3 class="mt-2">Start messaging</h3>
+                    <h6 class="text-white-50 mt-1">from existing chat or...</h6>
+                    <button class="btn btn-primary mt-1" data-bs-toggle="modal" data-bs-target="#newMessageModal">Start
+                        a new chat</button>
+                </div>
             </div>
         </div>
     </div>
@@ -200,11 +211,11 @@
             </div>
         </div>
     </div>
-    <div class="modal glassmorph" tabindex="-1" id="createGroup">
+    <div class="modal glassmorph overflow-hidden" tabindex="-1" id="createGroup">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-black text-white glassmorph">
                 <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
-                    <h5 class="modal-title pt-3">Emoji finder</h5>
+                    <h5 class="modal-title pt-3">Create a group</h5>
                     <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
                         data-bs-dismiss="modal" aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
@@ -215,12 +226,31 @@
                         </svg>
                     </button>
                     <hr class="w-100 border-white border-2">
-                    <input type="text" class="form-control bg-transparent text-white border-0 w-100"
-                        placeholder="Search for an emoji..." id="emojiSearch">
+                    <form class="input-group w-100 d-flex justify-content-center align-items-center flex-column">
+                        <h6><strong>Group
+                                profile icon:</strong></h6>
+                        <div>
+                            <input type="file" accept="image/*" class="position-absolute visually-hidden"
+                                placeholder="Profile icon" id="groupIconInput" aria-label="user upload files">
+                            <label for="groupIconInput" role="button"> <img width="100" height="100"
+                                    src="https://i.pinimg.com/564x/4e/fe/d2/4efed22f325c636539ad1d2c2dd166dc.jpg"
+                                    id="showUpload" alt="please select something to upload"
+                                    class="rounded rounded-circle" /></label>
+                        </div>
+                    </form>
+                    <form class="input-group w-100 mt-3">
+                        <span class="input-group-text bg-transparent text-white border-0"><strong>Group
+                                name:</strong></span>
+                        <input type="text" class="form-control bg-transparent text-white border-0"
+                            placeholder="Enter a group name..." id="groupNameInput">
+                    </form>
                     <hr class="w-100 border-white border-2">
                 </div>
-                <div class="modal-body d-flex w-100 flex-row m-0 p-0 overflow-y-auto text-wrap flex-wrap"
-                    id="emojiList">
+                <div class="modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4"
+                    id="showCaseMemberNewGroup">
+                </div>
+                <div class="modal-footer w-100 d-flex justify-content-center align-items-center">
+                    <button class="btn btn-primary w-100" id="createGroupBtn">Create group</button>
                 </div>
             </div>
         </div>

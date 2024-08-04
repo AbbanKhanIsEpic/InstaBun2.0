@@ -8,9 +8,20 @@ const startConversationButton = document.querySelector(
 );
 
 const createGroupModal = document.querySelector("#createGroup");
+
+const deleteMessageConfirmation = document.querySelector(
+  "#deleteMessageConfirmation"
+);
+const cancelDeleteMessage = document.querySelector("#cancelDeleteMessage");
+const confirmDeleteMessage = document.querySelector("#confirmDeleteMessage");
+
 const selectedArray = [];
 
 document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
+
+let isGroup;
+let deleteMessageID;
+let communicatingToID;
 
 //Event listeners
 searchUsersInput.addEventListener("input", function () {
@@ -23,6 +34,18 @@ searchUsersInput.addEventListener("input", function () {
       displayUserList();
     }
   }, 500);
+});
+
+cancelDeleteMessage.addEventListener("click", function () {
+  deleteMessageConfirmation.style.display = "none";
+});
+
+confirmDeleteMessage.addEventListener("click", async function () {
+  if (isGroup) {
+  } else {
+    await deleteDirectMessage(deleteMessageID);
+    displayDirectMessage(userID, communicatingToID);
+  }
 });
 
 startConversationButton.addEventListener("click", function () {
@@ -230,6 +253,8 @@ async function setMessageContainer(
   toName,
   toProfileIcon
 ) {
+  isGroup = !isDirect;
+  communicatingToID = toID;
   // Get the template source
   const templateSource = document.getElementById(
     "conversation-container-template"
@@ -251,121 +276,9 @@ async function setMessageContainer(
   const sendMessageBtn = document.querySelector("#sendMessageBtn");
 
   if (isDirect) {
-    Handlebars.registerHelper("isSendMessage", function (senderID) {
-      return senderID == userID;
-    });
-
-    Handlebars.registerHelper("isNewDay", function (index) {
-      if (index == 0) {
-        return true;
-      } else {
-        let currentMessageTime = new Date(
-          directMessageData[index].time
-        ).toDateString();
-        let previousMessageTime = new Date(
-          directMessageData[index - 1].time
-        ).toDateString();
-        if (currentMessageTime === previousMessageTime) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-    });
-
-    Handlebars.registerHelper("convertToDate", function (timestamp) {
-      return new Date(timestamp).toDateString();
-    });
-
-    Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
-      let time = timestamp.substring(11, 16);
-      switch (time.charAt(0)) {
-        case "1":
-          time =
-            Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
-          break;
-        case "0":
-          time += "am";
-          break;
-      }
-
-      return time;
-    });
-
-    const directMessageData = await getDirectMessage(userID, toID);
-
-    // Get the template source
-    const messageTemplateSource =
-      document.getElementById("message-template").innerHTML;
-
-    // Compile the template
-    const messageTemplate = Handlebars.compile(messageTemplateSource);
-
-    const data = { messages: directMessageData };
-
-    // Render the template with data
-    const messageHtmlOutput = messageTemplate(data);
-
-    // Insert the HTML into the DOM
-    document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+    displayDirectMessage(userID, toID);
   } else {
-    Handlebars.registerHelper("isSendMessage", function (senderID) {
-      return senderID == userID;
-    });
-
-    Handlebars.registerHelper("isNewDay", function (index) {
-      if (index == 0) {
-        return true;
-      } else {
-        let currentMessageTime = new Date(
-          groupMessageData[index].time
-        ).toDateString();
-        let previousMessageTime = new Date(
-          groupMessageData[index - 1].time
-        ).toDateString();
-        if (currentMessageTime === previousMessageTime) {
-          return false;
-        } else {
-          return true;
-        }
-      }
-    });
-
-    Handlebars.registerHelper("convertToDate", function (timestamp) {
-      return new Date(timestamp).toDateString();
-    });
-
-    Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
-      let time = timestamp.substring(11, 16);
-      switch (time.charAt(0)) {
-        case "1":
-          time =
-            Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
-          break;
-        case "0":
-          time += "am";
-          break;
-      }
-
-      return time;
-    });
-
-    const groupMessageData = await getGroupMessage(userID, toID);
-
-    // Get the template source
-    const messageTemplateSource =
-      document.getElementById("message-template").innerHTML;
-
-    // Compile the template
-    const messageTemplate = Handlebars.compile(messageTemplateSource);
-
-    const data = { messages: groupMessageData };
-
-    // Render the template with data
-    const messageHtmlOutput = messageTemplate(data);
-
-    // Insert the HTML into the DOM
-    document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+    displayGroupMessage(userID, toID);
   }
 
   messageTextArea.addEventListener("input", function () {
@@ -374,6 +287,144 @@ async function setMessageContainer(
     } else {
       sendMessageBtn.classList.remove("invisible");
     }
+  });
+}
+
+async function displayGroupMessage(userID, toID) {
+  Handlebars.registerHelper("isSendMessage", function (senderID) {
+    return senderID == userID;
+  });
+
+  Handlebars.registerHelper("isNewDay", function (index) {
+    if (index == 0) {
+      return true;
+    } else {
+      let currentMessageTime = new Date(
+        groupMessageData[index].time
+      ).toDateString();
+      let previousMessageTime = new Date(
+        groupMessageData[index - 1].time
+      ).toDateString();
+      if (currentMessageTime === previousMessageTime) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  });
+
+  Handlebars.registerHelper("convertToDate", function (timestamp) {
+    return new Date(timestamp).toDateString();
+  });
+
+  Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
+    let time = timestamp.substring(11, 16);
+    switch (time.charAt(0)) {
+      case "1":
+        time = Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
+        break;
+      case "0":
+        time += "am";
+        break;
+    }
+
+    return time;
+  });
+
+  const groupMessageData = await getGroupMessages(userID, toID);
+
+  // Get the template source
+  const messageTemplateSource =
+    document.getElementById("message-template").innerHTML;
+
+  // Compile the template
+  const messageTemplate = Handlebars.compile(messageTemplateSource);
+
+  const data = { messages: groupMessageData };
+
+  // Render the template with data
+  const messageHtmlOutput = messageTemplate(data);
+
+  // Insert the HTML into the DOM
+  document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+
+  const sentMessages = document.querySelectorAll(".sendMessage");
+
+  Array.from(sentMessages).forEach((sentMessage) => {
+    const deleteMessage = sentMessage.querySelector(".deleteMessage");
+    deleteMessage.addEventListener("click", function () {
+      deleteMessageID = sentMessage.id;
+      deleteMessageConfirmation.style.display = "block";
+    });
+  });
+}
+
+async function displayDirectMessage(userID, toID) {
+  Handlebars.registerHelper("isSendMessage", function (senderID) {
+    return senderID == userID;
+  });
+
+  Handlebars.registerHelper("isNewDay", function (index) {
+    if (index == 0) {
+      return true;
+    } else {
+      let currentMessageTime = new Date(
+        directMessageData[index].time
+      ).toDateString();
+      let previousMessageTime = new Date(
+        directMessageData[index - 1].time
+      ).toDateString();
+      if (currentMessageTime === previousMessageTime) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+  });
+
+  Handlebars.registerHelper("convertToDate", function (timestamp) {
+    return new Date(timestamp).toDateString();
+  });
+
+  Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
+    let time = timestamp.substring(11, 16);
+    switch (time.charAt(0)) {
+      case "1":
+        time = Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
+        break;
+      case "0":
+        time += "am";
+        break;
+    }
+
+    return time;
+  });
+
+  const directMessageData = await getDirectMessages(userID, toID);
+
+  // Get the template source
+  const messageTemplateSource =
+    document.getElementById("message-template").innerHTML;
+
+  // Compile the template
+  const messageTemplate = Handlebars.compile(messageTemplateSource);
+
+  const data = { messages: directMessageData };
+
+  // Render the template with data
+  const messageHtmlOutput = messageTemplate(data);
+
+  // Insert the HTML into the DOM
+  document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+
+  const sentMessages = document.querySelectorAll(".sendMessage");
+
+  Array.from(sentMessages).forEach((sentMessage) => {
+    const deleteMessage = sentMessage.querySelector(".deleteMessage");
+    deleteMessage.addEventListener("click", function () {
+      deleteMessageID = sentMessage.id;
+      deleteMessageConfirmation.style.display = "block";
+    });
   });
 }
 
@@ -390,7 +441,7 @@ async function getMessageLists(userID) {
   return result;
 }
 
-async function getDirectMessage(currentUserID, selectedUserID) {
+async function getDirectMessages(currentUserID, selectedUserID) {
   const server = "http://127.0.0.1:5000/api/message/direct";
   const query = `?senderID=${encodeURIComponent(
     currentUserID
@@ -405,7 +456,26 @@ async function getDirectMessage(currentUserID, selectedUserID) {
   return result;
 }
 
-async function getGroupMessage(userID, groupID) {
+async function deleteDirectMessage(messageID) {
+  const server = "http://127.0.0.1:5000/api/message/direct/delete";
+  const data = { messageID };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Message deletion failed:", error.message);
+    });
+}
+
+async function getGroupMessages(userID, groupID) {
   const server = "http://127.0.0.1:5000/api/message/group";
   const query = `?userID=${encodeURIComponent(
     userID

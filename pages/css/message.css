@@ -79,6 +79,14 @@ textarea::placeholder {
   min-width: 200px;
 }
 
+.sendMessage:hover .deleteMessage > svg {
+  display: block;
+}
+.deleteMessage > svg {
+  display: none;
+  cursor: pointer;
+}
+
 #sendMessageBtn {
   cursor: pointer;
 }

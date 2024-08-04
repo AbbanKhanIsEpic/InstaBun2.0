@@ -127,6 +127,7 @@ WHERE
   async getGroupMessage(userID, groupID) {
     try {
       const query = `SELECT 
+      groupmessages.messageID as messageID,
     users.displayName,
     users.profileIcon as icon,
     groupmessages.groupMessage AS message,
@@ -144,6 +145,16 @@ WHERE
         OR cleargroupmessage.time < groupmessages.time);`;
       const result = await select(query, [userID, groupID]);
       return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async deleteDirectMessage(messageID) {
+    try {
+      const query = `DELETE FROM directmessage WHERE (messageID = ?);`;
+      await update(query, [messageID]);
+      return "Update profile operation successful";
     } catch (error) {
       return error;
     }

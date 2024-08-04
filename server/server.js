@@ -722,6 +722,14 @@ app.get("/api/message/group", (req, res) => {
     });
 });
 
+app.post("/api/message/direct/delete", (req, res) => {
+  const messageID = req.body.messageID;
+
+  const messageManager = new MessageManager();
+  messageManager.deleteDirectMessage(messageID);
+  res.json({ message: "Data received and processed successfully" });
+});
+
 //Group
 
 app.get("/api/group/groupMembers", (req, res) => {

@@ -1,7 +1,7 @@
 const { initFirebase } = require("./Firebase");
 const { getStorage, ref, uploadBytes } = require("firebase/storage");
 const app = initFirebase();
-const storage = getStorage(app);
+const storage = (getStorage) => getStorage(app);
 
 class FirebaseStorageManager {
   async uploadFile(bytes, url) {

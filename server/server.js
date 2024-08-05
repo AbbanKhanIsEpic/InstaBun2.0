@@ -12,12 +12,11 @@ const UserManager = require("./UserManager");
 const FollowManager = require("./FollowManager");
 const PostManager = require("./PostManager");
 const StoryManager = require("./StoryManager");
-const DirectMessage = require("./DirectMessage");
 const GroupManager = require("./GroupManager");
-const GroupMessage = require("./GroupMessage");
 const CommentManager = require("./CommentManager");
 const EmailManager = require("./EmailManager");
 const MessageManager = require("./MessageManager");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -727,6 +726,15 @@ app.post("/api/message/direct/delete", (req, res) => {
 
   const messageManager = new MessageManager();
   messageManager.deleteDirectMessage(messageID);
+  res.json({ message: "Data received and processed successfully" });
+});
+
+//Firebase
+app.post("/api/firebase/storage", (req, res) => {
+  const bytes = req.body.bytes;
+
+  const firebaseStorageManager = new FirebaseStorageManager();
+  firebaseStorageManager.uploadFile(bytes);
   res.json({ message: "Data received and processed successfully" });
 });
 

@@ -37,10 +37,6 @@
   height: 400px;
 }
 
-.pointer {
-  cursor: pointer;
-}
-
 .custom-carousel-indicator:not(.active) {
   background: gray;
 }
@@ -53,7 +49,10 @@
   right: -60px !important;
 }
 
-.bi:hover {
+#leftArrow > .bi:hover,
+#rightArrow > .bi:hover,
+.rightStory > .bi:hover,
+.leftStory > .bi:hover {
   fill: white;
 }
 

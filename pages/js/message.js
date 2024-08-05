@@ -19,10 +19,11 @@ const deleteMessageConfirmation = document.querySelector(
 );
 const cancelDeleteMessage = document.querySelector("#cancelDeleteMessage");
 const confirmDeleteMessage = document.querySelector("#confirmDeleteMessage");
-const showCaseMemberNewGroup = document.querySelector(
+const showCaseMemberNewGroup = createGroupModal.querySelector(
   "#showCaseMemberNewGroup"
 );
-const createGroupBtn = document.querySelector("#createGroupBtn");
+const createGroupBtn = createGroupModal.querySelector("#createGroupBtn");
+const groupNameInput = createGroupModal.querySelector("#groupNameInput");
 
 let isGroup;
 let deleteMessageID;
@@ -30,9 +31,10 @@ let communicatingToID;
 
 const selectedArray = [];
 
+//Event listeners
+
 document.addEventListener("DOMContentLoaded", displayMessageLists(userID));
 
-//Event listeners
 searchUsersInput.addEventListener("input", function () {
   const keywords = searchUsersInput.value.trim();
   //Only display the list after 500ms -> user stop typing
@@ -46,30 +48,37 @@ searchUsersInput.addEventListener("input", function () {
 });
 
 createGroupModalClose.addEventListener("click", function () {
-  //createGroupModal.style.display = "none"; -> no work D:
-  window.open("http://127.0.0.1:5500/pages/message.html", "_self");
+  createGroupModal.style.display = "none";
+  document.querySelector(".modal-backdrop").classList.add("d-none");
 });
 
 createGroupBtn.addEventListener("click", function () {
-  window.open("http://127.0.0.1:5500/pages/message.html", "_self");
+  const groupName = groupNameInput.value;
+  if (groupName.length == 0) {
+    alert("You must enter a name for the group");
+  } else if (groupName.length > 100) {
+    alert("The group name is too long");
+  }
+  createGroupModal.style.display = "none";
+  document.querySelector(".modal-backdrop").classList.add("d-none");
 });
 
-groupIconInput.addEventListener("change", function (event) {
+groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
-  if (selectedFile.type.match("image.*")) {
+  const sizeInMB = selectedFile.size / 1024 / 1024;
+  let result;
+  if (sizeInMB > 15) {
+    alert("Image size is too large. 5MB max");
+  } else if (!selectedFile.type.match("image.*")) {
+    alert("You can only upload an image for the group icon");
+  } else {
     const reader = new FileReader();
-    reader.addEventListener("load", (event) => {
+    reader.addEventListener("load", async (event) => {
       const showUpload = document.querySelector("#showUpload");
       showUpload.src = event.target.result;
-      console.log(event.target.result);
-      const sizeInMB = selectedFile.size / 1024 / 1024;
-      if (sizeInMB > 15) {
-        alert("Image size is too large. 5MB max");
-      }
+      result = await new Response(event.target.result).arrayBuffer();
     });
     reader.readAsDataURL(selectedFile);
-  } else {
-    alert("You can only upload an img for the group icon");
   }
 });
 

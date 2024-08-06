@@ -16,7 +16,6 @@ const GroupManager = require("./GroupManager");
 const CommentManager = require("./CommentManager");
 const EmailManager = require("./EmailManager");
 const MessageManager = require("./MessageManager");
-const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -726,6 +725,34 @@ app.post("/api/message/direct/delete", (req, res) => {
 
   const messageManager = new MessageManager();
   messageManager.deleteDirectMessage(messageID);
+  res.json({ message: "Data received and processed successfully" });
+});
+
+app.post("/api/message/direct", (req, res) => {
+  const senderID = req.body.senderID;
+  const receiverID = req.body.receiverID;
+  const message = req.body.message;
+
+  const messageManager = new MessageManager();
+  messageManager.sendDirectMessage(senderID, receiverID, message);
+  res.json({ message: "Data received and processed successfully" });
+});
+
+app.post("/api/message/group", (req, res) => {
+  const groupID = req.body.groupID;
+  const senderID = req.body.senderID;
+  const message = req.body.message;
+
+  const messageManager = new MessageManager();
+  messageManager.sendGroupMessage(groupID, senderID, message);
+  res.json({ message: "Data received and processed successfully" });
+});
+
+app.post("/api/message/group/delete", (req, res) => {
+  const messageID = req.body.messageID;
+
+  const messageManager = new MessageManager();
+  messageManager.deleteGroupMessage(messageID);
   res.json({ message: "Data received and processed successfully" });
 });
 

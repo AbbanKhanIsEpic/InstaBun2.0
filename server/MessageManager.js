@@ -108,7 +108,8 @@ WHERE
       cleardirectmessage ON cleardirectmessage.senderID = ? AND cleardirectmessage.recieverID = ?
     WHERE
         directmessage.senderID IN (? , ?)
-            AND directmessage.receiverID IN (? , ?) and (cleardirectmessage.time IS NULL OR cleardirectmessage.Time < directmessage.time);
+            AND directmessage.receiverID IN (? , ?) and (cleardirectmessage.time IS NULL OR cleardirectmessage.Time < directmessage.time)
+            ORDER BY directmessage.time;
 `;
       const result = await select(query, [
         senderID,
@@ -129,6 +130,7 @@ WHERE
       const query = `SELECT 
       groupmessages.messageID as messageID,
     users.displayName,
+    users.userID as senderID,
     users.profileIcon as icon,
     groupmessages.groupMessage AS message,
     groupmessages.time
@@ -142,7 +144,7 @@ FROM
 WHERE
     groupmessages.groupID = ?
         AND (cleargroupmessage.time IS NULL
-        OR cleargroupmessage.time < groupmessages.time);`;
+        OR cleargroupmessage.time < groupmessages.time) ORDER BY groupmessages.time;;`;
       const result = await select(query, [userID, groupID]);
       return result;
     } catch (error) {
@@ -150,11 +152,41 @@ WHERE
     }
   }
 
-  async deleteDirectMessage(messageID) {
+  deleteDirectMessage(messageID) {
     try {
       const query = `DELETE FROM directmessage WHERE (messageID = ?);`;
-      await update(query, [messageID]);
-      return "Update profile operation successful";
+      update(query, [messageID]);
+      return "Delete direct message operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  deleteGroupMessage(messageID) {
+    try {
+      const query = `DELETE FROM groupmessages WHERE (messageID = ?);`;
+      update(query, [messageID]);
+      return "Delete direct message operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  sendDirectMessage(senderID, receiverID, message) {
+    try {
+      const query = `INSERT INTO directmessage (senderID,receiverID,message) VALUES (?,?,?);`;
+      update(query, [senderID, receiverID, message]);
+      return "Sent direct message operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  sendGroupMessage(groupID, senderID, message) {
+    try {
+      const query = `INSERT INTO groupmessages (groupID,userID,groupMessage) VALUES (?,?,?);`;
+      update(query, [groupID, senderID, message]);
+      return "Sent group message operation successful";
     } catch (error) {
       return error;
     }

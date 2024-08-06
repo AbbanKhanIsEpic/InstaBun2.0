@@ -86,11 +86,14 @@ cancelDeleteMessage.addEventListener("click", function () {
   deleteMessageConfirmation.style.display = "none";
 });
 
-confirmDeleteMessage.addEventListener("click", async function () {
+confirmDeleteMessage.addEventListener("click", function () {
   if (isGroup) {
   } else {
-    await deleteDirectMessage(deleteMessageID);
-    displayDirectMessage(userID, communicatingToID);
+    deleteDirectMessage(deleteMessageID);
+    setTimeout(function () {
+      displayDirectMessage(userID, communicatingToID);
+      deleteMessageConfirmation.style.display = "none";
+    }, 1); //WHY DO I NEED THIS FOR IT TO WORK
   }
 });
 
@@ -378,21 +381,25 @@ async function displayGroupMessage(userID, toID) {
   });
 
   Handlebars.registerHelper("convertToDate", function (timestamp) {
-    return new Date(timestamp).toDateString();
+    const date = new Date(timestamp);
+    const today = Date.now();
+    const dayInMiliseconds = 8.64e7;
+    if (today - date < dayInMiliseconds) {
+      return "Today";
+    } else if (today - date < dayInMiliseconds * 2) {
+      return "Yesterday";
+    } else if (today - date < dayInMiliseconds * 7) {
+      return date.toLocaleDateString("en-UK", { weekday: "long" });
+    } else {
+      return date.toLocaleDateString("en-UK");
+    }
   });
 
   Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
-    let time = timestamp.substring(11, 16);
-    switch (time.charAt(0)) {
-      case "1":
-        time = Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
-        break;
-      case "0":
-        time += "am";
-        break;
-    }
-
-    return time;
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   });
 
   const groupMessageData = await getGroupMessages(userID, toID);
@@ -425,6 +432,7 @@ async function displayGroupMessage(userID, toID) {
 
 async function displayDirectMessage(userID, toID) {
   Handlebars.registerHelper("isSendMessage", function (senderID) {
+    console.log(senderID);
     return senderID == userID;
   });
 
@@ -447,21 +455,25 @@ async function displayDirectMessage(userID, toID) {
   });
 
   Handlebars.registerHelper("convertToDate", function (timestamp) {
-    return new Date(timestamp).toDateString();
+    const date = new Date(timestamp);
+    const today = Date.now();
+    const dayInMiliseconds = 8.64e7;
+    if (today - date < dayInMiliseconds) {
+      return "Today";
+    } else if (today - date < dayInMiliseconds * 2) {
+      return "Yesterday";
+    } else if (today - date < dayInMiliseconds * 7) {
+      return date.toLocaleDateString("en-UK", { weekday: "long" });
+    } else {
+      return date.toLocaleDateString("en-UK");
+    }
   });
 
   Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
-    let time = timestamp.substring(11, 16);
-    switch (time.charAt(0)) {
-      case "1":
-        time = Number(time.substring(0, 2)) - 12 + time.substring(2, 5) + "pm";
-        break;
-      case "0":
-        time += "am";
-        break;
-    }
-
-    return time;
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   });
 
   const directMessageData = await getDirectMessages(userID, toID);
@@ -489,6 +501,7 @@ async function displayDirectMessage(userID, toID) {
       deleteMessageID = sentMessage.id;
       deleteMessageConfirmation.style.display = "block";
     });
+    deleteMessageConfirmation;
   });
 }
 
@@ -539,6 +552,25 @@ async function deleteDirectMessage(messageID) {
     });
 }
 
+async function sendGroupMessage(messageID) {
+  const server = "http://127.0.0.1:5000/api/message/group/delete";
+  const data = { messageID };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Message deletion failed:", error.message);
+    });
+}
+
 async function getGroupMessages(userID, groupID) {
   const server = "http://127.0.0.1:5000/api/message/group";
   const query = `?userID=${encodeURIComponent(
@@ -552,4 +584,53 @@ async function getGroupMessages(userID, groupID) {
       result = data;
     });
   return result;
+}
+
+function sendMessage() {
+  const message = document.querySelector("#messageTextArea").innerHTML;
+  if (isGroup) {
+    sendGroupMessage(communicatingToID, userID, message);
+  } else {
+    sendDirectMessage(userID, communicatingToID, message);
+  }
+}
+
+async function sendGroupMessage(groupID, senderID, message) {
+  const server = "http://127.0.0.1:5000/api/message/group";
+  const data = { groupID, senderID, message };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      displayGroupMessage(userID, communicatingToID);
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Message deletion failed:", error.message);
+    });
+}
+
+async function sendDirectMessage(senderID, receiverID, message) {
+  const server = "http://127.0.0.1:5000/api/message/direct";
+  const data = { senderID, receiverID, message };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      displayDirectMessage(userID, communicatingToID);
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Message deletion failed:", error.message);
+    });
 }

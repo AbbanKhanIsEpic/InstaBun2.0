@@ -1,4 +1,4 @@
-const { initFirebase } = require("./Firebase");
+const { initFirebase } = require("./Firebase.mjs");
 const { getStorage, ref, uploadBytes } = require("firebase/storage");
 const app = initFirebase();
 const storage = (getStorage) => getStorage(app);

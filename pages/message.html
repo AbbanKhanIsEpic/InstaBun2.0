@@ -353,7 +353,7 @@
                 class="text-white bg-black border-0 d-flex form-control ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break"
                 data-placeholder="Message..." contenteditable="true"></div>
             <div class="input-group-text bg-transparent border-0 d-flex text-primary invisible"
-                id="sendMessageBtn">
+                id="sendMessageBtn" onClick="sendMessage()">
                 Post
             </div>
         </form>
@@ -366,7 +366,7 @@
             {{convertToDate message.time}}
         </div>
         {{/if}}
-        {{#if (isSendMessage senderID)}}
+        {{#if (isSendMessage message.senderID)}}
         <div class="w-100 d-flex justify-content-end pb-3">
             <div class="sendMessage rounded-4 bg-primary pt-1 ps-2 pb-1 pe-2 me-3" id="{{message.messageID}}">
                 <span class="message">{{message.message}}</span>

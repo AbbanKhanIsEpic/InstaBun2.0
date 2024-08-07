@@ -1,0 +1,16 @@
+.emoji {
+  font-size: 32px;
+  vertical-align: middle !important;
+}
+.emojiBtn {
+  cursor: pointer;
+}
+.emoji:hover {
+  background: #424449;
+}
+#emojiList {
+  height: 240px;
+}
+.bi-emoji-smile {
+  cursor: pointer;
+}

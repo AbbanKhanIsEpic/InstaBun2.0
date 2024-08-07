@@ -1,3 +1,5 @@
+let messageTextArea;
+
 document.addEventListener("DOMContentLoaded", function () {
   //Helper
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
@@ -57,9 +59,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //Declaring all interactables
     const likeButton = post.querySelector(".like-button");
     const bookmarkButton = post.querySelector(".bookmarkButton");
-    const textarea = post.querySelector("textarea");
+    const commentArea = post.querySelector(".commentTextArea");
     const sendQuickComment = post.querySelector(".sendQuickComment");
     const likeCounter = post.querySelector(".likeCounter");
+    const emojiBtn = post.querySelector(".emojiBtn");
     const postID = post.getAttribute("data-post-id");
 
     //Event listeners
@@ -86,9 +89,14 @@ document.addEventListener("DOMContentLoaded", function () {
     //Bookmark and unbookmark
     bookmarkButton.addEventListener("click", function (event) {});
 
+    emojiBtn.addEventListener("click", function () {
+      messageTextArea = commentArea;
+    });
+
     //Typing a quick comment -> changing the span display value
-    textarea.addEventListener("input", function () {
-      if (textarea.value.length == 0) {
+    commentArea.addEventListener("input", function () {
+      const comment = commentArea.innerHTML;
+      if (comment == 0) {
         sendQuickComment.classList.add("d-none");
       } else {
         sendQuickComment.classList.remove("d-none");

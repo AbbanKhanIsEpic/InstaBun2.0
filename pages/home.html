@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/pages/css/sideBar.css" />
   <link rel="stylesheet" href="/pages/css/story.css" />
   <link rel="stylesheet" href="/pages/css/post.css" />
+  <link rel="stylesheet" href="/pages/css/emoji.css" />
 </head>
 
 <body class="container-fluid min-vh-100 min-vw-100 overflow-hidden m-0 p-0 text-white text-decoration-none">
@@ -106,6 +107,29 @@
         </div>
       </div>
       <div id="posts" class="d-flex align-items-center flex-column mt-4"></div>
+    </div>
+  </div>
+  <div class="modal glassmorph" tabindex="-1" id="emojiSelector">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-black text-white glassmorph">
+        <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
+          <h5 class="modal-title pt-3">Emoji finder</h5>
+          <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
+            data-bs-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
+              viewBox="0 0 16 16">
+              <path
+                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                stroke="white" stroke-width="1.5" />
+            </svg>
+          </button>
+          <hr class="w-100 border-white border-2" />
+          <input type="text" class="form-control bg-transparent text-white border-0 w-100"
+            placeholder="Search for an emoji..." id="emojiSearch" />
+          <hr class="w-100 border-white border-2" />
+        </div>
+        <div class="modal-body d-flex w-100 flex-row m-0 p-0 overflow-y-auto text-wrap flex-wrap" id="emojiList"></div>
+      </div>
     </div>
   </div>
   <script type="text/x-handlebars-template" id="story-template">
@@ -386,20 +410,22 @@
               comments</div>
           {{/ifEquals}}
           <div class="mt-2 d-flex flex-row">
-            <form>
-              <textarea
-                class="text-white-50 bg-black d-flex d-inline-block w-100"
-                name="text"
-                rows="1"
-                placeholder="Add a comment..."
-              ></textarea>
-            </form>
+              <form class="input-group">
+                <div
+              type="text"
+              class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break commentTextArea"
+              data-placeholder="Send a comment..."
+              contenteditable="true"
+            ></div>
+              </form>
             <div class="d-flex flex-row">
               <span
                 class="me-2 text-primary sendQuickComment d-none"
                 role="button"
               >Post</span>
-              <svg
+              <span class="emojiBtn" data-bs-toggle="modal"
+              data-bs-target="#emojiSelector">
+                <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
                 height="20"
@@ -411,16 +437,29 @@
                   d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8"
                 />
               </svg>
+              </span>
             </div>
           </div>
-          <hr />
+          <hr class="mt-1"/>
         </div>
+      {{/each}}
+    </script>
+  <script type="text/x-handlebars-template" id="emoji-button-template">
+      {{#each emojiObject}}
+        <div
+          class="emojiBtn d-flex justify-content-center align-items-center user-select-none"
+        ><div
+            class="emoji d-flex rounded-2"
+            data-bs-dismiss="modal"
+            data-bs-target="#emojiSelector"
+          >{{this}}</div></div>
       {{/each}}
     </script>
   <script src="/pages/js/userSession.js"></script>
   <script src="/pages/js/sidebar.js"></script>
-  <script src="/pages/js/story.js"></script>
   <script src="/pages/js/post.js"></script>
+  <script src="/pages/js/story.js"></script>
+  <script src="/pages/js/emoji.js"></script>
   <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>

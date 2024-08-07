@@ -166,46 +166,54 @@ document.addEventListener("DOMContentLoaded", function () {
     const carouselInner = modal.querySelector(".carousel-inner");
     const rightStory = modal.querySelector(".rightStory");
     const leftStory = modal.querySelector(".leftStory");
-    const lastIndex = carouselInner.childElementCount - 1;
+    const lastIndex =
+      carouselInner != null ? carouselInner.childElementCount - 1 : 0;
     const customCarouselIndicator = modal.getElementsByClassName(
       "custom-carousel-indicator"
     );
 
-    rightStory.addEventListener("click", function () {
-      for (let index = 0; index < lastIndex; index++) {
-        const currentStory = carouselInner.children[index];
-        if (currentStory.classList.contains("active")) {
-          carouselInner.children[index + 1].classList.toggle("active");
-          customCarouselIndicator[index + 1].classList.add("active");
-          currentStory.classList.toggle("active");
-          if (index == 0) {
-            leftStory.classList.toggle("visually-hidden");
+    if (rightStory != null) {
+      rightStory.addEventListener("click", function () {
+        for (let index = 0; index < lastIndex; index++) {
+          const currentStory = carouselInner.children[index];
+          if (currentStory.classList.contains("active")) {
+            carouselInner.children[index + 1].classList.toggle("active");
+            customCarouselIndicator[index + 1].classList.add("active");
+            currentStory.classList.toggle("active");
+            if (index == 0) {
+              leftStory.classList.toggle("visually-hidden");
+            }
+            if (index + 1 == lastIndex) {
+              rightStory.classList.toggle("visually-hidden");
+            }
+            break;
           }
-          if (index + 1 == lastIndex) {
-            rightStory.classList.toggle("visually-hidden");
-          }
-          break;
         }
-      }
-    });
+      });
+    }
 
-    leftStory.addEventListener("click", function () {
-      for (let index = 1; index <= lastIndex; index++) {
-        const currentStory = carouselInner.children[index];
-        if (currentStory.classList.contains("active")) {
-          carouselInner.children[index - 1].classList.toggle("active");
-          customCarouselIndicator[index].classList.remove("active");
-          currentStory.classList.toggle("active");
-          if (index == 1) {
-            leftStory.classList.toggle("visually-hidden");
+    if (leftStory != null) {
+      leftStory.addEventListener("click", function () {
+        for (let index = 1; index <= lastIndex; index++) {
+          const currentStory = carouselInner.children[index];
+          if (currentStory.classList.contains("active")) {
+            carouselInner.children[index - 1].classList.toggle("active");
+            customCarouselIndicator[index].classList.remove("active");
+            currentStory.classList.toggle("active");
+            const video = modal.querySelectorAll("video")[index];
+            video.currentTime = 0;
+            video.pause();
+            if (index == 1) {
+              leftStory.classList.toggle("visually-hidden");
+            }
+            if (index == lastIndex) {
+              rightStory.classList.toggle("visually-hidden");
+            }
+            break;
           }
-          if (index == lastIndex) {
-            rightStory.classList.toggle("visually-hidden");
-          }
-          break;
         }
-      }
-    });
+      });
+    }
 
     modal.addEventListener("hidden.bs.modal", function (event) {
       const videos = modal.querySelectorAll("video");

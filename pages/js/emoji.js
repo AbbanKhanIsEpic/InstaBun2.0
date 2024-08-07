@@ -46,7 +46,9 @@ function displayEmojies(data) {
   Array.from(emojis).forEach((emoji) => {
     emoji.addEventListener("click", function () {
       messageTextArea.innerHTML += emoji.innerHTML;
-      sendMessageBtn.classList.remove("invisible");
+      if (typeof sendMessageBtn !== "undefined") {
+        sendMessageBtn.classList.remove("invisible");
+      }
     });
   });
 }

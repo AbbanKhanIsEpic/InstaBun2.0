@@ -5,21 +5,21 @@ class GroupMessage {
   async getMessageList(userID) {
     try {
       const query = `(WITH getLatestDirect AS (
-  SELECT m.*, ROW_NUMBER() OVER (PARTITION BY Case
-    WHEN m.senderID = ? THEN m.receiverID
-    WHEN m.receiverID = ? THEN m.senderID
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY Case
+    WHEN senderID = ? THEN receiverID
+    WHEN receiverID = ? THEN senderID
     END ORDER BY time DESC) AS latest
-  FROM directmessage AS m
+  FROM directmessage
   WHERE
-    (m.senderID = ?
-        AND m.receiverID NOT IN (SELECT
+    (senderID = ?
+        AND receiverID NOT IN (SELECT
             blockedUserID
         FROM
             instabun.block
         WHERE
             blockerUserID = ?))
-        OR (m.receiverID = ?
-        AND m.senderID NOT IN (SELECT
+        OR (receiverID = ?
+        AND senderID NOT IN (SELECT
             blockedUserID
         FROM
             instabun.block
@@ -187,6 +187,32 @@ WHERE
       const query = `INSERT INTO groupmessages (groupID,userID,groupMessage) VALUES (?,?,?);`;
       update(query, [groupID, senderID, message]);
       return "Sent group message operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getBlockedMessages(userID) {
+    try {
+      const query = `With blockedUsers as (
+SELECT blockedUserID FROM block
+where blockerUserID = ?
+
+), lastestBlockedMessages as (
+ Select *, ROW_NUMBER() OVER (PARTITION BY Case
+    WHEN senderID = ? THEN receiverID
+    WHEN receiverID = ? THEN senderID
+    END ORDER BY time DESC) as latest FROM directmessage JOIN blockedUsers 
+where (receiverID IN (blockedUsers.blockedUserID) AND senderID =?) OR (senderID IN (blockedUsers.blockedUserID) AND receiverID = ?)
+) SELECT * FROM lastestBlockedMessages where latest = 1 `;
+      const result = await select(query, [
+        userID,
+        userID,
+        userID,
+        userID,
+        userID,
+      ]);
+      return result;
     } catch (error) {
       return error;
     }

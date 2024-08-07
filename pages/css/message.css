@@ -32,31 +32,16 @@
   height: 74px;
 }
 #userList,
-#emojiList,
 #hiddenMessageList,
 #showCaseMemberNewGroup {
   height: 240px;
 }
-.bi-emoji-smile {
-  cursor: pointer;
-}
-.emoji {
-  font-size: 32px;
-  vertical-align: middle !important;
-}
+
 #messageTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
   content: attr(data-placeholder);
 }
 #messageTextArea {
   height: 36px;
-}
-.emojiBtn {
-  cursor: pointer;
-  width: 48px;
-  height: 48px;
-}
-.emoji:hover {
-  background: #424449;
 }
 .user {
   min-height: 60px;
@@ -64,14 +49,6 @@
 }
 .user:hover {
   background: #1a1a1a;
-}
-input::placeholder,
-textarea::placeholder {
-  color: gray !important;
-}
-
-.form-control:focus {
-  box-shadow: none;
 }
 
 .sendMessage,

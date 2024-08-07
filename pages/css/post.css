@@ -20,12 +20,12 @@
   object-fit: contain;
 }
 
-textarea {
-  border: none;
-  outline: none;
-  resize: none;
+.commentTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
+  content: attr(data-placeholder);
 }
-
+.commentTextArea {
+  height: 36px;
+}
 form {
   width: 461px;
 }

@@ -63,6 +63,10 @@ createGroupBtn.addEventListener("click", function () {
   document.querySelector(".modal-backdrop").classList.add("d-none");
 });
 
+document
+  .querySelector("#viewHiddenMessages")
+  .addEventListener("shown.bs.modal", function () {});
+
 groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
   const sizeInMB = selectedFile.size / 1024 / 1024;
@@ -275,6 +279,10 @@ function createGroup(userID, groupName, groupProfileIcon, groupMembers) {
 }
 
 async function displayMessageLists(userID) {
+  Handlebars.registerHelper("currentUserSent", function (senderID) {
+    return senderID == userID;
+  });
+
   // Get the template source
   const templateSource = document.getElementById(
     "message-selection-template"
@@ -322,6 +330,7 @@ async function setMessageContainer(
 ) {
   isGroup = !isDirect;
   communicatingToID = toID;
+
   // Get the template source
   const templateSource = document.getElementById(
     "conversation-container-template"
@@ -382,13 +391,20 @@ async function displayGroupMessage(userID, toID) {
 
   Handlebars.registerHelper("convertToDate", function (timestamp) {
     const date = new Date(timestamp);
-    const today = Date.now();
-    const dayInMiliseconds = 8.64e7;
-    if (today - date < dayInMiliseconds) {
+
+    const dateString = date.toLocaleDateString();
+
+    const today = new Date();
+
+    const todayString = today.toLocaleDateString();
+
+    const dayDiff = today.getDate() - date.getDate();
+
+    if (dateString == todayString) {
       return "Today";
-    } else if (today - date < dayInMiliseconds * 2) {
+    } else if (dayDiff == 1) {
       return "Yesterday";
-    } else if (today - date < dayInMiliseconds * 7) {
+    } else if (dayDiff < 7) {
       return date.toLocaleDateString("en-UK", { weekday: "long" });
     } else {
       return date.toLocaleDateString("en-UK");

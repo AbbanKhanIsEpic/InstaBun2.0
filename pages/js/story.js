@@ -25,14 +25,17 @@ document.addEventListener("DOMContentLoaded", function () {
           "https://www.wfla.com/wp-content/uploads/sites/71/2023/05/GettyImages-1389862392.jpg?w=876&h=493&crop=1",
         stories: [
           {
+            id: 15,
             isVideo: true,
             url: "https://firebasestorage.googleapis.com/v0/b/cogent-osprey-390319.appspot.com/o/video%2FP1%3A6?alt=media&token=c6fc3d02-cb0a-48a6-a5dc-439bf66cccae",
           },
           {
+            id: 14,
             isVideo: false,
             url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
           {
+            id: 11,
             isVideo: false,
             url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
@@ -44,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         profileLink: "https://github.com/mdo.png",
         stories: [
           {
+            id: 110,
             isVideo: false,
             url: "https://cdn.theatlantic.com/thumbor/fWHNkP-IHxWP4gyI87XDAaiKPFU=/0x62:2000x1187/976x549/media/img/mt/2018/03/AP_325360162607/original.jpg",
           },
@@ -54,10 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
         profileLink: "https://github.com/mdo.png",
         stories: [
           {
+            id: 10,
             isVideo: false,
             url: "https://cdn.theatlantic.com/thumbor/fWHNkP-IHxWP4gyI87XDAaiKPFU=/0x62:2000x1187/976x549/media/img/mt/2018/03/AP_325360162607/original.jpg",
           },
           {
+            id: 9,
             isVideo: false,
             url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
@@ -68,10 +74,12 @@ document.addEventListener("DOMContentLoaded", function () {
         profileLink: "https://github.com/mdo.png",
         stories: [
           {
+            id: 3,
             isVideo: false,
             url: "https://cdn.theatlantic.com/thumbor/fWHNkP-IHxWP4gyI87XDAaiKPFU=/0x62:2000x1187/976x549/media/img/mt/2018/03/AP_325360162607/original.jpg",
           },
           {
+            id: 4,
             isVideo: false,
             url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
@@ -84,10 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
         closeFriend: true,
         stories: [
           {
+            id: 1,
             isVideo: false,
             url: "https://cdn.theatlantic.com/thumbor/fWHNkP-IHxWP4gyI87XDAaiKPFU=/0x62:2000x1187/976x549/media/img/mt/2018/03/AP_325360162607/original.jpg",
           },
           {
+            id: 2,
             isVideo: false,
             url: "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
           },
@@ -177,14 +187,19 @@ document.addEventListener("DOMContentLoaded", function () {
         for (let index = 0; index < lastIndex; index++) {
           const currentStory = carouselInner.children[index];
           if (currentStory.classList.contains("active")) {
-            carouselInner.children[index + 1].classList.toggle("active");
+            carouselInner.children[index + 1].classList.add("active");
             customCarouselIndicator[index + 1].classList.add("active");
-            currentStory.classList.toggle("active");
+            currentStory.classList.remove("active");
             if (index == 0) {
               leftStory.classList.toggle("visually-hidden");
             }
             if (index + 1 == lastIndex) {
               rightStory.classList.toggle("visually-hidden");
+            }
+            const currentVideo = currentStory.querySelector("video");
+            if (currentVideo != null) {
+              currentVideo.currentTime = 0;
+              currentVideo.pause();
             }
             break;
           }
@@ -200,14 +215,16 @@ document.addEventListener("DOMContentLoaded", function () {
             carouselInner.children[index - 1].classList.toggle("active");
             customCarouselIndicator[index].classList.remove("active");
             currentStory.classList.toggle("active");
-            const video = modal.querySelectorAll("video")[index];
-            video.currentTime = 0;
-            video.pause();
             if (index == 1) {
               leftStory.classList.toggle("visually-hidden");
             }
             if (index == lastIndex) {
               rightStory.classList.toggle("visually-hidden");
+            }
+            const currentVideo = currentStory.querySelector("video");
+            if (currentVideo != null) {
+              currentVideo.currentTime = 0;
+              currentVideo.pause();
             }
             break;
           }
@@ -215,7 +232,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    modal.addEventListener("hidden.bs.modal", function (event) {
+    //I have to chaneg the way I look for the next story and ya
+    modal.addEventListener("hidden.bs.modal", function () {
       const videos = modal.querySelectorAll("video");
       for (const video of videos) {
         video.currentTime = 0;

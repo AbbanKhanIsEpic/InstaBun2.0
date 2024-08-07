@@ -215,11 +215,11 @@
                   <div class="carousel-inner h-100 w-100">
                     {{#each stories}}
                     <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
-                      <div class="d-flex justify-content-center align-items-center h-100">
+                      <div class="d-flex justify-content-center align-items-center h-100 user-select-none">
                         {{#if isVideo}}
-                        <video controls src="{{url}}" class="d-block h-100 object-fit-cover"></video>
+                        <video controls src="{{url}}" class="d-block h-100 object-fit-cover" id="{{id}}"></video>
                         {{else}}
-                        <img src="{{url}}" class="d-block h-100 object-fit-cover">
+                        <img src="{{url}}" class="d-block h-100 object-fit-cover" id="{{id}}">
                         {{/if}}
                       </div>
                     </div>

@@ -759,8 +759,12 @@ app.post("/api/message/group/delete", (req, res) => {
 
 //Firebase
 app.post("/api/firebase/storage", (req, res) => {
+  const base64 = req.body.base64;
+  const mime = req.body.mime;
+  const url = req.body.url;
+  console.log(url);
   const firebaseStorageManager = new FirebaseStorageManager();
-  console.log("Hi");
+  firebaseStorageManager.uploadFile(base64, mime, url);
   res.json({ message: "Data received and processed successfully" });
 });
 

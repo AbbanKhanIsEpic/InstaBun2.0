@@ -70,7 +70,6 @@ document
 groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
   const sizeInMB = selectedFile.size / 1024 / 1024;
-  let result;
   if (sizeInMB > 15) {
     alert("Image size is too large. 5MB max");
   } else if (!selectedFile.type.match("image.*")) {
@@ -80,7 +79,9 @@ groupIconInput.addEventListener("change", async function (event) {
     reader.addEventListener("load", async (event) => {
       const showUpload = document.querySelector("#showUpload");
       showUpload.src = event.target.result;
-      result = await new Response(event.target.result).arrayBuffer();
+      const result = reader.result.substring(reader.result.indexOf(",") + 1);
+      console.log(result);
+      uploadToFirebase(result, selectedFile.type, "/groupIcon/3u8uefju");
     });
     reader.readAsDataURL(selectedFile);
   }
@@ -644,6 +645,25 @@ async function sendDirectMessage(senderID, receiverID, message) {
   })
     .then((response) => {
       displayDirectMessage(userID, communicatingToID);
+      return response.json();
+    })
+    .catch((error) => {
+      console.error("Message deletion failed:", error.message);
+    });
+}
+
+async function uploadToFirebase(base64, mime, url) {
+  const server = "http://127.0.0.1:5000/api/firebase/storage";
+  const data = { base64, mime, url };
+
+  fetch(server, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
       return response.json();
     })
     .catch((error) => {

@@ -1,14 +1,24 @@
-const { app, storage } = require("./Firebase.js");
+const admin = require("./Firebase");
+
+const { Storage } = require("@google-cloud/storage");
+const storage = new Storage();
+
+const bucket = admin.storage().bucket();
 
 class FirebaseStorageManager {
-  async uploadFile(bytes, url) {
+  async uploadFile(base64, mime, url) {
     try {
-      const storageRef = ref(this.storage, url);
-      const snapshot = await uploadBytes(storageRef, bytes);
-      console.log("Uploaded an array!");
-      console.log(snapshot);
+      // Convert base-64 to Uint8Array
+      const buffer = Buffer.from(base64, "base64");
+
+      // Upload the Buffer to Firebase Storage
+      const [file] = await bucket.upload(buffer, {
+        destination: url, // Set the desired filename in your bucket
+      });
+      console.log(file);
       return "File upload successful";
     } catch (error) {
+      console.error("Error uploading file:", error);
       return error;
     }
   }

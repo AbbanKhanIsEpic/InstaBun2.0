@@ -6,16 +6,17 @@ const cors = require("cors");
 //Status code
 const STATUS_TWO_STEP_REQUIRED = 497;
 
-const { createConnection } = require("./DB.cjs");
+const { createConnection } = require("./DB.js");
 
-const UserManager = require("./UserManager.cjs");
-const FollowManager = require("./FollowManager.cjs");
-const PostManager = require("./PostManager.cjs");
-const StoryManager = require("./StoryManager.cjs");
-const GroupManager = require("./GroupManager.cjs");
-const CommentManager = require("./CommentManager.cjs");
-const EmailManager = require("./EmailManager.cjs");
-const MessageManager = require("./MessageManager.cjs");
+const UserManager = require("./UserManager.js");
+const FollowManager = require("./FollowManager.js");
+const PostManager = require("./PostManager.js");
+const StoryManager = require("./StoryManager.js");
+const GroupManager = require("./GroupManager.js");
+const CommentManager = require("./CommentManager.js");
+const EmailManager = require("./EmailManager.js");
+const MessageManager = require("./MessageManager.js");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -27,7 +28,7 @@ app.set("trust proxy", true); //Allow server to get the IP address of user
 async function connectToDatabase() {
   try {
     await createConnection();
-    console.log("Connection established");
+    console.log("Connection to mySQL established");
   } catch (error) {
     // Handle the error appropriately
     console.error("Error connecting to the database:", error);
@@ -758,10 +759,9 @@ app.post("/api/message/group/delete", (req, res) => {
 
 //Firebase
 app.post("/api/firebase/storage", (req, res) => {
-  (async () => {
-    const { app, initFirebase } = await import("./FirebaseStorageManager.mjs");
-    res.json({ message: "Data received and processed successfully" });
-  })();
+  const firebaseStorageManager = new FirebaseStorageManager();
+  console.log("Hi");
+  res.json({ message: "Data received and processed successfully" });
 });
 
 //Group

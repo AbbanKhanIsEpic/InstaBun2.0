@@ -1,5 +1,5 @@
 //Imports
-const { select, update } = require("./DB.cjs");
+const { select, update } = require("./DB.js");
 
 class GroupManager {
   //Create a new group

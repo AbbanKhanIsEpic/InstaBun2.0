@@ -1,4 +1,5 @@
-import { initializeApp } from ("firebase/app");
+const firebase = require("firebase/app");
+const { getStorage, ref, uploadBytes } = require("firebase/storage");
 require("dotenv").config();
 
 const firebaseConfig = {
@@ -12,8 +13,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 
-export const initFirebase = () => {
-  return app;
-};
+const storage = app.storage();
+
+module.exports = { storage };

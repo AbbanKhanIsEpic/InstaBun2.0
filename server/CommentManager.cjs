@@ -1,4 +1,4 @@
-const { select, update } = require("./DB");
+const { select, update } = require("./DB.cjs");
 
 class CommentManager {
   //Save the comment to the database

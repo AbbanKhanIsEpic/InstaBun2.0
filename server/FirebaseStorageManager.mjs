@@ -1,7 +1,7 @@
-const { initFirebase } = require("./Firebase.mjs");
-const { getStorage, ref, uploadBytes } = require("firebase/storage");
+import { initFirebase } from "./Firebase.mjs";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 const app = initFirebase();
-const storage = (getStorage) => getStorage(app);
+const storage = getStorage(app);
 
 class FirebaseStorageManager {
   async uploadFile(bytes, url) {
@@ -18,4 +18,4 @@ class FirebaseStorageManager {
   }
 }
 
-module.exports = FirebaseStorageManager;
+export { FirebaseStorageManager };

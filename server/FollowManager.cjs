@@ -1,5 +1,5 @@
 //Import
-const { select, update } = require("./DB");
+const { select, update } = require("./DB.cjs");
 
 class FollowManager {
   //Save that the user (follwerID) is following the user(followingID)

@@ -1,6 +1,6 @@
 //Import
 const { select, update } = require("./DB");
-const UserManager = require("./UserManager");
+const UserManager = require("./UserManager.cjs");
 
 class DirectMessage {
   //Save the message to database

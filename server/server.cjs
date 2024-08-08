@@ -6,16 +6,16 @@ const cors = require("cors");
 //Status code
 const STATUS_TWO_STEP_REQUIRED = 497;
 
-const { createConnection } = require("./DB");
+const { createConnection } = require("./DB.cjs");
 
-const UserManager = require("./UserManager");
-const FollowManager = require("./FollowManager");
-const PostManager = require("./PostManager");
-const StoryManager = require("./StoryManager");
-const GroupManager = require("./GroupManager");
-const CommentManager = require("./CommentManager");
-const EmailManager = require("./EmailManager");
-const MessageManager = require("./MessageManager");
+const UserManager = require("./UserManager.cjs");
+const FollowManager = require("./FollowManager.cjs");
+const PostManager = require("./PostManager.cjs");
+const StoryManager = require("./StoryManager.cjs");
+const GroupManager = require("./GroupManager.cjs");
+const CommentManager = require("./CommentManager.cjs");
+const EmailManager = require("./EmailManager.cjs");
+const MessageManager = require("./MessageManager.cjs");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -758,11 +758,10 @@ app.post("/api/message/group/delete", (req, res) => {
 
 //Firebase
 app.post("/api/firebase/storage", (req, res) => {
-  const bytes = req.body.bytes;
-
-  const firebaseStorageManager = new FirebaseStorageManager();
-  firebaseStorageManager.uploadFile(bytes);
-  res.json({ message: "Data received and processed successfully" });
+  (async () => {
+    const { app, initFirebase } = await import("./FirebaseStorageManager.mjs");
+    res.json({ message: "Data received and processed successfully" });
+  })();
 });
 
 //Group

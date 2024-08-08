@@ -1,4 +1,4 @@
-const { initializeApp } = require("firebase/app");
+import { initializeApp } from ("firebase/app");
 require("dotenv").config();
 
 const firebaseConfig = {
@@ -12,10 +12,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
-module.exports = {
-  initFirebase: function () {
-    return app;
-  },
+export const initFirebase = () => {
+  return app;
 };

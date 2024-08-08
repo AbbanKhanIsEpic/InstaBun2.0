@@ -1,6 +1,6 @@
 //Imports
-const { select, update } = require("./DB");
-const FollowManager = require("./FollowManager");
+const { select, update } = require("./DB.cjs");
+const FollowManager = require("./FollowManager.cjs");
 
 class PostManager {
   //This is used for the naming convension for uploading files to firebase

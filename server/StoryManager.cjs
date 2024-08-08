@@ -1,5 +1,5 @@
-const { select, update } = require("./DB");
-const FollowManager = require("./FollowManager");
+const { select, update } = require("./DB.cjs");
+const FollowManager = require("./FollowManager.cjs");
 
 class StoryManager {
   async upload(userID, StoryLink, Title, isVideo) {

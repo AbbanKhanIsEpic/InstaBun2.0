@@ -1,6 +1,5 @@
 //Imports
-const { select, update } = require("./DB");
-const GroupMessage = require("./GroupMessage");
+const { select, update } = require("./DB.cjs");
 
 class GroupManager {
   //Create a new group

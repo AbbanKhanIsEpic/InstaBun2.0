@@ -1,5 +1,10 @@
 //Imports
 const express = require("express");
+
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const cors = require("cors");
@@ -16,7 +21,6 @@ const GroupManager = require("./GroupManager.js");
 const CommentManager = require("./CommentManager.js");
 const EmailManager = require("./EmailManager.js");
 const MessageManager = require("./MessageManager.js");
-const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -757,17 +761,6 @@ app.post("/api/message/group/delete", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-//Firebase
-app.post("/api/firebase/storage", (req, res) => {
-  const base64 = req.body.base64;
-  const mime = req.body.mime;
-  const url = req.body.url;
-  console.log(url);
-  const firebaseStorageManager = new FirebaseStorageManager();
-  firebaseStorageManager.uploadFile(base64, mime, url);
-  res.json({ message: "Data received and processed successfully" });
-});
-
 //Group
 
 app.get("/api/group/groupMembers", (req, res) => {
@@ -821,14 +814,17 @@ app.post("/api/group/delete", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-app.post("/api/group/create", (req, res) => {
-  const userID = req.body.userID;
-  const groupName = req.body.groupName;
-  const groupProfileIcon = req.body.groupProfileIcon;
-  const groupMembers = req.body.groupMembers;
+app.post("/api/group", upload.single("file"), (req, res) => {
+  const file = req.file;
+  const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
+
+  const groupMemebers = jsonData.groupMembers;
+  const groupName = jsonData.groupName;
+  const ownerID = jsonData.ownerID;
 
   const groupManager = new GroupManager();
-  groupManager.createGroup(userID, groupName, groupProfileIcon, groupMembers);
+  groupManager.createGroup(ownerID, groupName, file, groupMemebers);
+
   res.json({ message: "Data received and processed successfully" });
 });
 

@@ -6,17 +6,17 @@ const storage = new Storage();
 const bucket = admin.storage().bucket();
 
 class FirebaseStorageManager {
-  async uploadFile(base64, mime, url) {
+  async uploadFile(buffer, baseURL, mimetype) {
     try {
-      // Convert base-64 to Uint8Array
-      const buffer = Buffer.from(base64, "base64");
+      const fileRef = bucket.file(baseURL);
 
-      // Upload the Buffer to Firebase Storage
-      const [file] = await bucket.upload(buffer, {
-        destination: url, // Set the desired filename in your bucket
+      await fileRef.save(buffer, {
+        metadata: {
+          contentType: mimetype,
+        },
       });
-      console.log(file);
-      return "File upload successful";
+
+      await fileRef.makePublic();
     } catch (error) {
       console.error("Error uploading file:", error);
       return error;

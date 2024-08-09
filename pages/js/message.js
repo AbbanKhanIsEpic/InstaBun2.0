@@ -28,6 +28,7 @@ const groupNameInput = createGroupModal.querySelector("#groupNameInput");
 let isGroup;
 let deleteMessageID;
 let communicatingToID;
+let selectedFile;
 
 const selectedArray = [];
 
@@ -58,9 +59,33 @@ createGroupBtn.addEventListener("click", function () {
     alert("You must enter a name for the group");
   } else if (groupName.length > 100) {
     alert("The group name is too long");
+  } else {
+    const formData = new FormData();
+
+    const mime = selectedFile.type;
+
+    const newFile = new File([selectedFile], "groupIcon", { type: mime });
+
+    formData.append("file", newFile);
+
+    const selectedUserID = selectedArray.map((user) => user.id);
+    selectedUserID.push(userID);
+
+    formData.append(
+      "jsonData",
+      JSON.stringify({
+        groupMembers: selectedUserID,
+        groupName: groupName,
+        ownerID: userID,
+      })
+    );
+
+    console.log(formData);
+
+    createGroup(formData);
+    //createGroupModal.style.display = "none";
+    //document.querySelector(".modal-backdrop").classList.add("d-none");
   }
-  createGroupModal.style.display = "none";
-  document.querySelector(".modal-backdrop").classList.add("d-none");
 });
 
 document
@@ -70,18 +95,16 @@ document
 groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
   const sizeInMB = selectedFile.size / 1024 / 1024;
+  const mime = selectedFile.type;
   if (sizeInMB > 15) {
     alert("Image size is too large. 5MB max");
-  } else if (!selectedFile.type.match("image.*")) {
+  } else if (!mime.match("image.*")) {
     alert("You can only upload an image for the group icon");
   } else {
     const reader = new FileReader();
     reader.addEventListener("load", async (event) => {
       const showUpload = document.querySelector("#showUpload");
       showUpload.src = event.target.result;
-      const result = reader.result.substring(reader.result.indexOf(",") + 1);
-      console.log(result);
-      uploadToFirebase(result, selectedFile.type, "/groupIcon/3u8uefju");
     });
     reader.readAsDataURL(selectedFile);
   }
@@ -114,11 +137,6 @@ startConversationButton.addEventListener("click", function () {
   } else if (hasSelectedSelf) {
     alert("You can not select yourself as another member in a group");
   } else {
-    const selectedUserID = [];
-    selectedArray.forEach((selectedUser) => {
-      selectedUserID.push(selectedUser["id"]);
-    });
-    selectedUserID.push(userID);
     newMessageModal.style.display = "none";
     createGroupModal.style.display = "block";
   }
@@ -258,25 +276,6 @@ async function getUserList(searchQuery) {
       result = data;
     });
   return result;
-}
-
-function createGroup(userID, groupName, groupProfileIcon, groupMembers) {
-  const server = "http://127.0.0.1:5000/api/group/create";
-  const data = { userID, groupName, groupProfileIcon, groupMembers };
-
-  fetch(server, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Login failed:", error.message);
-    });
 }
 
 async function displayMessageLists(userID) {
@@ -652,16 +651,11 @@ async function sendDirectMessage(senderID, receiverID, message) {
     });
 }
 
-async function uploadToFirebase(base64, mime, url) {
-  const server = "http://127.0.0.1:5000/api/firebase/storage";
-  const data = { base64, mime, url };
-
+function createGroup(formData) {
+  const server = "http://127.0.0.1:5000/api/group";
   fetch(server, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    body: formData,
   })
     .then((response) => {
       return response.json();

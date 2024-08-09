@@ -1,12 +1,26 @@
 //Imports
 const { select, update } = require("./DB.js");
+const sha1 = require("sha1");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 class GroupManager {
   //Create a new group
-  async createGroup(createrUserID, groupName, groupProfileIcon, groupMembers) {
+  async createGroup(createrUserID, groupName, file, groupMembers) {
     try {
-      const query = `INSERT INTO instabun.community (ownerID groupName,groupProfileIcon) VALUES (?,?,?);`;
-      await update(query, [createrUserID, groupName, groupProfileIcon]);
+      const buffer = file.buffer;
+      const fileName = sha1(buffer);
+      const url = file.originalname + "/" + fileName;
+      const mimetype = file.mimetype;
+
+      const firebaseStorageManager = new FirebaseStorageManager();
+      const firebaseURL = await firebaseStorageManager.uploadFile(
+        buffer,
+        url,
+        mimetype
+      );
+
+      const query = `INSERT INTO instabun.community (ownerID, groupName,groupProfileIcon) VALUES (?,?,?);`;
+      await update(query, [createrUserID, groupName, firebaseURL]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
       const groupID = await this.#getLatestGroupID(createrUserID);

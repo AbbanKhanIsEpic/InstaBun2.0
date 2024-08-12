@@ -361,8 +361,6 @@ app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
 app.post("/api/user/sendChangePasswordEmail", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
-  console.log(toEmail, code, location);
-
   try {
     const emailManager = new EmailManager();
     await emailManager.passwordChange(toEmail, code, location);
@@ -445,23 +443,6 @@ app.post("/api/follow/unfollow", (req, res) => {
 });
 
 //Post
-
-app.get("/api/post/total", (req, res) => {
-  const { userID } = req.query;
-
-  const post = new PostManager();
-
-  post
-    .total(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(String(jsonifiedResult));
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
 app.get("/api/post/followings", (req, res) => {
   const { userID, page } = req.query;
 
@@ -494,16 +475,32 @@ app.get("/api/post/profile", (req, res) => {
     });
 });
 
-app.post("/api/post/createPost", (req, res) => {
-  const userID = req.body.userID;
-  const postLink = req.body.postLink;
-  const title = req.body.title;
-  const tags = req.body.tags;
-  const isVideo = req.body.isVideo;
+app.post("/api/post", upload.single("file"), async (req, res) => {
+  const file = req.file;
+  console.log(file);
+  const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
 
-  const post = new PostManager();
-  post.upload(userID, postLink, title, tags, isVideo);
-  res.json({ message: "Data received and processed successfully" });
+  if (jsonData.length == 0) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred, did not recieve jsonData",
+    });
+  }
+  const userID = jsonData.userID;
+  const description = jsonData.description;
+  const visibility = jsonData.visibility;
+  const tags = jsonData.tags;
+
+  try {
+    const post = new PostManager();
+    await post.upload(userID, file, tags, description, visibility);
+    res.status(200).json({ message: "Complete post upload" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
 });
 
 app.get("/api/post/search", (req, res) => {
@@ -630,48 +627,32 @@ app.post("/api/post/share", (req, res) => {
 
 //Story
 
-app.get("/api/story/total", (req, res) => {
-  const { userID } = req.query;
+app.post("/api/story", upload.single("file"), async (req, res) => {
+  const file = req.file;
 
-  const story = new StoryManager();
+  const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
 
-  story
-    .total(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(String(jsonifiedResult));
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  if (jsonData.length == 0) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred, did not recieve jsonData",
     });
-});
-
-app.get("/api/story/following", (req, res) => {
-  const { userID } = req.query;
-
-  const story = new StoryManager();
-
-  story
-    .getStories(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  }
+  const userID = jsonData.userID;
+  const visibility = jsonData.visibility;
+  try {
+    const story = new StoryManager();
+    await story.upload(userID, file, visibility);
+    res.status(200).json({ message: "Complete story upload" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
     });
+  }
 });
 
-app.post("/api/story/createStory", (req, res) => {
-  const userID = req.body.userID;
-  const storyLink = req.body.storyLink;
-  const title = req.body.title;
-  const isVideo = req.body.isVideo;
-
-  const story = new StoryManager();
-  story.upload(userID, storyLink, title, isVideo);
-  res.json({ message: "Data received and processed successfully" });
-});
+app.get("/api/story", (req, res) => {});
 
 //Message
 

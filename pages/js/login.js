@@ -272,12 +272,12 @@ async function login(userIdentifier, password) {
         document
           .querySelector("#verifyAuthBtn")
           .addEventListener("click", async function () {
-            if (codeInput.value == code) {
+            if (authCodeInput.value == code) {
               await createUserSession(userIdentifier, 30);
               window.open("http://127.0.0.1:5500/pages/home.html", "_self");
             } else {
               verifyError.textContent = "Make sure to enter the code correctly";
-              codeInput.style.borderColor = "red";
+              authCodeInput.style.borderColor = "red";
             }
           });
       } else if (response.status == 200) {

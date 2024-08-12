@@ -1,24 +1,29 @@
 const { select, update } = require("./DB.js");
+const sha1 = require("sha1");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 const FollowManager = require("./FollowManager.js");
 
 class StoryManager {
-  async upload(userID, StoryLink, Title, isVideo) {
+  async upload(userID, file, visibility) {
     try {
-      const query = `INSERT INTO instabun.Story (UserID,isVideo,StoryLink,Title,uploadDateTime) VALUES (?, ?, ?, ?,now());`;
-      await update(query, [userID, isVideo, StoryLink, Title]);
-      return "Upload story operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
+      const buffer = file.buffer;
+      const fileName = sha1(buffer);
+      const url = "story/" + fileName;
+      const mimetype = file.mimetype;
 
-  //Used for naming convensation
-  //So there will be no overridden in firebase
-  async total(userID) {
-    try {
-      const query = `SELECT count(*) FROM instabun.Story where UserID = ?;`;
-      const [result] = await select(query, [userID]);
-      return result["count(*)"];
+      const firebaseStorageManager = new FirebaseStorageManager();
+      const storyLink = await firebaseStorageManager.uploadFile(
+        buffer,
+        url,
+        mimetype
+      );
+
+      const isVideo = mimetype.match("video*") ? 1 : 0;
+
+      const query = `INSERT INTO story (userID, isVideo, storyLink, storyVisibility) VALUES (?,?,?,?);
+`;
+      await update(query, [userID, isVideo, storyLink, visibility]);
+      return "Upload story operation successful";
     } catch (error) {
       return error;
     }

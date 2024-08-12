@@ -106,9 +106,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ],
   };
 
-  const totalStories = data.users.length > 8;
+  const doesStoriesOverflow = data.users.length > 10;
 
-  data.storiesOverflow = totalStories;
+  if (!doesStoriesOverflow) {
+    rightArrow.classList.add("d-none");
+  }
 
   // Render the template with data
   const htmlOutput = template(data);
@@ -119,56 +121,55 @@ document.addEventListener("DOMContentLoaded", function () {
   const storiesModal = document.getElementsByClassName("modal");
   const stories = document.getElementsByClassName("story-icon");
 
-  let slideInterval = null;
+  function toggleArrows() {
+    rightArrow.classList.toggle("pointer");
+    leftArrow.classList.toggle("pointer");
+  }
+
+  function scrollStoryContainer(direction) {
+    const maxScrollLeft =
+      storyContainer.scrollWidth - storyContainer.offsetWidth;
+    const scrollDistance = 460;
+    const targetScrollLeft =
+      direction === "right"
+        ? Math.min(storyContainer.scrollLeft + scrollDistance, maxScrollLeft)
+        : Math.max(storyContainer.scrollLeft - scrollDistance, 0);
+
+    const scrollAnimation = () => {
+      if (
+        (direction === "right" &&
+          storyContainer.scrollLeft < targetScrollLeft) ||
+        (direction === "left" && storyContainer.scrollLeft > targetScrollLeft)
+      ) {
+        storyContainer.scrollLeft += direction === "right" ? 5 : -5;
+        requestAnimationFrame(scrollAnimation);
+      } else {
+        toggleArrows();
+      }
+      if (storyContainer.scrollLeft == 0) {
+        leftArrow.classList.add("d-none");
+      } else if (storyContainer.scrollLeft == maxScrollLeft) {
+        rightArrow.classList.add("d-none");
+      } else {
+        leftArrow.classList.remove("d-none");
+        rightArrow.classList.remove("d-none");
+      }
+    };
+
+    scrollAnimation();
+  }
 
   rightArrow.addEventListener("click", function () {
-    console.log(
-      storyContainer.scrollLeft !=
-        storyContainer.scrollWidth - storyContainer.offsetWidth
-    );
-    if (
-      leftArrow.classList.contains("pointer") &&
-      rightArrow.classList.contains("pointer") &&
-      storyContainer.scrollLeft !=
-        storyContainer.scrollWidth - storyContainer.offsetWidth
-    ) {
-      clearInterval(slideInterval);
-      rightArrow.classList.toggle("pointer");
-      leftArrow.classList.toggle("pointer");
-      const startingPosition = storyContainer.scrollLeft;
-      slideInterval = setInterval(function () {
-        if (storyContainer.scrollLeft - startingPosition >= 460) {
-          rightArrow.classList.toggle("pointer");
-          leftArrow.classList.toggle("pointer");
-          clearInterval(slideInterval);
-        } else {
-          storyContainer.scrollLeft += 1;
-        }
-      }, 0);
+    if (rightArrow.classList.contains("pointer")) {
+      toggleArrows();
+      scrollStoryContainer("right");
     }
   });
 
-  //Need to revamp it
-  //Poor use of logic here
   leftArrow.addEventListener("click", function () {
-    if (
-      leftArrow.classList.contains("pointer") &&
-      rightArrow.classList.contains("pointer") &&
-      storyContainer.scrollLeft != 0
-    ) {
-      clearInterval(slideInterval);
-      rightArrow.classList.toggle("pointer");
-      leftArrow.classList.toggle("pointer");
-      const startingPosition = storyContainer.scrollLeft;
-      slideInterval = setInterval(function () {
-        if (startingPosition - storyContainer.scrollLeft >= 460) {
-          rightArrow.classList.toggle("pointer");
-          leftArrow.classList.toggle("pointer");
-          clearInterval(slideInterval);
-        } else {
-          storyContainer.scrollLeft -= 1;
-        }
-      }, 0);
+    if (leftArrow.classList.contains("pointer")) {
+      toggleArrows();
+      scrollStoryContainer("left");
     }
   });
 

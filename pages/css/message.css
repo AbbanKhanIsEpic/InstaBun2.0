@@ -40,6 +40,9 @@
 #messageTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
   content: attr(data-placeholder);
 }
+.profileIcon {
+  min-width: 56px;
+}
 #messageTextArea {
   height: 36px;
 }

@@ -64,7 +64,9 @@ createGroupBtn.addEventListener("click", function () {
 
     const mime = selectedFile.type;
 
-    const newFile = new File([selectedFile], "groupIcon", { type: mime });
+    const name = selectedFile.name;
+
+    const newFile = new File([selectedFile], name, { type: mime });
 
     formData.append("file", newFile);
 
@@ -80,11 +82,10 @@ createGroupBtn.addEventListener("click", function () {
       })
     );
 
-    console.log(formData);
-
     createGroup(formData);
-    //createGroupModal.style.display = "none";
-    //document.querySelector(".modal-backdrop").classList.add("d-none");
+    createGroupModal.style.display = "none";
+    document.querySelector(".modal-backdrop").classList.add("d-none");
+    displayMessageLists(userID);
   }
 });
 
@@ -279,6 +280,7 @@ async function getUserList(searchQuery) {
 }
 
 async function displayMessageLists(userID) {
+  console.log("Hello");
   Handlebars.registerHelper("currentUserSent", function (senderID) {
     return senderID == userID;
   });

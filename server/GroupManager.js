@@ -9,7 +9,7 @@ class GroupManager {
     try {
       const buffer = file.buffer;
       const fileName = sha1(buffer);
-      const url = file.originalname + "/" + fileName;
+      const url = "groupIcon/" + fileName;
       const mimetype = file.mimetype;
 
       const firebaseStorageManager = new FirebaseStorageManager();

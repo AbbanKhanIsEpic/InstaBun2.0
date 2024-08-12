@@ -1,20 +1,22 @@
 //Imports
 const { select, update } = require("./DB.js");
+const sha1 = require("sha1");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 const FollowManager = require("./FollowManager.js");
 
 class PostManager {
-  //This is used for the naming convension for uploading files to firebase
-  async total(userID) {
-    try {
-      const query = `SELECT count(*) FROM instabun.Post where UserID = ?;`;
-      const [result] = await select(query, [userID]);
-      return result["count(*)"];
-    } catch (error) {
-      return error;
-    }
-  }
+  async upload(userID, file, tags, description, visibility) {
+    const buffer = file.buffer;
+    const fileName = sha1(buffer);
+    const url = "post/" + fileName;
+    const mimetype = file.mimetype;
 
-  async upload(userID, postLink, title, tags, isVideo) {
+    const firebaseStorageManager = new FirebaseStorageManager();
+    const postLink = await firebaseStorageManager.uploadFile(
+      buffer,
+      url,
+      mimetype
+    );
     try {
       //It is a promise because this needs to run first
       //So we can create the tags first then upload the post then attach the tags to the post
@@ -30,8 +32,11 @@ class PostManager {
       await Promise.all(tagPromises);
 
       //Create the post
-      const query = `INSERT INTO instabun.Post (UserID, isVideo , PostLink,Title) VALUES (?,?,?,?);`;
-      await update(query, [userID, isVideo, postLink, title]);
+      const query = `INSERT INTO post (userID, postLink, isVideo, description, postVisibility) VALUES (?,?,?,?,?);`;
+
+      const isVideo = mimetype.match("video*") ? 1 : 0;
+
+      await update(query, [userID, postLink, isVideo, description, visibility]);
       //Since this is the latest post, we can get its ID
       const postID = await this.#getLatestPostID(userID);
       //Now we have the postID, we can attach the tags to the post
@@ -71,9 +76,9 @@ class PostManager {
   //The latest postID is the post the user just uploaded
   async #getLatestPostID(userID) {
     try {
-      const query = `SELECT idPost FROM instabun.Post where UserID = ? Order by idPost DESC Limit 1;`;
+      const query = `SELECT postID FROM Post where UserID = ? Order by postID DESC Limit 1;`;
       const [result] = await select(query, [userID]);
-      return result.idPost;
+      return result.postID;
     } catch (error) {
       return error;
     }
@@ -84,7 +89,7 @@ class PostManager {
       const tagIDsArray = await this.#getTagIDs(tags);
       const attachTagIDToPostPromise = tagIDsArray.map(async (tagID) => {
         //Now attaching individual tag to the post
-        const query = `INSERT INTO instabun.PostTags (postID,tagID) VALUES (?,?);`;
+        const query = `INSERT INTO tagpost (postID,tagID) VALUES (?,?);`;
         await update(query, [postID, tagID]);
       });
       await Promise.all(attachTagIDToPostPromise);
@@ -357,10 +362,10 @@ class PostManager {
 
   async #getTagIDs(tags) {
     try {
-      const query = `SELECT idTag FROM instabun.Tag WHERE TagName in (?);`;
+      const query = `SELECT tagID FROM instabun.Tag WHERE tagName in (?);`;
       const result = await select(query, [tags]);
       //Convert JSON to array for easy reading
-      const idsArray = result.map((element) => element.idTag);
+      const idsArray = result.map((element) => element.tagID);
       return idsArray;
     } catch (error) {
       return error;

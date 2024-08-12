@@ -3,10 +3,13 @@
   gap: 13px;
 }
 
-#leftArrow,
-#rightArrow {
-  height: 30px;
-  width: 30px;
+.pointer {
+  cursor: pointer;
+}
+
+#leftArrowContainer,
+#rightArrowContainer {
+  flex: 0 0 80px;
 }
 
 .story-icon {

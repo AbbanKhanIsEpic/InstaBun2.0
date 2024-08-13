@@ -33,42 +33,40 @@ class StoryManager {
   //Stories only last for a day
   //So it is only getting stories that is a less or equal to a day old
   async getStories(userID) {
+    console.log(userID);
     try {
-      const follow = new FollowManager();
-      const followingArray = await follow.getFollowings(userID);
-      if (followingArray.length === 0) {
-        return new Error(
-          "Can not get stories of users when user follows no one"
-        );
-      }
-      const query = `SELECT 
-        timestampdiff(HOUR,Story.uploadDateTime,now()) as hoursOlD,
-        Users.Visibility,
-        (SELECT 
+      const query = `WITH getLatestStories AS (
+  SELECT story.storyID,story.userID, story.storyVisibility, (SELECT 
           COUNT(*)
             FROM
-            instabun.Follows
+            followers
             WHERE
-              (FollowerID = ?
+              (followers.followerID = ?
               AND FollowingID = Users.userID)
               OR (FollowerID = Users.userID
-              AND FollowingID = ?))
-          AS Status,
-        Story.isVideo,
-        Story.userID,
-        Story.storyID,
-        Story.storyLink,
-        Users.ProfileIconLink
-    FROM
-        Story
-            INNER JOIN
-        Users ON Users.UserID = Story.UserID
-    WHERE
-        Story.UserID in (?)
-        HAVING Status >= Users.Visibility AND hoursOlD <= 24
-   Order by hoursOlD;`;
+              AND FollowingID = ?)
+          AS Status, ROW_NUMBER() OVER (PARTITION BY story.userID ORDER BY uploadDate DESC) AS latest
+  FROM story
+ LEFT JOIN block ON block.blockerUserID = ?
+ INNER JOIN users on users.userID = story.userID HAVING story.storyVisibility >= status
+ )
 
-      const result = await select(query, [userID, userID, followingArray]);
+  Select getLatestStories.userID, users.username, users.displayName, ((SELECT 
+    JSON_ARRAYAGG(JSON_OBJECT('id',
+                    storyID,
+                    'isVideo',
+                    isVideo,
+                    'url',
+                    storyLink,
+                    'uploadDate',
+                    uploadDate)) 
+FROM
+    story
+       WHERE 
+        story.userID = getLatestStories.userID
+    ORDER BY uploadDate)) as stories from story INNER JOIN
+    users ON users.userID = story.userID JOIN getLatestStories ON getLatestStories.storyID = story.storyID Where latest = 1`;
+      const result = await select(query, [userID, userID, userID]);
       return result;
     } catch (error) {
       return error;

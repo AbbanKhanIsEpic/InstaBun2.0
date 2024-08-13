@@ -652,14 +652,26 @@ app.post("/api/story", upload.single("file"), async (req, res) => {
   }
 });
 
-app.get("/api/story", (req, res) => {});
+app.get("/api/story", (req, res) => {
+  const { userID } = req.query;
+
+  const storyManager = new StoryManager();
+
+  storyManager
+    .getStories(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
 
 //Message
 
 app.get("/api/message/list", (req, res) => {
   const { userID } = req.query;
-
-  console.log("Hi");
 
   const messageManager = new MessageManager();
 

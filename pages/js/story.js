@@ -1,7 +1,7 @@
 const leftArrow = document.querySelector("#leftArrow");
 const rightArrow = document.querySelector("#rightArrow");
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   // Get the template source
   const templateSource = document.getElementById("story-template").innerHTML;
 
@@ -15,6 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Compile the template
   const template = Handlebars.compile(templateSource);
+
+  const stories = await getStories(userID);
+
+  console.log(stories);
 
   // Define the data
   const data = {
@@ -122,7 +126,6 @@ document.addEventListener("DOMContentLoaded", function () {
   storyContainer.innerHTML = htmlOutput;
 
   const storiesModal = document.getElementsByClassName("modal");
-  const stories = document.getElementsByClassName("story-icon");
 
   function toggleArrows() {
     rightArrow.classList.toggle("pointer");
@@ -246,3 +249,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+async function getStories(userID) {
+  const server = `http://127.0.0.1:5000/api/story`;
+  const query = `?userID=${encodeURIComponent(userID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}

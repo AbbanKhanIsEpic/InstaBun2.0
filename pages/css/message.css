@@ -8,7 +8,7 @@
   white-space: nowrap;
   text-overflow: ellipsis !important;
 }
-#messageColumn {
+#messageSideBar {
   width: 500px;
 }
 #messageColumn > :hover:not(.selected) {
@@ -19,10 +19,10 @@
   background: #2e2e2e;
 }
 
-#messageColumn:hover::-webkit-scrollbar {
+#messageSideBar:hover::-webkit-scrollbar {
   display: block;
 }
-#messageColumn::-webkit-scrollbar {
+#messageSideBar::-webkit-scrollbar {
   display: none;
 }
 ::-webkit-scrollbar {

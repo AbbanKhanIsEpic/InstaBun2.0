@@ -28,6 +28,8 @@ const confirmDeleteMessage = document.querySelector("#confirmDeleteMessage");
 
 const infoModal = document.querySelector("#infoModal");
 
+const viewHiddenMessages = document.querySelector("#viewHiddenMessages");
+
 let isGroup;
 let deleteMessageID;
 let communicatingToID;
@@ -92,9 +94,32 @@ createGroupBtn.addEventListener("click", function () {
   }
 });
 
-document
-  .querySelector("#viewHiddenMessages")
-  .addEventListener("shown.bs.modal", function () {});
+infoModal.addEventListener("click", async function () {
+  const messageColumn = document.getElementById("messageColumn");
+  messageColumn.innerHTML = "";
+
+  Handlebars.registerHelper("currentUserSent", function (senderID) {
+    return senderID == userID;
+  });
+
+  // Get the template source
+  const templateSource = document.getElementById(
+    "message-selection-template"
+  ).innerHTML;
+
+  // Compile the template
+  const template = Handlebars.compile(templateSource);
+
+  const data = { messageList: await getMessageLists(userID) };
+
+  // Render the template with data
+  const htmlOutput = template(data);
+
+  // Insert the HTML into the DOM
+  document.getElementById("messageColumn").innerHTML += htmlOutput;
+});
+
+viewHiddenMessages.addEventListener("shown.bs.modal", function () {});
 
 groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
@@ -118,14 +143,17 @@ cancelDeleteMessage.addEventListener("click", function () {
   deleteMessageConfirmation.style.display = "none";
 });
 
-confirmDeleteMessage.addEventListener("click", function () {
+confirmDeleteMessage.addEventListener("click", async function () {
   if (isGroup) {
+    await deleteGroupMessage(deleteMessageID);
+    await displayMessages(userID, communicatingToID, false);
+    await displayMessageLists(userID);
+    deleteMessageConfirmation.style.display = "none";
   } else {
-    deleteDirectMessage(deleteMessageID);
-    setTimeout(function () {
-      displayDirectMessage(userID, communicatingToID);
-      deleteMessageConfirmation.style.display = "none";
-    }, 1); //WHY DO I NEED THIS FOR IT TO WORK
+    await deleteDirectMessage(deleteMessageID);
+    await displayMessages(userID, communicatingToID, true);
+    await displayMessageLists(userID);
+    deleteMessageConfirmation.style.display = "none";
   }
 });
 
@@ -138,6 +166,13 @@ startConversationButton.addEventListener("click", function () {
   if (numSelected == 0) {
     alert("You need to select someone to message to");
   } else if (numSelected == 1) {
+    const selectedUser = selectedArray[0];
+    const id = selectedUser.id;
+    const profileIcon = selectedUser.profileIcon;
+    const displayName = selectedUser.DisplayName;
+    setMessageContainer(userID, true, id, displayName, profileIcon);
+    newMessageModal.style.display = "none";
+    document.querySelector(".modal-backdrop").classList.add("d-none");
   } else if (hasSelectedSelf) {
     alert("You can not select yourself as another member in a group");
   } else {
@@ -172,6 +207,7 @@ async function displayUserList() {
     const displayName = user
       .querySelector('[aria-label="display name"]')
       .textContent.trim();
+    const profileIcon = user.querySelector("img").src;
     const checkbox = user.querySelector("input[type=checkbox]");
     const checkmark = user.querySelector(".checkmark > svg");
 
@@ -206,7 +242,11 @@ async function displayUserList() {
         user.classList.add("selected");
         const copy = user.childNodes[1].cloneNode(true);
         showCaseMemberNewGroup.appendChild(copy);
-        selectedArray.push({ id: id, DisplayName: displayName });
+        selectedArray.push({
+          id: id,
+          DisplayName: displayName,
+          profileIcon: profileIcon,
+        });
       }
       displaySelectedUsers(selectedArray);
       checkmark.classList.toggle("d-none");
@@ -283,7 +323,9 @@ async function getUserList(searchQuery) {
 }
 
 async function displayMessageLists(userID) {
-  console.log("Hello");
+  const messageColumn = document.getElementById("messageColumn");
+  messageColumn.innerHTML = "";
+
   Handlebars.registerHelper("currentUserSent", function (senderID) {
     return senderID == userID;
   });
@@ -309,6 +351,14 @@ async function displayMessageLists(userID) {
   let selectedMessage;
 
   Array.from(messageSelections).forEach((messageSelection) => {
+    const id = messageSelection.id;
+    const isDirect = messageSelection.classList.contains("direct");
+    if (id == communicatingToID) {
+      if (isDirect != isGroup) {
+        messageSelection.classList.add("selected");
+        selectedMessage = messageSelection;
+      }
+    }
     messageSelection.addEventListener("click", function () {
       const id = messageSelection.id;
       const isDirect = messageSelection.classList.contains("direct");
@@ -505,7 +555,7 @@ async function deleteDirectMessage(messageID) {
     });
 }
 
-async function sendGroupMessage(messageID) {
+async function deleteGroupMessage(messageID) {
   const server = "http://127.0.0.1:5000/api/message/group/delete";
   const data = { messageID };
 
@@ -559,8 +609,9 @@ async function sendGroupMessage(groupID, senderID, message) {
     },
     body: JSON.stringify(data),
   })
-    .then((response) => {
-      displayGroupMessage(userID, communicatingToID);
+    .then(async (response) => {
+      await displayMessages(senderID, groupID, false);
+      await displayMessageLists(senderID);
       return response.json();
     })
     .catch((error) => {
@@ -579,8 +630,9 @@ async function sendDirectMessage(senderID, receiverID, message) {
     },
     body: JSON.stringify(data),
   })
-    .then((response) => {
-      displayDirectMessage(userID, communicatingToID);
+    .then(async (response) => {
+      await displayMessages(senderID, receiverID, true);
+      await displayMessageLists(senderID);
       return response.json();
     })
     .catch((error) => {

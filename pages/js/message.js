@@ -10,20 +10,23 @@ const startConversationButton = document.querySelector(
 );
 
 const createGroupModal = document.querySelector("#createGroup");
+
 const groupIconInput = document.querySelector("#groupIconInput");
-const createGroupModalClose =
-  createGroupModal.querySelector(`[aria-label="Close"]`);
+
+const createGroupModalClose = createGroupModal.querySelector(".closeModal");
+const showCaseMemberNewGroup = createGroupModal.querySelector(
+  "#showCaseMemberNewGroup"
+);
+const createGroupBtn = createGroupModal.querySelector("#createGroupBtn");
+const groupNameInput = createGroupModal.querySelector("#groupNameInput");
 
 const deleteMessageConfirmation = document.querySelector(
   "#deleteMessageConfirmation"
 );
 const cancelDeleteMessage = document.querySelector("#cancelDeleteMessage");
 const confirmDeleteMessage = document.querySelector("#confirmDeleteMessage");
-const showCaseMemberNewGroup = createGroupModal.querySelector(
-  "#showCaseMemberNewGroup"
-);
-const createGroupBtn = createGroupModal.querySelector("#createGroupBtn");
-const groupNameInput = createGroupModal.querySelector("#groupNameInput");
+
+const infoModal = document.querySelector("#infoModal");
 
 let isGroup;
 let deleteMessageID;
@@ -353,11 +356,7 @@ async function setMessageContainer(
 
   const sendMessageBtn = document.querySelector("#sendMessageBtn");
 
-  if (isDirect) {
-    displayDirectMessage(userID, toID);
-  } else {
-    displayGroupMessage(userID, toID);
-  }
+  displayMessages(userID, toID, isDirect);
 
   messageTextArea.addEventListener("input", function () {
     if (messageTextArea.childNodes.length == 0) {
@@ -368,7 +367,7 @@ async function setMessageContainer(
   });
 }
 
-async function displayGroupMessage(userID, toID) {
+async function displayMessages(userID, toID, isDirect) {
   Handlebars.registerHelper("isSendMessage", function (senderID) {
     return senderID == userID;
   });
@@ -377,11 +376,9 @@ async function displayGroupMessage(userID, toID) {
     if (index == 0) {
       return true;
     } else {
-      let currentMessageTime = new Date(
-        groupMessageData[index].time
-      ).toDateString();
+      let currentMessageTime = new Date(messageData[index].time).toDateString();
       let previousMessageTime = new Date(
-        groupMessageData[index - 1].time
+        messageData[index - 1].time
       ).toDateString();
       if (currentMessageTime === previousMessageTime) {
         return false;
@@ -400,13 +397,15 @@ async function displayGroupMessage(userID, toID) {
 
     const todayString = today.toLocaleDateString();
 
-    const dayDiff = today.getDate() - date.getDate();
+    const isYesterday = today.getDate() - date.getDate() == 1;
+
+    const withinWeek = date > new Date().setDate(new Date().getDate() - 7);
 
     if (dateString == todayString) {
       return "Today";
-    } else if (dayDiff == 1) {
+    } else if (isYesterday) {
       return "Yesterday";
-    } else if (dayDiff < 7) {
+    } else if (withinWeek) {
       return date.toLocaleDateString("en-UK", { weekday: "long" });
     } else {
       return date.toLocaleDateString("en-UK");
@@ -420,7 +419,9 @@ async function displayGroupMessage(userID, toID) {
     });
   });
 
-  const groupMessageData = await getGroupMessages(userID, toID);
+  const messageData = isDirect
+    ? await getDirectMessages(userID, toID)
+    : await getGroupMessages(userID, toID);
 
   // Get the template source
   const messageTemplateSource =
@@ -429,7 +430,7 @@ async function displayGroupMessage(userID, toID) {
   // Compile the template
   const messageTemplate = Handlebars.compile(messageTemplateSource);
 
-  const data = { messages: groupMessageData };
+  const data = { messages: messageData };
 
   // Render the template with data
   const messageHtmlOutput = messageTemplate(data);
@@ -439,79 +440,14 @@ async function displayGroupMessage(userID, toID) {
 
   const sentMessages = document.querySelectorAll(".sendMessage");
 
-  Array.from(sentMessages).forEach((sentMessage) => {
-    const deleteMessage = sentMessage.querySelector(".deleteMessage");
-    deleteMessage.addEventListener("click", function () {
-      deleteMessageID = sentMessage.id;
-      deleteMessageConfirmation.style.display = "block";
-    });
-  });
-}
+  const moreInfo = document.querySelector("#moreInfo");
 
-async function displayDirectMessage(userID, toID) {
-  Handlebars.registerHelper("isSendMessage", function (senderID) {
-    console.log(senderID);
-    return senderID == userID;
-  });
-
-  Handlebars.registerHelper("isNewDay", function (index) {
-    if (index == 0) {
-      return true;
+  moreInfo.addEventListener("click", function () {
+    if (isDirect) {
     } else {
-      let currentMessageTime = new Date(
-        directMessageData[index].time
-      ).toDateString();
-      let previousMessageTime = new Date(
-        directMessageData[index - 1].time
-      ).toDateString();
-      if (currentMessageTime === previousMessageTime) {
-        return false;
-      } else {
-        return true;
-      }
+      infoModal.style.display = "block";
     }
   });
-
-  Handlebars.registerHelper("convertToDate", function (timestamp) {
-    const date = new Date(timestamp);
-    const today = Date.now();
-    const dayInMiliseconds = 8.64e7;
-    if (today - date < dayInMiliseconds) {
-      return "Today";
-    } else if (today - date < dayInMiliseconds * 2) {
-      return "Yesterday";
-    } else if (today - date < dayInMiliseconds * 7) {
-      return date.toLocaleDateString("en-UK", { weekday: "long" });
-    } else {
-      return date.toLocaleDateString("en-UK");
-    }
-  });
-
-  Handlebars.registerHelper("convertTo12HourTime", function (timestamp) {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  });
-
-  const directMessageData = await getDirectMessages(userID, toID);
-
-  // Get the template source
-  const messageTemplateSource =
-    document.getElementById("message-template").innerHTML;
-
-  // Compile the template
-  const messageTemplate = Handlebars.compile(messageTemplateSource);
-
-  const data = { messages: directMessageData };
-
-  // Render the template with data
-  const messageHtmlOutput = messageTemplate(data);
-
-  // Insert the HTML into the DOM
-  document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
-
-  const sentMessages = document.querySelectorAll(".sendMessage");
 
   Array.from(sentMessages).forEach((sentMessage) => {
     const deleteMessage = sentMessage.querySelector(".deleteMessage");
@@ -519,7 +455,6 @@ async function displayDirectMessage(userID, toID) {
       deleteMessageID = sentMessage.id;
       deleteMessageConfirmation.style.display = "block";
     });
-    deleteMessageConfirmation;
   });
 }
 

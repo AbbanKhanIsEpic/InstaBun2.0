@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       {
         id: 99,
+        username: "TikTefioejfnefieifiowefubweiofbok",
         profileLink: "https://github.com/mdo.png",
         stories: [
           {
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       {
         id: 100,
+        username: "TikTok",
         profileLink: "https://github.com/mdo.png",
         stories: [
           {
@@ -87,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       {
         id: 5,
+        username: "Skibid",
         profileLink:
           "https://us-tuna-sounds-images.voicemod.net/d679d362-02ae-4036-a039-ba2174ab0231-1670513117620.jpg",
         closeFriend: true,

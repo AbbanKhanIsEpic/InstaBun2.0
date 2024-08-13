@@ -3,6 +3,7 @@
   --maxWidth: 240px;
   --minWidth: 150px;
   --hoverTime: 0.5s;
+  --background: #000;
 }
 
 body {
@@ -15,6 +16,9 @@ body {
   width: 10px;
 }
 
+input::placeholder {
+  color: rgb(255, 255, 255);
+}
 .noBoxShadow:focus {
   box-shadow: none;
 }

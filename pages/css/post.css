@@ -42,6 +42,13 @@ hr {
   animation: beat 0.5s;
 }
 
+.ellipsis {
+  width: 80px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .side-interactions {
   height: 500px;
 }

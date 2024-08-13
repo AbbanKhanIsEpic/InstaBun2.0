@@ -13,10 +13,14 @@
 }
 
 .story-icon {
-  min-width: 80px;
-  min-height: 80px;
-  max-width: 80px;
-  max-height: 80px;
+  width: 80px;
+  height: 80px;
+}
+.story-icon-username {
+  width: 75px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .story-icon-background {

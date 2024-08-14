@@ -132,14 +132,14 @@
   </div>
   <script type="text/x-handlebars-template" id="story-template">
       {{#each users as |user|}}
-        <div class="story-icon" id={{id}}>
+        <div class="story-icon" id="{{userID}}">
             <div
               class="rounded-circle story-icon-background {{#if closeFriend}} friend {{/if}} d-flex justify-content-center align-items-center"
               data-bs-toggle="modal"
-              data-bs-target="#storyModal-{{user.id}}"
+              data-bs-target="#storyModal-{{userID}}"
             >
               <img
-                src={{user.profileLink}}
+                src={{profileIcon}}
                 alt=""
                 width="66"
                 height="66"
@@ -147,12 +147,12 @@
               />
             </div>
             <div class="story-icon-username text-center">
-              {{user.username}}
+              {{username}}
             </div>
         </div>
         <div
           class="modal fade overflow-hidden glassmorph"
-          id="storyModal-{{user.id}}"
+          id="storyModal-{{userID}}"
           tabindex="-1"
           aria-hidden="true"
           data-bs-backdrop="static"
@@ -163,13 +163,13 @@
                 <div class="d-flex flex-row justify-content-between w-100">
                   <div>
                     <img
-                      src={{user.profileLink}}
+                      src="{{profileIcon}}"
                       alt=""
                       width="32"
                       height="32"
                       class="rounded-circle"
                     />
-                    <span>{{user.username}}</span>
+                    <span>{{username}}</span>
                     <span><svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
@@ -180,7 +180,7 @@
                       >
                         <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
                       </svg></span>
-                    <span>How old</span>
+                    <span class="">{{this.uploadDate}}</span>
                   </div>
                   <button
                     type="button"
@@ -212,16 +212,16 @@
                 </div>
               </div>
               <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
-                <div id="carouselStory-{{user.id}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
+                <div id="carouselStory-{{userID}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
                   <div class="carousel-inner h-100 w-100">
                     {{#each stories}}
                     <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
                       <div class="d-flex justify-content-center align-items-center h-100 user-select-none">
-                        {{#if isVideo}}
-                        <video controls src="{{url}}" class="d-block h-100 object-fit-cover" id="{{id}}"></video>
+                        {{#ifEquals this.isVideo 1}}
+                        <video  controls src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{this.id}}"></video>
                         {{else}}
-                        <img src="{{url}}" class="d-block h-100 object-fit-cover" id="{{id}}">
-                        {{/if}}
+                        <img src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{this.id}}">
+                        {{/ifEquals}}
                       </div>
                     </div>
                     {{/each}}

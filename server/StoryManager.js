@@ -35,38 +35,34 @@ class StoryManager {
   async getStories(userID) {
     console.log(userID);
     try {
-      const query = `WITH getLatestStories AS (
-  SELECT story.storyID,story.userID, story.storyVisibility, (SELECT 
+      const query = `With filterStories as (
+	Select *, (SELECT 
           COUNT(*)
             FROM
             followers
             WHERE
               (followers.followerID = ?
-              AND FollowingID = Users.userID)
-              OR (FollowerID = Users.userID
-              AND FollowingID = ?)
-          AS Status, ROW_NUMBER() OVER (PARTITION BY story.userID ORDER BY uploadDate DESC) AS latest
-  FROM story
- LEFT JOIN block ON block.blockerUserID = ?
- INNER JOIN users on users.userID = story.userID HAVING story.storyVisibility >= status
- )
+              AND FollowingID = story.userID)
+              OR (FollowerID = story.userID
+              AND FollowingID = ?))
+          AS Status from story
+          WHERE 
+          NOT EXISTS (SELECT 1 FROM block WHERE blockedUserID = story.userID AND blockerUserID = ?)
+		  AND
+		  NOT EXISTS (SELECT 1 FROM block WHERE blockerUserID = story.userID AND blockedUserID = ?)
+          HAVING Status >= storyVisibility
+)
 
-  Select getLatestStories.userID, users.username, users.displayName, ((SELECT 
-    JSON_ARRAYAGG(JSON_OBJECT('id',
+select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJECT('id',
                     storyID,
                     'isVideo',
                     isVideo,
                     'url',
                     storyLink,
                     'uploadDate',
-                    uploadDate)) 
-FROM
-    story
-       WHERE 
-        story.userID = getLatestStories.userID
-    ORDER BY uploadDate)) as stories from story INNER JOIN
-    users ON users.userID = story.userID JOIN getLatestStories ON getLatestStories.storyID = story.storyID Where latest = 1`;
-      const result = await select(query, [userID, userID, userID]);
+                    uploadDate, 
+                    'visibility',storyVisibility))) as stories from filterStories INNER JOIN users on users.userID = filterStories.userID GROUP BY filterStories.userID`;
+      const result = await select(query, [userID, userID, userID, userID]);
       return result;
     } catch (error) {
       return error;

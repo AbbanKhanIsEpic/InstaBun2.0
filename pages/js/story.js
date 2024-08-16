@@ -16,6 +16,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
+  Handlebars.registerHelper("storyAge", function (uploadDate) {
+    return storyAge(uploadDate);
+  });
+
   // Compile the template
   const template = Handlebars.compile(templateSource);
 
@@ -23,8 +27,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Define the data
   const data = { users: stories };
-
-  console.log(data);
 
   const doesStoriesOverflow = data.users.length > 10;
 
@@ -94,6 +96,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   Array.from(storiesModal).forEach((modal) => {
     const carouselInner = modal.querySelector(".carousel-inner");
+    const storyAgeElement = modal.querySelector(".storyAge");
     const rightStory = modal.querySelector(".rightStory");
     const leftStory = modal.querySelector(".leftStory");
     const lastIndex =
@@ -106,8 +109,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       rightStory.addEventListener("click", function () {
         for (let index = 0; index < lastIndex; index++) {
           const currentStory = carouselInner.children[index];
+          const nextStory = carouselInner.children[index + 1];
           if (currentStory.classList.contains("active")) {
-            carouselInner.children[index + 1].classList.add("active");
+            nextStory.classList.add("active");
             customCarouselIndicator[index + 1].classList.add("active");
             currentStory.classList.remove("active");
             if (index == 0) {
@@ -121,6 +125,13 @@ document.addEventListener("DOMContentLoaded", async function () {
               currentVideo.currentTime = 0;
               currentVideo.pause();
             }
+            const currentStoriesID = modal.id.substring(
+              modal.id.indexOf("-") + 1
+            );
+            const nextStoryID = nextStory.querySelector("img,video").id;
+            const nextStoryUploadDate =
+              stories[currentStoriesID]["stories"][nextStoryID]["uploadDate"];
+            storyAgeElement.innerHTML = storyAge(nextStoryUploadDate);
             break;
           }
         }
@@ -131,8 +142,9 @@ document.addEventListener("DOMContentLoaded", async function () {
       leftStory.addEventListener("click", function () {
         for (let index = 1; index <= lastIndex; index++) {
           const currentStory = carouselInner.children[index];
+          const prevStory = carouselInner.children[index - 1];
           if (currentStory.classList.contains("active")) {
-            carouselInner.children[index - 1].classList.toggle("active");
+            prevStory.classList.toggle("active");
             customCarouselIndicator[index].classList.remove("active");
             currentStory.classList.toggle("active");
             if (index == 1) {
@@ -146,6 +158,13 @@ document.addEventListener("DOMContentLoaded", async function () {
               currentVideo.currentTime = 0;
               currentVideo.pause();
             }
+            const currentStoriesID = modal.id.substring(
+              modal.id.indexOf("-") + 1
+            );
+            const prevStoryID = prevStory.querySelector("img,video").id;
+            const prevStoryUploadDate =
+              stories[currentStoriesID]["stories"][prevStoryID]["uploadDate"];
+            storyAgeElement.innerHTML = storyAge(prevStoryUploadDate);
             break;
           }
         }
@@ -174,4 +193,17 @@ async function getStories(userID) {
       result = data;
     });
   return result;
+}
+
+function storyAge(timestamp) {
+  const timeDiffInSec = (new Date() - new Date(timestamp)) / 1000;
+
+  const minute = Math.floor(timeDiffInSec / 60);
+  const hour = Math.floor(timeDiffInSec / 3600);
+
+  if (hour == 0) {
+    return minute + " mins";
+  } else {
+    return hour + " hr";
+  }
 }

@@ -46,11 +46,7 @@ class StoryManager {
               OR (FollowerID = story.userID
               AND FollowingID = ?))
           AS Status from story
-          WHERE 
-          NOT EXISTS (SELECT 1 FROM block WHERE blockedUserID = story.userID AND blockerUserID = ?)
-		  AND
-		  NOT EXISTS (SELECT 1 FROM block WHERE blockerUserID = story.userID AND blockedUserID = ?)
-          HAVING Status >= storyVisibility
+  
 )
 
 select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJECT('id',

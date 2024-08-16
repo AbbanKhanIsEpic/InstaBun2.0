@@ -132,11 +132,11 @@
   </div>
   <script type="text/x-handlebars-template" id="story-template">
       {{#each users as |user|}}
-        <div class="story-icon" id="{{userID}}">
+        <div class="story-icon" id="{{@index}}">
             <div
               class="rounded-circle story-icon-background {{#if closeFriend}} friend {{/if}} d-flex justify-content-center align-items-center"
               data-bs-toggle="modal"
-              data-bs-target="#storyModal-{{userID}}"
+              data-bs-target="#storyModal-{{@index}}"
             >
               <img
                 src={{profileIcon}}
@@ -152,7 +152,7 @@
         </div>
         <div
           class="modal fade overflow-hidden glassmorph"
-          id="storyModal-{{userID}}"
+          id="storyModal-{{@index}}"
           tabindex="-1"
           aria-hidden="true"
           data-bs-backdrop="static"
@@ -180,7 +180,7 @@
                       >
                         <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
                       </svg></span>
-                    <span class="">{{this.uploadDate}}</span>
+                    <span class="storyAge">{{storyAge stories.0.uploadDate}}</span>
                   </div>
                   <button
                     type="button"
@@ -206,21 +206,21 @@
                 </div>
                 <div class="w-100 d-flex flex-row gap-1">
                 {{#each stories}}
-                <button data-bs-target="#carouselStory-{{user.id}}" data-bs-slide-to="{{@index}}"  class="border-0 custom-carousel-indicator mt-2 mb-2 {{#if @first}}active{{/if}}"
+                <button data-bs-target="#carouselStory-{{@index}}" data-bs-slide-to="{{@index}}"  class="border-0 custom-carousel-indicator mt-2 mb-2 {{#if @first}}active{{/if}}"
                   aria-label="Slide {{@index}}" style = "width : {{width ../stories.length}}" disabled></button>
                   {{/each}}
                 </div>
               </div>
               <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
-                <div id="carouselStory-{{userID}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
+                <div id="carouselStory-{{@index}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
                   <div class="carousel-inner h-100 w-100">
                     {{#each stories}}
                     <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
                       <div class="d-flex justify-content-center align-items-center h-100 user-select-none">
                         {{#ifEquals this.isVideo 1}}
-                        <video  controls src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{this.id}}"></video>
+                        <video  controls src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{@index}}"></video>
                         {{else}}
-                        <img src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{this.id}}">
+                        <img src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{@index}}">
                         {{/ifEquals}}
                       </div>
                     </div>

@@ -1,0 +1,19 @@
+{{#each messageList}}
+      <div class="message ps-2 d-flex flex-row align-items-center {{#if isGroup}}group{{else}}direct{{/if}}" id="{{id}}">
+       <img src="{{icon}}" alt="profile icon"
+           width="56" height="56" class="rounded-circle me-2 profileIcon" />
+       <div class="d-flex flex-column w-100">
+           <div class="ellipsis" aria-label="name">
+               {{name}}
+           </div>
+           <div class="text-white-50 ellipsis" aria-label="latest message">
+            {{#if senderName}}
+               {{#if (currentUserSent senderID)}}
+               You
+               {{else}}
+               {{senderName}}
+               {{/if}} said: {{message}}
+            {{/if}}</div>
+       </div>
+       </div>
+      {{/each}}

@@ -1,0 +1,78 @@
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content bg-black text-white glassmorph">
+    <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
+      <h5 class="modal-title pt-3">Create a group</h5>
+      <button
+        type="button"
+        class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3 closeModal"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          class="bi bi-x-lg"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+            stroke="white"
+            stroke-width="1.5"
+          />
+        </svg>
+      </button>
+      <hr class="w-100 border-white border-2" />
+      <form
+        class="input-group w-100 d-flex justify-content-center align-items-center flex-column"
+      >
+        <h6><strong>Group profile icon:</strong></h6>
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            class="position-absolute visually-hidden"
+            placeholder="Profile icon"
+            id="changeGroupProfileIcon"
+            aria-label="user upload files"
+            disabled
+          />
+          <label for="changeGroupProfileIcon" role="button">
+            <img
+              width="100"
+              height="100"
+              src="https://i.pinimg.com/564x/4e/fe/d2/4efed22f325c636539ad1d2c2dd166dc.jpg"
+              id="showUpload"
+              alt="please select something to upload"
+              class="rounded rounded-circle"
+            /></label>
+        </div>
+      </form>
+      <form class="input-group w-100 mt-3">
+        <span
+          class="input-group-text bg-transparent text-white border-0"
+        ><strong>Group name:</strong></span>
+        <input
+          type="text"
+          class="form-control bg-transparent text-white border-0 noBoxShadow"
+          placeholder="Enter a group name..."
+          id="changeGroupNameInput"
+          disabled
+        />
+      </form>
+      <hr class="w-100 border-white border-2" />
+    </div>
+    <div
+      class="modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4"
+      id="showCaseMemberNewGroup"
+    ></div>
+    <div
+      class="modal-footer w-100 d-flex justify-content-center align-items-center"
+    >
+      <button class="btn btn-primary w-100" id="updateGroupButton">
+        Update group
+      </button>
+    </div>
+  </div>
+</div>

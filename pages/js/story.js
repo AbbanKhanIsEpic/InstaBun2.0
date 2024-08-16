@@ -182,19 +182,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 });
 
-async function getStories(userID) {
-  const server = `http://127.0.0.1:5000/api/story`;
-  const query = `?userID=${encodeURIComponent(userID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
-}
-
 function storyAge(timestamp) {
   const timeDiffInSec = (new Date() - new Date(timestamp)) / 1000;
 

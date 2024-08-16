@@ -1,3 +1,4 @@
+//Imports
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const userList = document.getElementById("userList");
@@ -102,13 +103,7 @@ infoModal.addEventListener("click", async function () {
     return senderID == userID;
   });
 
-  // Get the template source
-  const templateSource = document.getElementById(
-    "message-selection-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["message-selection"];
 
   const data = { messageList: await getMessageLists(userID) };
 
@@ -132,8 +127,8 @@ groupIconInput.addEventListener("change", async function (event) {
   } else {
     const reader = new FileReader();
     reader.addEventListener("load", async (event) => {
-      const showUpload = document.querySelector("#showUpload");
-      showUpload.src = event.target.result;
+      const showNewGroupIcon = document.querySelector("#showNewGroupIcon");
+      showNewGroupIcon.src = event.target.result;
     });
     reader.readAsDataURL(selectedFile);
   }
@@ -184,14 +179,7 @@ startConversationButton.addEventListener("click", function () {
 //Functions
 
 async function displayUserList() {
-  // Get the template source
-  const templateSource = document.getElementById(
-    "search-user-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
-  console.log(searchUsersInput.value);
+  const template = Handlebars.templates["search-user"];
   const data = await getUserList(searchUsersInput.value);
 
   // Render the template with data
@@ -255,13 +243,7 @@ async function displayUserList() {
 }
 
 function displaySelectedUsers(selectedArray) {
-  // Get the template source
-  const templateSource = document.getElementById(
-    "selected-user-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["selected-user"];
   const data = { users: selectedArray };
 
   console.log(data);
@@ -330,13 +312,7 @@ async function displayMessageLists(userID) {
     return senderID == userID;
   });
 
-  // Get the template source
-  const templateSource = document.getElementById(
-    "message-selection-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["message-selection"];
 
   const data = { messageList: await getMessageLists(userID) };
 
@@ -386,13 +362,7 @@ async function setMessageContainer(
   isGroup = !isDirect;
   communicatingToID = toID;
 
-  // Get the template source
-  const templateSource = document.getElementById(
-    "conversation-container-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["message-container"];
 
   const data = { name: toName, profileIcon: toProfileIcon };
 
@@ -473,12 +443,7 @@ async function displayMessages(userID, toID, isDirect) {
     ? await getDirectMessages(userID, toID)
     : await getGroupMessages(userID, toID);
 
-  // Get the template source
-  const messageTemplateSource =
-    document.getElementById("message-template").innerHTML;
-
-  // Compile the template
-  const messageTemplate = Handlebars.compile(messageTemplateSource);
+  const messageTemplate = Handlebars.templates["message"];
 
   const data = { messages: messageData };
 

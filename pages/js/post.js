@@ -6,11 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
-  // Get the template source
-  const templateSource = document.getElementById("post-template").innerHTML;
-
   // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["post-explore"];
 
   // Define the data
   const data = {

@@ -141,15 +141,12 @@ cancelDeleteMessage.addEventListener("click", function () {
 confirmDeleteMessage.addEventListener("click", async function () {
   if (isGroup) {
     await deleteGroupMessage(deleteMessageID);
-    await displayMessages(userID, communicatingToID, false);
-    await displayMessageLists(userID);
-    deleteMessageConfirmation.style.display = "none";
   } else {
     await deleteDirectMessage(deleteMessageID);
-    await displayMessages(userID, communicatingToID, true);
-    await displayMessageLists(userID);
-    deleteMessageConfirmation.style.display = "none";
   }
+  await displayMessages(userID, communicatingToID, !isGroup);
+  await displayMessageLists(userID);
+  deleteMessageConfirmation.style.display = "none";
 });
 
 startConversationButton.addEventListener("click", function () {
@@ -316,6 +313,8 @@ async function displayMessageLists(userID) {
 
   const data = { messageList: await getMessageLists(userID) };
 
+  console.log(data);
+
   // Render the template with data
   const htmlOutput = template(data);
 
@@ -447,6 +446,8 @@ async function displayMessages(userID, toID, isDirect) {
 
   const data = { messages: messageData };
 
+  console.log(data);
+
   // Render the template with data
   const messageHtmlOutput = messageTemplate(data);
 
@@ -473,11 +474,13 @@ async function displayMessages(userID, toID, isDirect) {
   });
 }
 
-function sendMessage() {
+async function sendMessage() {
   const message = document.querySelector("#messageTextArea").innerHTML;
   if (isGroup) {
-    sendGroupMessage(communicatingToID, userID, message);
+    const status = await sendGroupMessage(communicatingToID, userID, message);
+    console.log(status);
   } else {
-    sendDirectMessage(userID, communicatingToID, message);
+    const status = await sendDirectMessage(userID, communicatingToID, message);
+    console.log(status);
   }
 }

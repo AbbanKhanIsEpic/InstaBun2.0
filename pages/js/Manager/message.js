@@ -11,12 +11,11 @@ async function sendGroupMessage(groupID, senderID, message) {
     body: JSON.stringify(data),
   })
     .then(async (response) => {
-      await displayMessages(senderID, groupID, false);
-      await displayMessageLists(senderID);
-      return response.json();
+      return response;
     })
     .catch((error) => {
       console.error("Message deletion failed:", error.message);
+      return error;
     });
 }
 
@@ -32,12 +31,11 @@ async function sendDirectMessage(senderID, receiverID, message) {
     body: JSON.stringify(data),
   })
     .then(async (response) => {
-      await displayMessages(senderID, receiverID, true);
-      await displayMessageLists(senderID);
       return response.json();
     })
     .catch((error) => {
       console.error("Message deletion failed:", error.message);
+      return error;
     });
 }
 

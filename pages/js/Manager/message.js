@@ -1,3 +1,4 @@
+//Send messages
 async function sendGroupMessage(groupID, senderID, message) {
   const server = "http://127.0.0.1:5000/api/message/group";
   const data = { groupID, senderID, message };
@@ -40,20 +41,7 @@ async function sendDirectMessage(senderID, receiverID, message) {
     });
 }
 
-function createGroup(formData) {
-  const server = "http://127.0.0.1:5000/api/group";
-  fetch(server, {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Group creation failed:", error.message);
-    });
-}
-
+//Get messages
 async function getMessageLists(userID) {
   const server = "http://127.0.0.1:5000/api/message/list";
   const query = `?userID=${encodeURIComponent(userID)}`;
@@ -81,6 +69,23 @@ async function getDirectMessages(currentUserID, selectedUserID) {
     });
   return result;
 }
+
+async function getGroupMessages(userID, groupID) {
+  const server = "http://127.0.0.1:5000/api/message/group";
+  const query = `?userID=${encodeURIComponent(
+    userID
+  )}&groupID=${encodeURIComponent(groupID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}
+
+//Delete messages
 
 async function deleteDirectMessage(messageID) {
   const server = "http://127.0.0.1:5000/api/message/direct/delete";
@@ -118,19 +123,4 @@ async function deleteGroupMessage(messageID) {
     .catch((error) => {
       console.error("Message deletion failed:", error.message);
     });
-}
-
-async function getGroupMessages(userID, groupID) {
-  const server = "http://127.0.0.1:5000/api/message/group";
-  const query = `?userID=${encodeURIComponent(
-    userID
-  )}&groupID=${encodeURIComponent(groupID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
 }

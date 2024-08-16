@@ -1,14 +1,3 @@
-I will just put my thoughts here
+Rules txt
 
-  let index = selectedArray.indexOf(displayName);
-  selectedArray.splice(index, 1);
-
-  This is kinda bad because multiple users might have the same display name and this removes the first match, not the selected match
-
-  When user remove user from button, does not unselect from the list
-
-  I might need to have an array of objects
-  {
-    displayName: display name
-    username: username //Perhaps I can use userID instead. Vulnerabolity is an issue I am not focusing on :D
-  }
+If you are using an element once, just dust don't make a variable for it

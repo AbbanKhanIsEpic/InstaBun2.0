@@ -2,9 +2,6 @@ const leftArrow = document.querySelector("#leftArrow");
 const rightArrow = document.querySelector("#rightArrow");
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // Get the template source
-  const templateSource = document.getElementById("story-template").innerHTML;
-
   Handlebars.registerHelper("width", function (length) {
     return 100 / length + "%";
   });
@@ -20,8 +17,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return storyAge(uploadDate);
   });
 
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["story"];
 
   const stories = await getStories(userID);
 

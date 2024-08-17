@@ -477,10 +477,20 @@ async function displayMessages(userID, toID, isDirect) {
 async function sendMessage() {
   const message = document.querySelector("#messageTextArea").innerHTML;
   if (isGroup) {
-    const status = await sendGroupMessage(communicatingToID, userID, message);
-    console.log(status);
+    const resultStatus = (
+      await sendGroupMessage(communicatingToID, userID, message)
+    )["status"];
+    if (resultStatus == 200) {
+      displayMessages(userID, communicatingToID, false);
+      displayMessageLists(userID);
+    }
   } else {
-    const status = await sendDirectMessage(userID, communicatingToID, message);
-    console.log(status);
+    const resultStatus = (
+      await sendDirectMessage(userID, communicatingToID, message)
+    )["status"];
+    if (resultStatus == 200) {
+      displayMessages(userID, communicatingToID, true);
+      displayMessageLists(userID);
+    }
   }
 }

@@ -5,9 +5,6 @@ function createStory(formData) {
     body: formData,
   })
     .then((response) => {
-      uploadButton.classList.remove("disabled");
-      alert("The story has been uploaded, the page will be refreshed now");
-      window.open("http://127.0.0.1:5500/pages/create.html", "_self");
       return response.json();
     })
     .catch((error) => {

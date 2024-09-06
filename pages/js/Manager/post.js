@@ -14,3 +14,17 @@ function createPost(formData) {
       console.error("Message deletion failed:", error.message);
     });
 }
+
+async function getFollowingPost(userID) {
+  const server = "http://127.0.0.1:5000/api/message/group";
+  const query = `?userID=${encodeURIComponent(
+    userID
+  )}&groupID=${encodeURIComponent(groupID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+}

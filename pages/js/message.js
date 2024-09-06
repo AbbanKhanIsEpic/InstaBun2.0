@@ -139,13 +139,17 @@ cancelDeleteMessage.addEventListener("click", function () {
 });
 
 confirmDeleteMessage.addEventListener("click", async function () {
-  if (isGroup) {
-    await deleteGroupMessage(deleteMessageID);
+  const resultStatus = (
+    isGroup
+      ? await deleteGroupMessage(deleteMessageID)
+      : await deleteDirectMessage(deleteMessageID)
+  )["status"];
+  if (resultStatus == 200) {
+    await displayMessages(userID, communicatingToID, !isGroup);
+    await displayMessageLists(userID);
   } else {
-    await deleteDirectMessage(deleteMessageID);
+    alert("Unable to delete the message, try again");
   }
-  await displayMessages(userID, communicatingToID, !isGroup);
-  await displayMessageLists(userID);
   deleteMessageConfirmation.style.display = "none";
 });
 
@@ -476,21 +480,15 @@ async function displayMessages(userID, toID, isDirect) {
 
 async function sendMessage() {
   const message = document.querySelector("#messageTextArea").innerHTML;
-  if (isGroup) {
-    const resultStatus = (
-      await sendGroupMessage(communicatingToID, userID, message)
-    )["status"];
-    if (resultStatus == 200) {
-      displayMessages(userID, communicatingToID, false);
-      displayMessageLists(userID);
-    }
+  const resultStatus = (
+    isGroup
+      ? await sendGroupMessage(communicatingToID, userID, message)
+      : await sendDirectMessage(userID, communicatingToID, message)
+  )["status"];
+  if (resultStatus == 200) {
+    displayMessages(userID, communicatingToID, false);
+    displayMessageLists(userID);
   } else {
-    const resultStatus = (
-      await sendDirectMessage(userID, communicatingToID, message)
-    )["status"];
-    if (resultStatus == 200) {
-      displayMessages(userID, communicatingToID, true);
-      displayMessageLists(userID);
-    }
+    alert("Unable to send message");
   }
 }

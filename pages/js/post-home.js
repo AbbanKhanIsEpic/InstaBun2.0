@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Compile the template
-  const template = Handlebars.templates["post-explore"];
+  const template = Handlebars.templates["post-home"];
 
   // Define the data
   const data = {
@@ -55,10 +55,11 @@ document.addEventListener("DOMContentLoaded", function () {
   Array.from(posts).forEach((post) => {
     //Declaring all interactables
     const likeButton = post.querySelector(".like-button");
+    const uploader = post.querySelector(".uploader");
     const bookmarkButton = post.querySelector(".bookmarkButton");
     const commentArea = post.querySelector(".commentTextArea");
     const sendQuickComment = post.querySelector(".sendQuickComment");
-    const likeCounter = post.querySelector(".likeCounter");
+    const likeCounter = post.querySelector("div:has(> .likeCounter)");
     const emojiBtn = post.querySelector(".emojiBtn");
     const postID = post.getAttribute("data-post-id");
 
@@ -98,6 +99,14 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         sendQuickComment.classList.remove("d-none");
       }
+    });
+
+    //Send user to the profile of the sender
+    uploader.addEventListener("click", function () {});
+
+    //Show the list of people who liked the post
+    likeCounter.addEventListener("click", function () {
+      console.log(postID);
     });
   });
 });

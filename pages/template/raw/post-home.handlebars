@@ -3,7 +3,7 @@
     <div
       class="card-header d-flex flex-row justify-content-between text-white mb-2"
     >
-      <div>
+      <div class="uploader">
         <img
           src={{profileLink}}
           alt=""
@@ -23,20 +23,6 @@
             <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
           </svg></span>
         <span>{{postAge}}</span>
-      </div>
-      <div role="button">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-three-dots"
-          viewBox="0 0 16 16"
-        >
-          <path
-            d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"
-          />
-        </svg>
       </div>
     </div>
     <div class="contentContainer">
@@ -80,7 +66,11 @@
             </svg>
           {{/if}}
         </div>
-        <div role="button">
+        <div
+          role="button"
+          data-bs-toggle="modal"
+          data-bs-target="#viewComments"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -139,7 +129,12 @@
         {{/if}}
       </div>
     </div>
-    <div class="text-white mt-2" role="button">
+    <div
+      class="text-white mt-2"
+      role="button"
+      data-bs-toggle="modal"
+      data-bs-target="#viewLikedList"
+    >
       <span class="likeCounter">{{likeCount}}</span>
       likes
     </div>
@@ -147,9 +142,19 @@
       <span class="fw-bold" role="button">{{name}} </span>{{description}}
     </div>
     {{#ifEquals commentCount 1}}
-      <div class="text-white-50 mt-2" role="button">View the only comment</div>
+      <div
+        class="text-white-50 mt-2"
+        role="button"
+        data-bs-toggle="modal"
+        data-bs-target="#viewComments"
+      >View the only comment</div>
     {{else}}
-      <div class="text-white-50 mt-2" role="button">View all
+      <div
+        class="text-white-50 mt-2"
+        role="button"
+        data-bs-toggle="modal"
+        data-bs-target="#viewComments"
+      >View all
         <span>{{commentCount}}</span>
         comments</div>
     {{/ifEquals}}

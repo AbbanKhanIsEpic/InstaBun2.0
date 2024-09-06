@@ -92,7 +92,6 @@ async function getGroupMessages(userID, groupID) {
 }
 
 //Delete messages
-
 async function deleteDirectMessage(messageID) {
   const server = "http://127.0.0.1:5000/api/message/direct/delete";
   const data = { messageID };

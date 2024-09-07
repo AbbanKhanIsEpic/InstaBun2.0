@@ -19,11 +19,14 @@ document.addEventListener("DOMContentLoaded", function () {
 function toHome() {
   window.open("http://127.0.0.1:5500/pages/home.html", "_self");
 }
-function toExplore() {
-  window.open("http://127.0.0.1:5500/pages/explore.html", "_self");
+function toDiscover() {
+  window.open("http://127.0.0.1:5500/pages/discover.html", "_self");
 }
 function toCreate() {
   window.open("http://127.0.0.1:5500/pages/create.html", "_self");
+}
+function toSearch() {
+  window.open("http://127.0.0.1:5500/pages/search.html", "_self");
 }
 function toMessage() {
   window.open("http://127.0.0.1:5500/pages/message.html", "_self");

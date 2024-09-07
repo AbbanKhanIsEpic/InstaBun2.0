@@ -414,17 +414,15 @@ async function displayMessages(userID, toID, isDirect) {
   Handlebars.registerHelper("convertToDate", function (timestamp) {
     const date = new Date(timestamp);
 
-    const dateString = date.toLocaleDateString();
-
     const today = new Date();
 
-    const todayString = today.toLocaleDateString();
+    const yesterday = new Date(new Date().setDate(today.getDate() - 1));
 
-    const isYesterday = today.getDate() - date.getDate() == 1;
+    const isYesterday = yesterday == date;
 
     const withinWeek = date > new Date().setDate(new Date().getDate() - 7);
 
-    if (dateString == todayString) {
+    if (today.toLocaleDateString() == date.toLocaleDateString()) {
       return "Today";
     } else if (isYesterday) {
       return "Yesterday";

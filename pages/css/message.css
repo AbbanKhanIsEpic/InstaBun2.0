@@ -2,19 +2,23 @@
   height: 72px;
   width: 100%;
 }
+
 .ellipsis {
   width: 250px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis !important;
 }
+
 #messageSideBar {
   width: 500px;
 }
+
 #messageColumn > :hover:not(.selected) {
   background: #1a1a1a;
   cursor: pointer;
 }
+
 .selected {
   background: #2e2e2e;
 }
@@ -22,15 +26,19 @@
 #messageSideBar:hover::-webkit-scrollbar {
   display: block;
 }
+
 #messageSideBar::-webkit-scrollbar {
   display: none;
 }
+
 ::-webkit-scrollbar {
   width: 10px;
 }
+
 #messageBar {
   height: 74px;
 }
+
 #userList,
 #hiddenMessageList,
 #showCaseMemberNewGroup {
@@ -40,16 +48,20 @@
 #messageTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
   content: attr(data-placeholder);
 }
+
 .profileIcon {
   min-width: 56px;
 }
+
 #messageTextArea {
   height: 36px;
 }
+
 .user {
   min-height: 60px;
   max-height: 60px;
 }
+
 .user:hover {
   background: #1a1a1a;
 }
@@ -63,6 +75,7 @@
 .sendMessage:hover .deleteMessage > svg {
   display: block;
 }
+
 .deleteMessage > svg {
   display: none;
   cursor: pointer;

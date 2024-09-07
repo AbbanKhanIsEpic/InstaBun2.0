@@ -63,6 +63,30 @@
       </div>
     </div>
   </div>
+  <div class="modal glassmorph" tabindex="-1" id="emojiSelector">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-black text-white glassmorph">
+        <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
+          <h5 class="modal-title pt-3">Emoji finder</h5>
+          <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
+            data-bs-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
+              viewBox="0 0 16 16">
+              <path
+                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                stroke="white" stroke-width="1.5" />
+            </svg>
+          </button>
+          <hr class="w-100 border-white border-2" />
+          <input type="text" class="form-control bg-transparent text-white border-0 w-100 noBoxShadow"
+            placeholder="Search for an emoji..." id="emojiSearch" />
+          <hr class="w-100 border-white border-2" />
+        </div>
+        <div class="modal-body d-flex w-100 flex-row m-0 p-0 overflow-y-auto text-wrap flex-wrap align-items-start"
+          id="emojiList"></div>
+      </div>
+    </div>
+  </div>
   <div class="modal glassmorph" tabindex="-1" id="newMessageModal">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-black text-white glassmorph">
@@ -115,29 +139,6 @@
         <div class="modal-footer w-100 p-0 border-0">
           <button class="btn btn-primary w-100 visually-hidden">Chat</button>
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal glassmorph" tabindex="-1" id="emojiSelector">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-black text-white glassmorph">
-        <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
-          <h5 class="modal-title pt-3">Emoji finder</h5>
-          <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
-            data-bs-dismiss="modal" aria-label="Close">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
-              viewBox="0 0 16 16">
-              <path
-                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                stroke="white" stroke-width="1.5" />
-            </svg>
-          </button>
-          <hr class="w-100 border-white border-2" />
-          <input type="text" class="form-control bg-transparent text-white border-0 w-100 noBoxShadow"
-            placeholder="Search for an emoji..." id="emojiSearch" />
-          <hr class="w-100 border-white border-2" />
-        </div>
-        <div class="modal-body d-flex w-100 flex-row m-0 p-0 overflow-y-auto text-wrap flex-wrap" id="emojiList"></div>
       </div>
     </div>
   </div>
@@ -212,10 +213,12 @@
   <script src="/pages/template/pre-compiled/message.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/message-container.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/message-selection.precompiled.js"></script>
+  <script src="/pages/js/Manager/message.js"></script>
+  <script src="/pages/js/Manager/emoji.js"></script>
+  <script src="/pages/js/Manager/group.js"></script>
   <script src="/pages/js/userSession.js"></script>
   <script src="/pages/js/sidebar.js"></script>
-  <script src="/pages/js/Manager/message.js"></script>
-  <script src="/pages/js/Manager/group.js"></script>
+  <script src="/pages/js/emoji.js"></script>
   <script src="/pages/js/message.js"></script>
 </body>
 

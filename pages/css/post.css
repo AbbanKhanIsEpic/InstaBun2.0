@@ -23,9 +23,11 @@
 .commentTextArea:not(:focus):empty:not([data-div-placeholder-content]):before {
   content: attr(data-placeholder);
 }
+
 .commentTextArea {
   height: 36px;
 }
+
 form {
   width: 461px;
 }

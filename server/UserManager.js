@@ -116,7 +116,6 @@ class UserManager {
 
   //Checking if the email address is the user's email
   //This is used to allow user to login if they forgot their password
-
   async getDisplayName(userID) {
     try {
       const query = `SELECT DisplayName FROM instabun.Users where UserID = ?`;
@@ -174,6 +173,18 @@ class UserManager {
       return error;
     }
   }
+
+  async getRecommendardUsers(userID, page, numOfPreviousPopular) {}
+
+  //This function is basically:
+  //Get a list of users that the current user might friend
+  //Basic breakdown:
+  //First get the list of users who the current user is friends with
+  //Second get a list of users who the friends are friends with
+  //Thirdly, filter them by checking if the friends' friends are not friends with the current user
+  async #getMutualAcquaintance(userID, page) {}
+
+  async #getPopularUsers(userID) {}
 
   async isUsernameTaken(username) {
     try {

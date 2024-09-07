@@ -4,6 +4,7 @@ const emojiSearch = document.querySelector("#emojiSearch");
 const emojiSelector = document.querySelector("#emojiSelector");
 
 emojiSearch.addEventListener("input", function () {
+  console.log("Hi");
   const keywords = emojiSearch.value.trim();
   //Only display the list after 500ms -> user stop typing
   setTimeout(function () {
@@ -26,13 +27,8 @@ function displayEmojies(data) {
       true
     );
   });
-  // Get the template source
-  const templateSource = document.getElementById(
-    "emoji-button-template"
-  ).innerHTML;
 
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["emoji-button"];
 
   data = Object.fromEntries(data);
 

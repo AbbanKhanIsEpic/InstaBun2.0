@@ -1,10 +1,12 @@
 input::placeholder {
   color: gray !important;
 }
+
 button:hover {
   color: black !important;
   font-weight: bolder;
 }
+
 #redirect:hover {
   font-weight: bolder;
 }

@@ -31,6 +31,12 @@ const infoModal = document.querySelector("#infoModal");
 
 const viewHiddenMessages = document.querySelector("#viewHiddenMessages");
 
+const searchMessageModal = document.querySelector("#searchMessageModal");
+const searchMessageInput = document.querySelector("#searchMessageInput");
+const filteredMessageList = searchMessageModal.querySelector(
+  "#filteredMessageList"
+);
+
 let isGroup;
 let deleteMessageID;
 let communicatingToID;
@@ -89,9 +95,12 @@ createGroupBtn.addEventListener("click", function () {
     );
 
     createGroup(formData);
-    createGroupModal.style.display = "none";
-    document.querySelector(".modal-backdrop").classList.add("d-none");
-    displayMessageLists(userID);
+    //This ensures that by the time the screen rehreshes -> the group can be displayed
+    setTimeout(() => {
+      createGroupModal.style.display = "none";
+      document.querySelector(".modal-backdrop").classList.add("d-none");
+      displayMessageLists(userID);
+    }, 3000);
   }
 });
 
@@ -115,6 +124,36 @@ infoModal.addEventListener("click", async function () {
 });
 
 viewHiddenMessages.addEventListener("shown.bs.modal", function () {});
+
+searchMessageModal.addEventListener("shown.bs.modal", defaultSearchMessage);
+
+searchMessageInput.addEventListener("input", function () {
+  const keywords = searchMessageInput.value.trim();
+  //Only display the list after 500ms -> user stop typing
+  setTimeout(function () {
+    if (keywords !== searchMessageInput.value || keywords.length == 0) {
+      filteredMessageList.innerHTML = "";
+      defaultSearchMessage();
+    } else if (keywords == searchMessageInput.value) {
+      const regex = new RegExp(`${keywords}.*`);
+      for (let i = 0; i < filteredMessageList.childElementCount; i++) {
+        const messageListRow = filteredMessageList.childNodes[i];
+        const messageListRowName = messageListRow
+          .querySelector('[aria-label="name"]')
+          .textContent.trim();
+        if (!messageListRowName.match(regex)) {
+          messageListRow.classList.add("d-none");
+        } else {
+          messageListRow.classList.remove("d-none");
+        }
+      }
+    }
+  }, 500);
+});
+
+searchMessageModal.addEventListener("hide.bs.modal", function () {
+  filteredMessageList.innerHTML = "";
+});
 
 groupIconInput.addEventListener("change", async function (event) {
   selectedFile = event.target.files[0];
@@ -179,8 +218,17 @@ startConversationButton.addEventListener("click", function () {
 
 //Functions
 
+function defaultSearchMessage() {
+  const messageRows = document.getElementById("messageColumn").children;
+
+  for (let i = 0; i < messageRows.length; i++) {
+    filteredMessageList.appendChild(messageRows[i].cloneNode(true));
+    console.log(messageRows[i].cloneNode(true));
+  }
+}
+
 async function displayUserList() {
-  const template = Handlebars.templates["search-user"];
+  const template = Handlebars.templates["search-user-message"];
   const data = await getUserList(searchUsersInput.value);
 
   // Render the template with data
@@ -418,7 +466,8 @@ async function displayMessages(userID, toID, isDirect) {
 
     const yesterday = new Date(new Date().setDate(today.getDate() - 1));
 
-    const isYesterday = yesterday == date;
+    const isYesterday =
+      yesterday.toLocaleDateString() == date.toLocaleDateString();
 
     const withinWeek = date > new Date().setDate(new Date().getDate() - 7);
 
@@ -484,7 +533,7 @@ async function sendMessage() {
       : await sendDirectMessage(userID, communicatingToID, message)
   )["status"];
   if (resultStatus == 200) {
-    displayMessages(userID, communicatingToID, false);
+    displayMessages(userID, communicatingToID, !isGroup);
     displayMessageLists(userID);
   } else {
     alert("Unable to send message");

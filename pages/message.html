@@ -18,7 +18,8 @@
   <div class="row row-cols grid content">
     <div id="contentPage" class="col vh-100 w-100 d-flex flex-row">
       <div id="messageSideBar" class="border-end border-dark overflow-y-auto user-select-none overflow-x-hidden">
-        <div class="border-bottom border-dark pt-2 ps-2 pb-2" data-bs-toggle="modal" data-bs-target="#newMessageModal">
+        <div class="border-bottom border-dark pt-2 ps-2 pb-2 pointer" data-bs-toggle="modal"
+          data-bs-target="#newMessageModal">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pencil-square"
             viewBox="0 0 16 16">
             <path
@@ -28,7 +29,8 @@
           </svg>
           <span>Start a new conversation</span>
         </div>
-        <div class="border-bottom border-dark pt-2 ps-2 pb-2">
+        <div class="border-bottom border-dark pt-2 ps-2 pb-2 pointer" data-bs-toggle="modal"
+          data-bs-target="#searchMessageModal">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-search"
             viewBox="0 0 16 16">
             <path
@@ -36,7 +38,7 @@
           </svg>
           <span>Find a conversation</span>
         </div>
-        <div class="border-bottom border-dark pt-2 ps-2 pb-2" data-bs-toggle="modal"
+        <div class="border-bottom border-dark pt-2 ps-2 pb-2 pointer" data-bs-toggle="modal"
           data-bs-target="#viewHiddenMessages">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
             class="bi bi-person-fill-slash" viewBox="0 0 16 16">
@@ -116,6 +118,33 @@
             Chat
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal glassmorph" tabindex="-1" id="searchMessageModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-black text-white glassmorph">
+        <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
+          <h5 class="modal-title pt-3">Find a conversation</h5>
+          <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
+            data-bs-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
+              viewBox="0 0 16 16">
+              <path
+                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                stroke="white" stroke-width="1.5" />
+            </svg>
+          </button>
+          <hr class="w-100 border-white border-2" />
+          <form class="input-group w-100">
+            <span class="input-group-text bg-transparent text-white border-0"><strong>Looking for:</strong></span>
+            <div class="d-flex gap-2 flex-wrap text-wrap"></div>
+            <input type="text" class="form-control bg-transparent text-white border-0 noBoxShadow"
+              placeholder="Search..." id="searchMessageInput" />
+          </form>
+          <hr class="w-100 border-white border-2" />
+        </div>
+        <div class="modal-body d-flex w-100 flex-column m-0 p-0 overflow-y-scroll" id="filteredMessageList"></div>
       </div>
     </div>
   </div>
@@ -213,6 +242,8 @@
   <script src="/pages/template/pre-compiled/message.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/message-container.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/message-selection.precompiled.js"></script>
+  <script src="/pages/template/pre-compiled/search-user-message.precompiled.js"></script>
+  <script src="/pages/template/pre-compiled/selected-user.precompiled.js"></script>
   <script src="/pages/js/Manager/message.js"></script>
   <script src="/pages/js/Manager/emoji.js"></script>
   <script src="/pages/js/Manager/group.js"></script>

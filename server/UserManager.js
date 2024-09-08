@@ -152,19 +152,31 @@ class UserManager {
   }
 
   //Users can search for other users by username or display name
-  async getListOfUsers(searchQuery, userPerPage, page) {
+  async getListOfUsers(searchQuery, userID) {
     //The apart of the username could be in the front, end or middle
     //This is to give a better result
-    userPerPage = parseInt(userPerPage);
+    console.log(searchQuery, userID);
     searchQuery = "%" + searchQuery + "%";
-    console.log(searchQuery);
     try {
-      const query = `SELECT userID,Username,DisplayName,profileIcon FROM instabun.Users where (Username Like ? OR DisplayName like ?)limit ?,?;`;
+      const query = `SELECT 
+    Username, DisplayName, ProfileIcon,
+    userID,
+    (SELECT 
+            COUNT(*)
+        FROM
+            followers
+        WHERE
+            FollowerID = ? AND FollowingID = userID) AS isFollowing
+FROM
+    users
+WHERE
+    (username LIKE ?
+        OR displayNAme LIKE ?) AND userID != ?;`;
       const result = await select(query, [
+        userID,
         searchQuery,
         searchQuery,
-        page * userPerPage,
-        userPerPage,
+        userID,
       ]);
       console.log(query);
       console.log(result);
@@ -174,7 +186,18 @@ class UserManager {
     }
   }
 
-  async getRecommendardUsers(userID, page, numOfPreviousPopular) {}
+  async getRecommendardUsers(userID) {
+    try {
+      const users = await this.#getMutualAcquaintance(userID);
+      if (users.length == 0) {
+        return await this.#getPopularUsers(userID);
+      }
+      return users;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 
   //This function is basically:
   //Get a list of users that the current user might friend
@@ -182,9 +205,65 @@ class UserManager {
   //First get the list of users who the current user is friends with
   //Second get a list of users who the friends are friends with
   //Thirdly, filter them by checking if the friends' friends are not friends with the current user
-  async #getMutualAcquaintance(userID, page) {}
+  async #getMutualAcquaintance(userID) {
+    try {
+      const query = `With friend as (SELECT 
+    FollowingID AS userID
+FROM
+    followers
+WHERE
+    FollowerID = ?
+HAVING (SELECT 
+        COUNT(*)
+    FROM
+        followers
+    WHERE
+        (FollowingID = ? AND FollowerID = userID)
+            OR (FollowingID = userID AND FollowerID = ?)) = 2), 
 
-  async #getPopularUsers(userID) {}
+MutualAcquaintance as (SELECT FollowerID as friendID, FollowingID as userID FROM followers WHERE  FollowerID IN (select * from friend) AND FollowingID NOT IN (select * from friend UNION select ? as userID) HAVING (SELECT 
+        COUNT(*)
+    FROM
+        followers
+    WHERE
+        (FollowingID = friendID AND FollowerID = userID)
+            OR (FollowingID = userID AND FollowerID = friendID)) = 2)
+            
+Select Username, DisplayName, ProfileIcon, MutualAcquaintance.userID, 0 as isFollowing from MutualAcquaintance INNER JOIN users on users.userID = MutualAcquaintance.userID group by MutualAcquaintance.userID;`;
+      const result = await select(query, [userID, userID, userID, userID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async #getPopularUsers(userID) {
+    try {
+      const query = `SELECT 
+    username,
+    displayName,
+    profileIcon,
+    userID,
+    (SELECT 
+            COUNT(*)
+        FROM
+            followers
+        WHERE
+            FollowerID = ? AND FollowingID = userID) isFollowing
+FROM
+    followers
+        INNER JOIN
+    users ON users.userID = followers.followingID
+WHERE
+    userID != ?
+GROUP BY FollowingID
+ORDER BY (COUNT(*)) DESC;`;
+      const result = await select(query, [userID, userID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
 
   async isUsernameTaken(username) {
     try {

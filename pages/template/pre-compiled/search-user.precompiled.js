@@ -8,9 +8,9 @@ templates['search-user'] = template({"1":function(container,depth0,helpers,parti
         return undefined
     };
 
-  return "  <div\r\n    class=\"user d-flex flex-row justify-content-between align-items-center w-100 pt-2 pb-2\"\r\n  >\r\n    <div class=\"d-flex flex-row ms-4\">\r\n      <img\r\n        src="
-    + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"profileIcon") : stack1), depth0))
-    + "\r\n        height=\"100\"\r\n        width=\"100\"\r\n        alt=\"\"\r\n        class=\"rounded-circle profileIcon\"\r\n      />\r\n      <div class=\"d-flex flex-column ms-3\">\r\n        <div class=\"display-6 displayName\">\r\n          <strong>"
+  return "  <div\r\n    class=\"user d-flex flex-row justify-content-between align-items-center w-100 pt-2 pb-2\"\r\n  >\r\n    <div class=\"d-flex flex-row ms-4\">\r\n      <img\r\n        src=\""
+    + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"ProfileIcon") : stack1), depth0))
+    + "\"\r\n        height=\"100\"\r\n        width=\"100\"\r\n        alt=\"\"\r\n        class=\"rounded-circle profileIcon\"\r\n      />\r\n      <div class=\"d-flex flex-column ms-3\">\r\n        <div class=\"display-6 displayName\">\r\n          <strong>"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"DisplayName") : stack1), depth0))
     + "</strong>\r\n        </div>\r\n        <div class=\"username text-white-50 h3\">\r\n          "
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"Username") : stack1), depth0))

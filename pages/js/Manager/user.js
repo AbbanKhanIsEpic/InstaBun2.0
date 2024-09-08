@@ -218,3 +218,31 @@ async function isUsernameTaken(username) {
     });
   return result;
 }
+
+async function getRecommendardUsers(userID) {
+  const server = "http://127.0.0.1:5000/api/user/recommendard";
+  const query = `?userID=${encodeURIComponent(userID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}
+
+async function getSearchedUser(searchQuery, userID) {
+  const server = "http://127.0.0.1:5000/api/user/search";
+  const query = `?searchQuery=${encodeURIComponent(
+    searchQuery
+  )}&userID=${encodeURIComponent(userID)}`;
+
+  let result;
+  await fetch(server + query)
+    .then((response) => response.json())
+    .then((data) => {
+      result = data;
+    });
+  return result;
+}

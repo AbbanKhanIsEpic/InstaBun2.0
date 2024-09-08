@@ -216,13 +216,34 @@ app.get("/api/user/userID", (req, res) => {
 });
 
 app.get("/api/user/search", (req, res) => {
-  const { searchQuery, userPerPage, page } = req.query;
+  const { searchQuery, userID } = req.query;
 
   const user = new UserManager();
 
   try {
     user
-      .getListOfUsers(searchQuery, userPerPage, page)
+      .getListOfUsers(searchQuery, userID)
+      .then((jsonifiedResult) => {
+        res.status(200).send({ users: jsonifiedResult });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send("Error occurred");
+      });
+  } catch (error) {
+    console.error("Synchronous error:", error);
+    res.status(500).send("Unexpected error occurred");
+  }
+});
+
+app.get("/api/user/recommendard", (req, res) => {
+  const { userID } = req.query;
+
+  const user = new UserManager();
+
+  try {
+    user
+      .getRecommendardUsers(userID)
       .then((jsonifiedResult) => {
         res.status(200).send({ users: jsonifiedResult });
       })

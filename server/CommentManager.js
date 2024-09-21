@@ -4,7 +4,7 @@ class CommentManager {
   //Save the comment to the database
   async comment(postID, userID, comment) {
     try {
-      const query = `INSERT INTO instabun.PostComment (PostID, Commenter, Comment) VALUES (?, ?, ?);`;
+      const query = `INSERT INTO instabun.commentpost (postID, commenterID, comment) VALUES (?, ?, ?);`;
       await update(query, [postID, userID, comment]);
       return "Comment operation successful";
     } catch (error) {

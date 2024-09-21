@@ -33,7 +33,6 @@ class StoryManager {
   //Stories only last for a day
   //So it is only getting stories that is a less or equal to a day old
   async getStories(userID) {
-    console.log(userID);
     try {
       const query = `With filterStories as (
 	Select *, (SELECT 

@@ -14,7 +14,7 @@ class UserManager {
     newDMLimit
   ) {
     try {
-      const query = `UPDATE instabun.Users SET DisplayName = ?, Bio = ?, ProfileIconLink = ?, Visibility = ?, DMLimit = ?  WHERE (UserID = ?)`;
+      const query = `UPDATE instabun.users SET displayName = ?, bio = ?, profileIconLink = ?, visibility = ?, DMLimit = ?  WHERE (userID = ?)`;
       await update(query, [
         newDisplayName,
         newBio,

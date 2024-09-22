@@ -1,26 +1,22 @@
-function createStory(formData) {
-  const server = "http://127.0.0.1:5000/api/story";
-  fetch(server, {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Message deletion failed:", error.message);
+const API_BASE_URL = "http://127.0.0.1:5000/api/story";
+
+export async function createStory(formData) {
+  try {
+    await axios.post(`${API_BASE_URL}`, {
+      formData,
     });
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-async function getStories(userID) {
-  const server = `http://127.0.0.1:5000/api/story`;
-  const query = `?userID=${encodeURIComponent(userID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
+export async function getStories(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}`, {
+      params: { userID },
     });
-  return result;
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }

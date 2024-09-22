@@ -1,20 +1,18 @@
-//Send messages
-async function sendGroupMessage(groupID, senderID, message) {
-  const server = "http://127.0.0.1:5000/api/message/group";
-  const data = { groupID, senderID, message };
+const API_BASE_URL = "http://127.0.0.1:5000/api/message";
 
+//Send messages
+export async function sendGroupMessage(groupID, senderID, message) {
   try {
-    const response = await fetch(server, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+    const response = await axios.post(`${API_BASE_URL}/group`, {
+      groupID,
+      senderID,
+      message,
     });
     const responseData = await response.json();
 
     return { status: 200, response: responseData };
   } catch (error) {
+    console.error(error);
     return {
       status: 500,
       internalMessage: "Failed to send group message",
@@ -23,22 +21,18 @@ async function sendGroupMessage(groupID, senderID, message) {
   }
 }
 
-async function sendDirectMessage(senderID, receiverID, message) {
-  const server = "http://127.0.0.1:5000/api/message/direct";
-  const data = { senderID, receiverID, message };
-
+export async function sendDirectMessage(senderID, receiverID, message) {
   try {
-    const response = await fetch(server, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+    const response = await axios.post(`${API_BASE_URL}/direct`, {
+      senderID,
+      receiverID,
+      message,
     });
     const responseData = await response.json();
 
     return { status: 200, response: responseData };
   } catch (error) {
+    console.error(error);
     return {
       status: 500,
       internalMessage: "Failed to send direct message",
@@ -48,94 +42,53 @@ async function sendDirectMessage(senderID, receiverID, message) {
 }
 
 //Get messages
-async function getMessageLists(userID) {
-  const server = "http://127.0.0.1:5000/api/message/list";
-  const query = `?userID=${encodeURIComponent(userID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
-}
-
-async function getDirectMessages(currentUserID, selectedUserID) {
-  const server = "http://127.0.0.1:5000/api/message/direct";
-  const query = `?senderID=${encodeURIComponent(
-    currentUserID
-  )}&receiverID=${encodeURIComponent(selectedUserID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
-}
-
-async function getGroupMessages(userID, groupID) {
-  const server = "http://127.0.0.1:5000/api/message/group";
-  const query = `?userID=${encodeURIComponent(
-    userID
-  )}&groupID=${encodeURIComponent(groupID)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
-}
-
-//Delete messages
-async function deleteDirectMessage(messageID) {
-  const server = "http://127.0.0.1:5000/api/message/direct/delete";
-  const data = { messageID };
-
+export async function getMessageLists(userID) {
   try {
-    const response = await fetch(server, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+    const response = await axios.get(`${API_BASE_URL}/list`, {
+      params: { userID },
     });
-    const responseData = await response.json();
-
-    return { status: 200, response: responseData };
+    return response.data;
   } catch (error) {
-    return {
-      status: 500,
-      internalMessage: "Failed to send group message",
-      error: error.message,
-    };
+    console.error(error);
   }
 }
 
-async function deleteGroupMessage(messageID) {
-  const server = "http://127.0.0.1:5000/api/message/group/delete";
-  const data = { messageID };
-
+export async function getDirectMessages(currentUserID, selectedUserID) {
   try {
-    const response = await fetch(server, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+    const response = await axios.get(`${API_BASE_URL}/direct`, {
+      params: { currentUserID, selectedUserID },
     });
-    const responseData = await response.json();
-
-    return { status: 200, response: responseData };
+    return response.data;
   } catch (error) {
-    return {
-      status: 500,
-      internalMessage: "Failed to send group message",
-      error: error.message,
-    };
+    console.error(error);
+  }
+}
+
+export async function getGroupMessages(userID, groupID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/group`, {
+      params: { userID, groupID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function deleteDirectMessage(messageID) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/direct/${messageID}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function deleteGroupMessage(messageID) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/group/${messageID}`);
+    return response;
+  } catch (error) {
+    console.error(error);
   }
 }

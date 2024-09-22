@@ -1,3 +1,5 @@
+import { login, getEmailAddress, sendAuth } from "./API/user.js";
+
 const loginButton = document.querySelector("#loginButton");
 const sendEmail = document.querySelector("#sendEmail");
 const verifyPasswordBtn = document.querySelector("#verifyPasswordBtn");
@@ -15,10 +17,6 @@ const verifyPasswordError = document.querySelector("#verifyPasswordError");
 
 const twoStepModal = document.querySelector("#TwoStepModal");
 const changePasswordModal = document.querySelector("#changePasswordModal");
-
-let timer = null;
-const duration = 900000; //15 mins
-let timeOver = null;
 
 const userIdentifierInput = document.querySelector("#userIdentifierInput"); // Input element
 const passwordInput = document.querySelector("#passwordInput");
@@ -39,7 +37,7 @@ const sendPasswordEmailAgain = document.querySelector(
   "#changePasswordModal .modal-footer > div:first-child"
 );
 
-loginButton.addEventListener("click", function () {
+loginButton.addEventListener("click", async function () {
   const userIdentifier = userIdentifierInput.value;
   const password = passwordInput.value;
 
@@ -75,7 +73,59 @@ loginButton.addEventListener("click", function () {
     return;
   }
 
-  login(userIdentifier, password);
+  const status = await login(userIdentifier, password);
+
+  console.log(status);
+
+  if (status == 401) {
+    if (userIdentifier.includes("@")) {
+      loginError.textContent = "Email address or password incorrect";
+      userIdentifierInput.style.borderColor = "red";
+      passwordInput.style.borderColor = "red";
+    } else {
+      loginError.textContent = "Username or password incorrect";
+      userIdentifierInput.style.borderColor = "red";
+      passwordInput.style.borderColor = "red";
+    }
+  } else if (status == 497) {
+    let toEmail;
+    if (!userIdentifier.includes("@")) {
+      toEmail = await getEmailAddress(userIdentifier);
+      console.log(toEmail);
+    } else {
+      toEmail = userIdentifier;
+    }
+    twoStepModal.style.display = "block";
+    let code = Math.floor(100000 + Math.random() * 900000);
+    const location = await getLocation();
+    sendAuth(toEmail, code, location);
+    startTimer();
+    document
+      .querySelector("#sendEmailAgainAuth")
+      .addEventListener("click", function () {
+        if (!timeOver) {
+          alert("You can only request when the code expires");
+        } else {
+          code = Math.floor(100000 + Math.random() * 900000);
+          sendAuth(toEmail, code, location);
+          resetTimer();
+        }
+      });
+    document
+      .querySelector("#verifyAuthBtn")
+      .addEventListener("click", async function () {
+        if (authCodeInput.value == code) {
+          await createUserSession(userIdentifier, 30);
+          window.open("http://127.0.0.1:5500/pages/home.html", "_self");
+        } else {
+          verifyError.textContent = "Make sure to enter the code correctly";
+          authCodeInput.style.borderColor = "red";
+        }
+      });
+  } else if (status == 200) {
+    await createUserSession(userIdentifier, 30);
+    window.open("http://127.0.0.1:5500/pages/home.html", "_self");
+  }
 });
 
 forgotPassword.addEventListener("click", async function () {

@@ -5,6 +5,7 @@ const FollowManager = require("./FollowManager.js");
 
 class UserManager {
   //Update the user's profile
+  //I believe I will need to seperate this into its individual methods
   async updateProfile(
     userID,
     newDisplayName,
@@ -29,6 +30,7 @@ class UserManager {
     }
   }
 
+  //Creates an account
   async createAccount(username, emailAddress, password) {
     try {
       const query = `INSERT INTO Users (Username,Email,DisplayName, Password) VALUES (?,?,?,?);`;
@@ -39,16 +41,18 @@ class UserManager {
   }
 
   //Block control
-  async isUserBlocked(blockerUserID, blockedUserID) {
+  //Check if user has been blocked
+  async isUserBlocked(blockedUserID, blockerUserID) {
     try {
-      const query = `SELECT count(*) FROM instabun.BlockUser where BlockerUserID = ? AND BlockedUserID = ?;`;
-      const [result] = await select(query, [blockerUserID, blockedUserID]);
+      const query = `SELECT count(*) FROM instabun.block where blockedUserID = ? AND blockerUserID = ?;`;
+      const [result] = await select(query, [blockedUserID, blockerUserID]);
       return result["count(*)"] == 1;
     } catch (error) {
       return error;
     }
   }
 
+  //Blocks the user
   async block(blockerUserID, blockedUserID) {
     try {
       const query = `INSERT INTO BlockUser(BlockerUserID,BlockedUserID) VALUE(?,?);`;
@@ -63,9 +67,10 @@ class UserManager {
     }
   }
 
+  //Deletes the block
   async unblock(blockerUserID, blockedUserID) {
     try {
-      const query = `DELETE FROM BlockUser WHERE BlockerUserID = ? AND BlockedUserID = ?;`;
+      const query = `DELETE FROM instabun.block WHERE blockerUserID = ? AND blockedUserID = ?;`;
       await update(query, [blockerUserID, blockedUserID]);
       return "Unblock operation successful";
     } catch (error) {
@@ -341,7 +346,7 @@ ORDER BY (COUNT(*)) DESC;`;
   async userLogin(userIdentifier, password) {
     if (userIdentifier.includes("@")) {
       try {
-        const query = `SELECT count(*) FROM instabun.Users where Email = ? AND Password = ?`;
+        const query = `SELECT count(*) FROM instabun.users where email = ? AND password = ?`;
         const [result] = await select(query, [userIdentifier, password]);
         return result["count(*)"] == 1;
       } catch (error) {
@@ -349,7 +354,7 @@ ORDER BY (COUNT(*)) DESC;`;
       }
     } else {
       try {
-        const query = `SELECT count(*) FROM instabun.Users where Username = ? AND Password = ?`;
+        const query = `SELECT count(*) FROM instabun.Users where username = ? AND password = ?`;
         const [result] = await select(query, [userIdentifier, password]);
         return result["count(*)"] == 1;
       } catch (error) {

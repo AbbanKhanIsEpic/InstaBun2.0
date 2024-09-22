@@ -1,6 +1,7 @@
+const API_BASE_URL = "http://127.0.0.1:5000/api/post";
+
 function createPost(formData) {
-  const server = "http://127.0.0.1:5000/api/post";
-  fetch(server, {
+  fetch(API_BASE_URL, {
     method: "POST",
     body: formData,
   })
@@ -15,16 +16,16 @@ function createPost(formData) {
     });
 }
 
-async function getFollowingPost(userID) {
-  const server = "http://127.0.0.1:5000/api/message/group";
-  const query = `?userID=${encodeURIComponent(
-    userID
-  )}&groupID=${encodeURIComponent(groupID)}`;
+// async function getFollowingPost(userID) {
+//   const server = "http://127.0.0.1:5000/api/message/group";
+//   const query = `?userID=${encodeURIComponent(
+//     userID
+//   )}&groupID=${encodeURIComponent(groupID)}`;
 
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-}
+//   let result;
+//   await fetch(server + query)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       result = data;
+//     });
+// }

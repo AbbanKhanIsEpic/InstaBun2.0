@@ -43,8 +43,15 @@ async function connectToDatabase() {
 connectToDatabase();
 
 //All the api end-points
+//I have changed it a bit to be closer to what the API is actually doing
 
 //User
+
+//The reasons why I use post instead get
+//1) When using the get REST API, the creditional will be in the url part which is bad D:
+//2) Industry standard (Ofc what I have here is not really but it is closer to it wih put)
+
+//Checks if user has all creditional is correct and send email if 2STEP is enabled
 app.post("/api/user/login", async (req, res) => {
   const { userIdentifier, password } = req.body;
   try {
@@ -78,6 +85,7 @@ app.post("/api/user/login", async (req, res) => {
   }
 });
 
+//Returns the user's display name
 app.get("/api/user/displayName", (req, res) => {
   const { userID } = req.query;
 
@@ -94,13 +102,14 @@ app.get("/api/user/displayName", (req, res) => {
     });
 });
 
-app.get("/api/user/isBlock", (req, res) => {
-  const { userID, profileUserID } = req.query;
+//Returns if user has been blocked by the other user
+app.get("/api/user/isBlocked", (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
   const user = new UserManager();
 
   user
-    .isUserBlocked(userID, profileUserID)
+    .isUserBlocked(requestingUserID, targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -110,6 +119,7 @@ app.get("/api/user/isBlock", (req, res) => {
     });
 });
 
+//Create an account
 app.post("/api/user/createAccount", (req, res) => {
   const { username, emailAddress, password } = req.body;
 
@@ -124,7 +134,8 @@ app.post("/api/user/createAccount", (req, res) => {
   }
 });
 
-app.post("/api/user/changePassword", (req, res) => {
+//Changes the user's password
+app.patch("/api/user/changePassword", (req, res) => {
   const { emailAddress, password } = req.body;
 
   try {
@@ -141,15 +152,24 @@ app.post("/api/user/changePassword", (req, res) => {
   }
 });
 
-app.post("/api/user/unblock", (req, res) => {
-  const userID = req.body.userID;
-  const profileUserID = req.body.profileUserID;
+//Remove the block
+app.delete("/api/user/unblock", (req, res) => {
+  const requestingUserID = req.body.userID;
+  const targetUserID = req.body.profileUserID;
 
-  const user = new UserManager();
-  user.unblock(userID, profileUserID);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    const user = new UserManager();
+    user.unblock(requestingUserID, targetUserID);
+    res.status(200).json({ message: "User unblocked successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while unblocking the user",
+    });
+  }
 });
 
+//Returns if email has been taken
 app.get("/api/user/IsEmailTaken", (req, res) => {
   const { email } = req.query;
 
@@ -166,6 +186,7 @@ app.get("/api/user/IsEmailTaken", (req, res) => {
     });
 });
 
+//Returns if username has been taken
 app.get("/api/user/isUsernameTaken", (req, res) => {
   const { username } = req.query;
 
@@ -182,6 +203,7 @@ app.get("/api/user/isUsernameTaken", (req, res) => {
     });
 });
 
+//Returns the user's username
 app.get("/api/user/username", (req, res) => {
   const { userID } = req.query;
 
@@ -198,23 +220,7 @@ app.get("/api/user/username", (req, res) => {
     });
 });
 
-app.get("/api/user/userID", (req, res) => {
-  const { userIdentifier } = req.query;
-
-  const user = new UserManager();
-
-  user
-    .getUserID(userIdentifier)
-    .then((jsonifiedResult) => {
-      console.log(jsonifiedResult);
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
+//Returns a list of user filtered by page number, skip and key word (what username or display name  contain)
 app.get("/api/user/search", (req, res) => {
   const { searchQuery, userID } = req.query;
 
@@ -236,6 +242,7 @@ app.get("/api/user/search", (req, res) => {
   }
 });
 
+//Returns a list of users recommendard to the user
 app.get("/api/user/recommendard", (req, res) => {
   const { userID } = req.query;
 
@@ -257,6 +264,7 @@ app.get("/api/user/recommendard", (req, res) => {
   }
 });
 
+//Returns the user's profile
 app.get("/api/user/profile", (req, res) => {
   const { userID } = req.query;
 
@@ -273,6 +281,7 @@ app.get("/api/user/profile", (req, res) => {
     });
 });
 
+//Returns user's profile icon
 app.get("/api/user/profileIcon", (req, res) => {
   const { userID } = req.query;
 
@@ -289,6 +298,7 @@ app.get("/api/user/profileIcon", (req, res) => {
     });
 });
 
+//Returns user's dm limit
 app.get("/api/user/dmlimit", (req, res) => {
   const { userID } = req.query;
 
@@ -305,6 +315,7 @@ app.get("/api/user/dmlimit", (req, res) => {
     });
 });
 
+//Update user's profile
 app.post("/api/user/profile", (req, res) => {
   const userID = req.body.userID;
   const newDisplayName = req.body.newDisplayName;
@@ -325,6 +336,7 @@ app.post("/api/user/profile", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
+//Returns user's email address
 app.get("/api/user/getEmailAddress", (req, res) => {
   const { username } = req.query;
 
@@ -343,8 +355,8 @@ app.get("/api/user/getEmailAddress", (req, res) => {
     });
 });
 
-//Email
-
+//Sending email
+//Send email because of 2Step
 app.post("/api/user/sendAuthEmail", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
@@ -362,6 +374,7 @@ app.post("/api/user/sendAuthEmail", async (req, res) => {
   }
 });
 
+//Send email to finalise account creation
 app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
@@ -379,6 +392,7 @@ app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
   }
 });
 
+//Send email to change user's password
 app.post("/api/user/sendChangePasswordEmail", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
@@ -395,14 +409,14 @@ app.post("/api/user/sendChangePasswordEmail", async (req, res) => {
 });
 
 //Follow
-
-app.get("/api/follow/following", (req, res) => {
-  const { currentID, profileID } = req.query;
+//Returns true or false if the reqesting user is following the target user
+app.get("/api/follow/isFollowing", (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
   const follow = new FollowManager();
 
   follow
-    .isFollowing(currentID, profileID)
+    .isFollowing(requestingUserID, targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -412,13 +426,14 @@ app.get("/api/follow/following", (req, res) => {
     });
 });
 
+//Return the list of followers of the target user
 app.get("/api/follow/listOfFollowers", (req, res) => {
-  const { profileID } = req.query;
+  const { targetUserID } = req.query;
 
   const follow = new FollowManager();
 
   follow
-    .getFollowers(profileID)
+    .getFollowers(targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -428,13 +443,14 @@ app.get("/api/follow/listOfFollowers", (req, res) => {
     });
 });
 
+//Returns the list of following of the target user
 app.get("/api/follow/listOfFollowings", (req, res) => {
-  const { profileID } = req.query;
+  const { targetUserID } = req.query;
 
   const follow = new FollowManager();
 
   follow
-    .getFollowings(profileID)
+    .getFollowings(targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -444,21 +460,29 @@ app.get("/api/follow/listOfFollowings", (req, res) => {
     });
 });
 
-app.post("/api/follow/becomeFollower", (req, res) => {
-  const followerID = req.body.currentID;
-  const followingID = req.body.profileID;
+//
+app.post("/api/follow", (req, res) => {
+  const { requestingUserID, targetUserID } = req.body;
 
-  const follow = new FollowManager();
-  follow.follow(followerID, followingID);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    const follow = new FollowManager();
+    follow.follow(requestingUserID, targetUserID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).send({
+      error: error,
+      message: "Error occurred",
+    });
+  }
 });
 
-app.post("/api/follow/unfollow", (req, res) => {
-  const followerID = req.body.currentID;
-  const followingID = req.body.profileID;
+app.delete("/api/follow", (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
   const follow = new FollowManager();
-  follow.unfollow(followerID, followingID);
+  follow.unfollow(requestingUserID, targetUserID);
 
   res.json({ message: "Data received and processed successfully" });
 });
@@ -739,96 +763,162 @@ app.get("/api/message/group", (req, res) => {
     });
 });
 
-app.post("/api/message/direct/delete", (req, res) => {
-  const messageID = req.body.messageID;
+//Delete direct message
+app.delete("/api/message/direct", (req, res) => {
+  const { messageID } = req.query;
 
-  const messageManager = new MessageManager();
-  messageManager.deleteDirectMessage(messageID);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    const messageManager = new MessageManager();
+    messageManager.deleteDirectMessage(messageID);
+
+    res.json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    return error;
+  }
 });
 
 app.post("/api/message/direct", (req, res) => {
-  const senderID = req.body.senderID;
-  const receiverID = req.body.receiverID;
-  const message = req.body.message;
+  const { senderID, receiverID, message } = req.body;
 
   const messageManager = new MessageManager();
-  messageManager.sendDirectMessage(senderID, receiverID, message);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    messageManager.sendDirectMessage(senderID, receiverID, message);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
 app.post("/api/message/group", (req, res) => {
-  const groupID = req.body.groupID;
-  const senderID = req.body.senderID;
-  const message = req.body.message;
+  const { groupID, senderID, message } = req.body;
 
   const messageManager = new MessageManager();
-  messageManager.sendGroupMessage(groupID, senderID, message);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    messageManager.sendGroupMessage(groupID, senderID, message);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
-app.post("/api/message/group/delete", (req, res) => {
-  const messageID = req.body.messageID;
+app.delete("/api/message/group", (req, res) => {
+  const { messageID } = req.query;
 
   const messageManager = new MessageManager();
-  messageManager.deleteGroupMessage(messageID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    messageManager.deleteGroupMessage(messageID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
 //Group
-
-app.get("/api/group/groupMembers", (req, res) => {
+app.get("/api/group/groupMembers", async (req, res) => {
   const { groupID } = req.query;
 
   const groupManager = new GroupManager();
-  groupManager
-    .getGroupMembers(groupID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+
+  try {
+    const jsonifiedResult = await groupManager.getGroupMembers(groupID);
+    res.status(200).send(jsonifiedResult);
+  } catch (error) {
+    console.error("Error retrieving group members:", error);
+    res.status(500).json({
+      error: error.message || "Internal server error",
+      message: "Error occurred while retrieving group members",
     });
+  }
 });
 
-app.post("/api/group/transferOwnership", (req, res) => {
-  const groupID = req.body.groupID;
-  const newOwnerID = req.body.newOwnerID;
+app.patch("/api/group/transferOwnership", async (req, res) => {
+  const { groupID, newOwnerID } = req.body;
 
   const groupManager = new GroupManager();
-  groupManager.transferOwnership(groupID, newOwnerID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await groupManager.transferOwnership(groupID, newOwnerID);
+    res.status(200).json({ message: "Ownership transferred successfully" });
+  } catch (error) {
+    console.error("Error transferring ownership:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request" });
+  }
 });
 
-app.post("/api/group/addMember", (req, res) => {
-  const groupID = req.body.groupID;
-  const userID = req.body.userID;
+app.post("/api/group/member", async (req, res) => {
+  const { groupID, userID } = req.body;
 
   const groupManager = new GroupManager();
-  groupManager.addMember(groupID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await groupManager.addMember(groupID, userID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while adding member to group",
+    });
+  }
 });
 
-app.post("/api/group/removeMember", (req, res) => {
-  const groupID = req.body.groupID;
-  const userID = req.body.userID;
+app.delete("/api/group/member", async (req, res) => {
+  const { groupID, userID } = req.query;
 
   const groupManager = new GroupManager();
-  groupManager.removeMemeber(groupID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await groupManager.removeMemeber(groupID, userID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the member from group",
+    });
+  }
 });
 
-app.post("/api/group/delete", (req, res) => {
-  const groupID = req.body.groupID;
-  const groupMembers = req.body.groupMembers;
+app.delete("/api/group", async (req, res) => {
+  const { groupID, groupMembers } = req.query;
 
   const groupManager = new GroupManager();
-  groupManager.deleteGroup(groupID, groupMembers);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await groupManager.deleteGroup(groupID, groupMembers);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while deleting the group",
+    });
+  }
 });
 
-app.post("/api/group", upload.single("file"), (req, res) => {
+app.post("/api/group", upload.single("file"), async (req, res) => {
   const file = req.file;
   const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
 
@@ -837,47 +927,90 @@ app.post("/api/group", upload.single("file"), (req, res) => {
   const ownerID = jsonData.ownerID;
 
   const groupManager = new GroupManager();
-  groupManager.createGroup(ownerID, groupName, file, groupMemebers);
 
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    await groupManager.createGroup(ownerID, groupName, file, groupMemebers);
+
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while creating the group",
+    });
+  }
 });
 
 //Comment
-
-app.post("/api/comment/like", (req, res) => {
-  const userID = req.body.userID;
-  const commentID = req.body.commentID;
+//Save record that user liked the comment
+app.post("/api/comment/like", async (req, res) => {
+  const { userID, commentID } = req.body;
 
   const commentManager = new CommentManager();
-  commentManager.like(commentID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await commentManager.like(commentID, userID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
-app.post("/api/comment/unlike", (req, res) => {
-  const userID = req.body.userID;
-  const commentID = req.body.commentID;
+//Remove record that user liked the comment
+app.delete("/api/comment/unlike", async (req, res) => {
+  const { userID, commentID } = req.query;
 
   const commentManager = new CommentManager();
-  commentManager.unLike(commentID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await commentManager.unLike(commentID, userID);
+    res.json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
-app.post("/api/comment/dislike", (req, res) => {
-  const userID = req.body.userID;
-  const commentID = req.body.commentID;
+//Save record that user dislike the comment
+app.post("/api/comment/dislike", async (req, res) => {
+  const { userID, commentID } = req.body;
 
   const commentManager = new CommentManager();
-  commentManager.dislike(commentID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await commentManager.dislike(commentID, userID);
+    res.status(200).json({ message: "Comment disliked successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
-app.post("/api/comment/unDislike", (req, res) => {
-  const userID = req.body.userID;
-  const commentID = req.body.commentID;
+//Remove the record that user dislike the comment
+app.delete("/api/comment/dislike", async (req, res) => {
+  const { userID, commentID } = req.query;
 
   const commentManager = new CommentManager();
-  commentManager.unDisLike(commentID, userID);
-  res.json({ message: "Data received and processed successfully" });
+
+  try {
+    await commentManager.unDisLike(commentID, userID);
+    res.status(200).json({ message: "Remove comment dislike successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
 //Create server

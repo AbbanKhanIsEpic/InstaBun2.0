@@ -17,41 +17,41 @@ class CommentManager {
     try {
       const query = `
       SELECT 
-      PostComment.idComment,
-      PostComment.Comment,
-      Users.Username,
-      Users.DisplayName,
-      Users.ProfileIconLink,
+      collectionpost.commentID,
+      collectionpost.commentpost,
+      users.username,
+      users.displayName,
+      users.profileIcon,
+      (SELECT 
+              COUNT(*)
+          FROM
+              commentLike
+          WHERE
+              commentLike.commentID = commentpost.commentID) AS totalLike,
+      (SELECT 
+              COUNT(*)
+          FROM
+              commentDislike
+          WHERE
+              commentDislike.commentID = commentpost.commentID) AS totalDislike,
       (SELECT 
               COUNT(*)
           FROM
               CommentLike
           WHERE
-              CommentLike.commentID = PostComment.idComment) AS totalLike,
-      (SELECT 
-              COUNT(*)
-          FROM
-              CommentDislike
-          WHERE
-              CommentDislike.commentID = PostComment.idComment) AS totalDislike,
-      (SELECT 
-              COUNT(*)
-          FROM
-              CommentLike
-          WHERE
-              CommentLike.commentID = PostComment.idComment
+              CommentLike.commentID = commentpost.commentID
                   AND CommentLike.userID = ?) AS didLike,
       (SELECT 
               COUNT(*)
           FROM
               CommentDislike
           WHERE
-              CommentDislike.commentID = PostComment.idComment
+              CommentDislike.commentID = commentpost.commentID
                   AND CommentDislike.userID = ?) AS didDislike
   FROM
-      instabun.PostComment
+      instabun.commentpost
           INNER JOIN
-      Users ON Users.UserID = PostComment.Commenter
+      Users ON users.userID = commentpost.commenterID
   WHERE
       PostID = ?
   ORDER BY ((totalLike + 1) / (totalDislike + 1)) DESC;`;

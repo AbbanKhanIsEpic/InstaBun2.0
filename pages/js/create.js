@@ -1,3 +1,7 @@
+//Import
+import { createStory } from "./API/story.js";
+import { createPost } from "./API/post.js";
+
 const createModal = document.querySelector("#createModal");
 const uploadPostInput = document.querySelector("#uploadPostInput");
 const createGroupModalClose = createModal.querySelector(`[aria-label="Close"]`);
@@ -93,7 +97,7 @@ uploadPostInput.addEventListener("change", function (event) {
   }
 });
 
-uploadButton.addEventListener("click", function () {
+uploadButton.addEventListener("click", async function () {
   const description = postDescription.value;
 
   if (isPost) {
@@ -146,13 +150,20 @@ uploadButton.addEventListener("click", function () {
       "jsonData",
       JSON.stringify({
         userID: userID,
-        tags: tags,
         visibility: visibility,
-        description: description,
       })
     );
-    createStory(formData);
+
     uploadButton.classList.add("disabled");
+    const response = await createStory(formData);
+    if (response.status == "200") {
+      alert("The story has been uploaded");
+      window.open("http://127.0.0.1:5500/pages/create.html", "_self");
+      window.re;
+    } else {
+      alert("Error has occured, try again");
+      window.open("http://127.0.0.1:5500/pages/create.html", "_self");
+    }
   }
 });
 

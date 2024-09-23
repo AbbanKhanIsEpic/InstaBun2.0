@@ -164,7 +164,7 @@ class UserManager {
     searchQuery = "%" + searchQuery + "%";
     try {
       const query = `SELECT 
-    Username, DisplayName, ProfileIcon,
+    username, displayName, profileIcon,
     userID,
     (SELECT 
             COUNT(*)
@@ -191,26 +191,13 @@ WHERE
     }
   }
 
-  async getRecommendardUsers(userID) {
-    try {
-      const users = await this.#getMutualAcquaintance(userID);
-      if (users.length == 0) {
-        return await this.#getPopularUsers(userID);
-      }
-      return users;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
-
   //This function is basically:
   //Get a list of users that the current user might friend
   //Basic breakdown:
   //First get the list of users who the current user is friends with
   //Second get a list of users who the friends are friends with
   //Thirdly, filter them by checking if the friends' friends are not friends with the current user
-  async #getMutualAcquaintance(userID) {
+  async getMutualAcquaintance(userID) {
     try {
       const query = `With friend as (SELECT 
     FollowingID AS userID
@@ -234,7 +221,7 @@ MutualAcquaintance as (SELECT FollowerID as friendID, FollowingID as userID FROM
         (FollowingID = friendID AND FollowerID = userID)
             OR (FollowingID = userID AND FollowerID = friendID)) = 2)
             
-Select Username, DisplayName, ProfileIcon, MutualAcquaintance.userID, 0 as isFollowing from MutualAcquaintance INNER JOIN users on users.userID = MutualAcquaintance.userID group by MutualAcquaintance.userID;`;
+Select username, displayName, profileIcon, MutualAcquaintance.userID, 0 as isFollowing from MutualAcquaintance INNER JOIN users on users.userID = MutualAcquaintance.userID group by MutualAcquaintance.userID;`;
       const result = await select(query, [userID, userID, userID, userID]);
       return result;
     } catch (error) {
@@ -242,7 +229,7 @@ Select Username, DisplayName, ProfileIcon, MutualAcquaintance.userID, 0 as isFol
     }
   }
 
-  async #getPopularUsers(userID) {
+  async getPopularUsers(userID) {
     try {
       const query = `SELECT 
     username,

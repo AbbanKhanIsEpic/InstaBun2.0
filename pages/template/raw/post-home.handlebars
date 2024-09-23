@@ -161,21 +161,22 @@
     <div class="mt-2 d-flex flex-row">
       <form class="input-group">
         <div
-          type="text"
-          class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break commentTextArea"
+          type="textarea"
+          class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break commentTextArea input"
           data-placeholder="Send a comment..."
           contenteditable="true"
         ></div>
       </form>
       <div class="d-flex flex-row">
         <span
-          class="me-2 text-primary sendQuickComment d-none"
+          class="me-2 text-primary sendQuickComment invisible"
           role="button"
         >Post</span>
         <span
           class="emojiBtn"
           data-bs-toggle="modal"
           data-bs-target="#emojiSelector"
+          onclick="setTarget(this)"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

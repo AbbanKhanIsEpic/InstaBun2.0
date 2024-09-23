@@ -35,6 +35,7 @@
       class="input-group-text bg-transparent border-0 d-flex"
       data-bs-toggle="modal"
       data-bs-target="#emojiSelector"
+      onclick="setTarget(this)"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -55,14 +56,14 @@
     <div
       type="text"
       id="messageTextArea"
-      class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break"
+      class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break input"
       data-placeholder="Message..."
       contenteditable="true"
     ></div>
     <div
       class="input-group-text bg-transparent border-0 d-flex text-primary invisible"
       id="sendMessageBtn"
-      onClick="sendMessage()"
+      role="button"
     >
       Post
     </div>

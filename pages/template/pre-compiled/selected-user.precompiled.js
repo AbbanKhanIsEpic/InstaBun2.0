@@ -11,7 +11,7 @@ templates['selected-user'] = template({"1":function(container,depth0,helpers,par
   return "  <div\r\n    class=\"d-flex btn btn-primary rounded-2 justify-content-center align-items-center selectedUser\"\r\n    id=\"selectedUser-"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"id") : stack1), depth0))
     + "\"\r\n  ><span aria-label=\"display name\">"
-    + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"DisplayName") : stack1), depth0))
+    + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"displayName") : stack1), depth0))
     + "</span><span\r\n      class=\"btn btn-close d-flex\"\r\n    ></span></div>\r\n";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data,blockParams) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {

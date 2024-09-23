@@ -1,19 +1,14 @@
 const API_BASE_URL = "http://127.0.0.1:5000/api/post";
 
-function createPost(formData) {
-  fetch(API_BASE_URL, {
-    method: "POST",
-    body: formData,
-  })
-    .then((response) => {
-      uploadButton.classList.remove("disabled");
-      alert("The post has been uploaded, the page will be refreshed now");
-      window.open("http://127.0.0.1:5500/pages/create.html", "_self");
-      return response.json();
-    })
-    .catch((error) => {
-      console.error("Message deletion failed:", error.message);
+export async function createPost(formData) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}`, {
+      formData,
     });
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // async function getFollowingPost(userID) {

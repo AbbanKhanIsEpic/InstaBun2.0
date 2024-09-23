@@ -95,9 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
     commentArea.addEventListener("input", function () {
       const comment = commentArea.innerHTML;
       if (comment == 0) {
-        sendQuickComment.classList.add("d-none");
+        sendQuickComment.classList.add("invisible");
       } else {
-        sendQuickComment.classList.remove("d-none");
+        sendQuickComment.classList.remove("invisible");
       }
     });
 

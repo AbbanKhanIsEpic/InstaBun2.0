@@ -673,26 +673,28 @@ app.post("/api/post/share", (req, res) => {
 //Story
 
 app.post("/api/story", upload.single("file"), async (req, res) => {
-  const file = req.file;
-
-  const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
-
-  if (jsonData.length == 0) {
-    res.status(500).send({
-      error: error,
-      message: "Error occurred, did not recieve jsonData",
-    });
-  }
-  const userID = jsonData.userID;
-  const visibility = jsonData.visibility;
   try {
+    console.log(req.file);
+    console.log(req.body);
+
+    const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
+
+    if (!jsonData || Object.keys(jsonData).length === 0) {
+      return res.status(400).json({
+        message: "Error occurred, did not receive jsonData",
+      });
+    }
+
+    const { userID, visibility } = jsonData;
     const story = new StoryManager();
-    await story.upload(userID, file, visibility);
+
+    await story.upload(userID, req.file, visibility);
     res.status(200).json({ message: "Complete story upload" });
   } catch (error) {
+    console.error("Error uploading story:", error);
     res.status(500).send({
-      error: error,
-      message: "Error occurred",
+      error: error.message || error,
+      message: "Error occurred while uploading story",
     });
   }
 });
@@ -732,12 +734,12 @@ app.get("/api/message/list", (req, res) => {
 });
 
 app.get("/api/message/direct", (req, res) => {
-  const { senderID, receiverID } = req.query;
+  const { requestingUserID, targetUserID } = req.query;
 
   const messageManager = new MessageManager();
 
   messageManager
-    .getDirectMessage(senderID, receiverID)
+    .getDirectMessage(requestingUserID, targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -764,8 +766,8 @@ app.get("/api/message/group", (req, res) => {
 });
 
 //Delete direct message
-app.delete("/api/message/direct", (req, res) => {
-  const { messageID } = req.query;
+app.delete("/api/message/direct/:messageID", (req, res) => {
+  const { messageID } = req.params;
 
   try {
     const messageManager = new MessageManager();
@@ -812,8 +814,8 @@ app.post("/api/message/group", (req, res) => {
   }
 });
 
-app.delete("/api/message/group", (req, res) => {
-  const { messageID } = req.query;
+app.delete("/api/message/group/:messageID", (req, res) => {
+  const { messageID } = req.params;
 
   const messageManager = new MessageManager();
 

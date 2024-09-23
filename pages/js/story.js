@@ -1,3 +1,5 @@
+import { getStories } from "./API/story.js";
+
 const leftArrow = document.querySelector("#leftArrow");
 const rightArrow = document.querySelector("#rightArrow");
 

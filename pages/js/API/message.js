@@ -8,9 +8,7 @@ export async function sendGroupMessage(groupID, senderID, message) {
       senderID,
       message,
     });
-    const responseData = await response.json();
-
-    return { status: 200, response: responseData };
+    return { status: 200, response: response };
   } catch (error) {
     console.error(error);
     return {
@@ -28,9 +26,7 @@ export async function sendDirectMessage(senderID, receiverID, message) {
       receiverID,
       message,
     });
-    const responseData = await response.json();
-
-    return { status: 200, response: responseData };
+    return { status: 200, response: response };
   } catch (error) {
     console.error(error);
     return {
@@ -53,10 +49,10 @@ export async function getMessageLists(userID) {
   }
 }
 
-export async function getDirectMessages(currentUserID, selectedUserID) {
+export async function getDirectMessages(requestingUserID, targetUserID) {
   try {
     const response = await axios.get(`${API_BASE_URL}/direct`, {
-      params: { currentUserID, selectedUserID },
+      params: { requestingUserID, targetUserID },
     });
     return response.data;
   } catch (error) {
@@ -78,6 +74,7 @@ export async function getGroupMessages(userID, groupID) {
 export async function deleteDirectMessage(messageID) {
   try {
     const response = await axios.delete(`${API_BASE_URL}/direct/${messageID}`);
+    console.log("Hello");
     return response;
   } catch (error) {
     console.error(error);

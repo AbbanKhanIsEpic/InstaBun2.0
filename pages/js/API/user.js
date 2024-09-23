@@ -35,3 +35,14 @@ export async function sendAuth(email, code, location) {
     console.error(error);
   }
 }
+
+export async function getUserList(searchQuery, userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/search`, {
+      params: { searchQuery, userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

@@ -1,4 +1,15 @@
 //Imports
+import { createGroup } from "./API/group.js";
+import { getUserList } from "./API/user.js";
+import {
+  sendGroupMessage,
+  sendDirectMessage,
+  getDirectMessages,
+  getMessageLists,
+  getGroupMessages,
+  deleteDirectMessage,
+  deleteGroupMessage,
+} from "./API/message.js";
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const userList = document.getElementById("userList");
@@ -229,7 +240,7 @@ function defaultSearchMessage() {
 
 async function displayUserList() {
   const template = Handlebars.templates["search-user-message"];
-  const data = await getUserList(searchUsersInput.value);
+  const data = await getUserList(searchUsersInput.value, userID);
 
   // Render the template with data
   const htmlOutput = template(data);
@@ -281,7 +292,7 @@ async function displayUserList() {
         showCaseMemberNewGroup.appendChild(copy);
         selectedArray.push({
           id: id,
-          DisplayName: displayName,
+          displayName: displayName,
           profileIcon: profileIcon,
         });
       }
@@ -336,21 +347,6 @@ function displaySelectedUsers(selectedArray) {
       displaySelectedUsers(selectedArray);
     });
   });
-}
-
-async function getUserList(searchQuery) {
-  const server = "http://127.0.0.1:5000/api/user/search";
-  const query = `?searchQuery=${encodeURIComponent(
-    searchQuery
-  )}&userPerPage=${encodeURIComponent(4)}&page=${encodeURIComponent(0)}`;
-
-  let result;
-  await fetch(server + query)
-    .then((response) => response.json())
-    .then((data) => {
-      result = data;
-    });
-  return result;
 }
 
 async function displayMessageLists(userID) {
@@ -436,9 +432,29 @@ async function setMessageContainer(
       sendMessageBtn.classList.remove("invisible");
     }
   });
+
+  sendMessageBtn.addEventListener("click", async function () {
+    console.log("Hello");
+    const message = document.querySelector("#messageTextArea").innerHTML;
+    const resultStatus = (
+      isGroup
+        ? await sendGroupMessage(communicatingToID, userID, message)
+        : await sendDirectMessage(userID, communicatingToID, message)
+    )["status"];
+    if (resultStatus == 200) {
+      displayMessages(userID, communicatingToID, !isGroup);
+      displayMessageLists(userID);
+    } else {
+      alert("Unable to send message");
+    }
+  });
 }
 
 async function displayMessages(userID, toID, isDirect) {
+  console.log(userID);
+  console.log(toID);
+  console.log(isDirect);
+
   Handlebars.registerHelper("isSendMessage", function (senderID) {
     return senderID == userID;
   });
@@ -523,19 +539,4 @@ async function displayMessages(userID, toID, isDirect) {
       deleteMessageConfirmation.style.display = "block";
     });
   });
-}
-
-async function sendMessage() {
-  const message = document.querySelector("#messageTextArea").innerHTML;
-  const resultStatus = (
-    isGroup
-      ? await sendGroupMessage(communicatingToID, userID, message)
-      : await sendDirectMessage(userID, communicatingToID, message)
-  )["status"];
-  if (resultStatus == 200) {
-    displayMessages(userID, communicatingToID, !isGroup);
-    displayMessageLists(userID);
-  } else {
-    alert("Unable to send message");
-  }
 }

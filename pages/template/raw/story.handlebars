@@ -1,7 +1,7 @@
  {{#each users as |user|}}
         <div class="story-icon" id="{{@index}}">
             <div
-              class="rounded-circle story-icon-background {{#if closeFriend}} friend {{/if}} d-flex justify-content-center align-items-center"
+              class="rounded-circle story-icon-background {{#if hasCloseFriend}}closeFriend{{/if}} d-flex justify-content-center align-items-center"
               data-bs-toggle="modal"
               data-bs-target="#storyModal-{{@index}}"
             >

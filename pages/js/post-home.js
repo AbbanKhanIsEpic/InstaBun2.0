@@ -1,3 +1,4 @@
+import { userID } from "./userSession.js";
 let messageTextArea;
 
 document.addEventListener("DOMContentLoaded", function () {

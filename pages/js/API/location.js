@@ -1,5 +1,5 @@
 //THIS IS EXTREMELY BAD!!!
-async function getLocation() {
+export async function getLocation() {
   let result;
   await fetch(
     "https://api.geoapify.com/v1/ipinfo?&apiKey=8f2e3799151b4063b5b4f35cd40546b0"

@@ -45,9 +45,9 @@ class StoryManager {
               OR (FollowerID = story.userID
               AND FollowingID = ?))
           AS Status from story
-  
+          WHERE timestampdiff(hour,uploadDate,now()) <= 24
+          HAVING storyVisibility <= status OR userID = ?
 )
-
 select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJECT('id',
                     storyID,
                     'isVideo',
@@ -56,8 +56,9 @@ select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJEC
                     storyLink,
                     'uploadDate',
                     uploadDate, 
-                    'visibility',storyVisibility))) as stories from filterStories INNER JOIN users on users.userID = filterStories.userID GROUP BY filterStories.userID`;
+                    'visibility',storyVisibility))) as stories, MAX(storyVisibility) = 2 as hasCloseFriend from filterStories INNER JOIN users on users.userID = filterStories.userID GROUP BY filterStories.userID ORDER BY CASE WHEN users.userID = ? THEN 1 ELSE 0 END DESC`;
       const result = await select(query, [userID, userID, userID, userID]);
+      console.log(result);
       return result;
     } catch (error) {
       return error;

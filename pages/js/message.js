@@ -10,6 +10,7 @@ import {
   deleteDirectMessage,
   deleteGroupMessage,
 } from "./API/message.js";
+import { userID } from "./userSession.js";
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const userList = document.getElementById("userList");

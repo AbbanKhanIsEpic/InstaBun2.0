@@ -1,19 +1,17 @@
-let userID = null;
+import { getUserID } from "./API/user.js";
 
-checkUserSession();
+export const userID = await checkUserSession();
 
-async function createUserSession(userIdentifier, expirationDays) {
+export async function createUserSession(userIdentifier, expirationDays) {
   try {
-    const response = await fetch(
-      `http://127.0.0.1:5000/api/user/userID?userIdentifier=${encodeURIComponent(
-        userIdentifier
-      )}`
-    );
+    const response = await getUserID(userIdentifier);
 
-    if (!response.ok) {
+    console.log(response.data.userID);
+
+    if (response.status != "200") {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    const userID = (await response.json()).userID;
+    const userID = response.data.userID;
     const date = new Date();
     date.setTime(date.getTime() + expirationDays * 24 * 60 * 60 * 1000);
 
@@ -23,18 +21,19 @@ async function createUserSession(userIdentifier, expirationDays) {
 
     document.cookie =
       "userID" + "=" + userID + ";" + expires + ";" + domain + ";" + path;
+    console.log("Cookie has been made");
+    alert("Hello");
   } catch (error) {
     console.log(error);
   }
 }
 
-function checkUserSession() {
-  const cookies = document.cookie.split("; ");
+async function checkUserSession() {
+  const cookies = document.cookie.split(";");
   for (const cookie of cookies) {
     const [cookieName, cookieValue] = cookie.split("=");
     if (cookieName === "userID") {
-      userID = cookieValue;
-      return;
+      return cookieValue;
     }
   }
   if (

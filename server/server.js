@@ -120,7 +120,7 @@ app.get("/api/user/isBlocked", (req, res) => {
 });
 
 //Create an account
-app.post("/api/user/createAccount", (req, res) => {
+app.post("/api/user", (req, res) => {
   const { username, emailAddress, password } = req.body;
 
   try {
@@ -220,6 +220,23 @@ app.get("/api/user/username", (req, res) => {
     });
 });
 
+//Returns the user's userID
+app.get("/api/user/userID", (req, res) => {
+  const { userIdentifier } = req.query;
+
+  const user = new UserManager();
+
+  user
+    .getUserID(userIdentifier)
+    .then((userID) => {
+      res.status(200).send(userID);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
 //Returns a list of user filtered by page number, skip and key word (what username or display name  contain)
 app.get("/api/user/search", (req, res) => {
   const { searchQuery, userID } = req.query;
@@ -242,22 +259,36 @@ app.get("/api/user/search", (req, res) => {
   }
 });
 
-//Returns a list of users recommendard to the user
-app.get("/api/user/recommendard", (req, res) => {
-  const { userID } = req.query;
+//Returns a list of users recommended to the user
+app.get("/api/user/recommended", async (req, res) => {
+  const { type, userID } = req.query;
 
   const user = new UserManager();
 
   try {
-    user
-      .getRecommendardUsers(userID)
-      .then((jsonifiedResult) => {
-        res.status(200).send({ users: jsonifiedResult });
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).send("Error occurred");
+    if (type == "mutual") {
+      const mutuals = await user.getMutualAcquaintance(userID);
+      if (mutuals && mutuals.length > 0) {
+        return res.status(200).json({
+          type: "mutual",
+          users: mutuals,
+        });
+      } else {
+        const popular = await user.getPopularUsers(userID);
+        return res.status(200).json({
+          type: "popular",
+          users: popular,
+        });
+      }
+    } else if (type == "popular") {
+      const popular = await user.getPopularUsers(userID);
+      return res.status(200).json({
+        type: "popular",
+        users: popular,
       });
+    } else {
+      return res.status(400).json({ message: "Invalid type" });
+    }
   } catch (error) {
     console.error("Synchronous error:", error);
     res.status(500).send("Unexpected error occurred");
@@ -337,7 +368,7 @@ app.post("/api/user/profile", (req, res) => {
 });
 
 //Returns user's email address
-app.get("/api/user/getEmailAddress", (req, res) => {
+app.get("/api/user/email", (req, res) => {
   const { username } = req.query;
 
   const user = new UserManager();
@@ -357,14 +388,12 @@ app.get("/api/user/getEmailAddress", (req, res) => {
 
 //Sending email
 //Send email because of 2Step
-app.post("/api/user/sendAuthEmail", async (req, res) => {
-  const { toEmail, code, location } = req.body;
-
-  console.log(toEmail, code, location);
+app.post("/api/email/auth", async (req, res) => {
+  const { email, code, location } = req.body;
 
   try {
     const emailManager = new EmailManager();
-    await emailManager.auth(toEmail, code, location);
+    await emailManager.auth(email, code, location);
     res.status(200).json({ message: "Complete" });
   } catch (error) {
     res.status(500).send({
@@ -375,7 +404,7 @@ app.post("/api/user/sendAuthEmail", async (req, res) => {
 });
 
 //Send email to finalise account creation
-app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
+app.post("/api/email/creation", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
   console.log(toEmail, code, location);
@@ -393,7 +422,7 @@ app.post("/api/user/sendCreationCodeEmail", async (req, res) => {
 });
 
 //Send email to change user's password
-app.post("/api/user/sendChangePasswordEmail", async (req, res) => {
+app.post("/api/email/changePassword", async (req, res) => {
   const { toEmail, code, location } = req.body;
 
   try {
@@ -478,11 +507,18 @@ app.post("/api/follow", (req, res) => {
   }
 });
 
-app.delete("/api/follow", (req, res) => {
-  const { requestingUserID, targetUserID } = req.query;
+app.delete("/api/follow/:requestingUserID/:targetUserID", (req, res) => {
+  const { requestingUserID, targetUserID } = req.params;
 
   const follow = new FollowManager();
-  follow.unfollow(requestingUserID, targetUserID);
+  try {
+    follow.unfollow(requestingUserID, targetUserID);
+  } catch (error) {
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred",
+    });
+  }
 
   res.json({ message: "Data received and processed successfully" });
 });

@@ -36,8 +36,8 @@
   height: 80px;
 }
 
-.story-icon-background.friend {
-  background: linear-gradient(to right, rgb(5, 182, 5), green);
+.story-icon-background.closeFriend {
+  background: linear-gradient(to right, rgb(5, 182, 5), rgb(19, 189, 19));
 }
 
 .modal-body {

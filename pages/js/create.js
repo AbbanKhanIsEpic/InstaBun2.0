@@ -1,6 +1,7 @@
 //Import
 import { createStory } from "./API/story.js";
 import { createPost } from "./API/post.js";
+import { userID } from "./userSession.js";
 
 const createModal = document.querySelector("#createModal");
 const uploadPostInput = document.querySelector("#uploadPostInput");

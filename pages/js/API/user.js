@@ -23,25 +23,48 @@ export async function getEmailAddress(username) {
   }
 }
 
-export async function sendAuth(email, code, location) {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/sendAuth`, {
-      email,
-      code,
-      location,
-    });
-    return response;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export async function getUserList(searchQuery, userID) {
   try {
     const response = await axios.get(`${API_BASE_URL}/search`, {
       params: { searchQuery, userID },
     });
     return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getRecommendedUsers(type, userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/recommended`, {
+      params: { type, userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function createAccount(username, emailAddress, password) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}`, {
+      username,
+      emailAddress,
+      password,
+    });
+    return response.status;
+  } catch (error) {
+    return error.response.status;
+  }
+}
+
+export async function getUserID(userIdentifier) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/userID`, {
+      params: { userIdentifier },
+    });
+    console.log(response);
+    return response;
   } catch (error) {
     console.error(error);
   }

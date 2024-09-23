@@ -84,6 +84,7 @@ class UserManager {
       try {
         const query = `SELECT userID FROM instabun.Users where Email = ?`;
         const [result] = await select(query, [userIdentifier]);
+        console.log(result);
         return result;
       } catch (error) {
         return error;
@@ -92,6 +93,7 @@ class UserManager {
       try {
         const query = `SELECT userID FROM instabun.Users where Username = ?`;
         const [result] = await select(query, [userIdentifier]);
+        console.log(result);
         return result;
       } catch (error) {
         return error;
@@ -160,8 +162,7 @@ class UserManager {
   async getListOfUsers(searchQuery, userID) {
     //The apart of the username could be in the front, end or middle
     //This is to give a better result
-    console.log(searchQuery, userID);
-    searchQuery = "%" + searchQuery + "%";
+    searchQuery = searchQuery + "%";
     try {
       const query = `SELECT 
     username, displayName, profileIcon,
@@ -183,8 +184,6 @@ WHERE
         searchQuery,
         userID,
       ]);
-      console.log(query);
-      console.log(result);
       return result;
     } catch (error) {
       return error;
@@ -213,16 +212,16 @@ HAVING (SELECT
         (FollowingID = ? AND FollowerID = userID)
             OR (FollowingID = userID AND FollowerID = ?)) = 2), 
 
-MutualAcquaintance as (SELECT FollowerID as friendID, FollowingID as userID FROM followers WHERE  FollowerID IN (select * from friend) AND FollowingID NOT IN (select * from friend UNION select ? as userID) HAVING (SELECT 
-        COUNT(*)
-    FROM
-        followers
-    WHERE
-        (FollowingID = friendID AND FollowerID = userID)
-            OR (FollowingID = userID AND FollowerID = friendID)) = 2)
+MutualAcquaintance as (SELECT FollowerID as friendID, FollowingID as userID FROM followers WHERE  FollowerID IN (select * from friend) AND FollowingID NOT IN (select * from friend UNION select ? as userID) AND FollowingID NOT IN (Select followingID from followers where FollowerID = ?))
             
 Select username, displayName, profileIcon, MutualAcquaintance.userID, 0 as isFollowing from MutualAcquaintance INNER JOIN users on users.userID = MutualAcquaintance.userID group by MutualAcquaintance.userID;`;
-      const result = await select(query, [userID, userID, userID, userID]);
+      const result = await select(query, [
+        userID,
+        userID,
+        userID,
+        userID,
+        userID,
+      ]);
       return result;
     } catch (error) {
       return error;

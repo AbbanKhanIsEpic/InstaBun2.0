@@ -1,3 +1,8 @@
+import { getLocation } from "./API/location.js";
+import { sendCreationCode } from "./API/location.js";
+import { createUserSession } from "./userSession.js";
+
+//Declaring elements
 const registerButton = document.querySelector("#registerButton");
 const registerError = document.querySelector("#registerError");
 const passwordError = document.querySelector("#passwordError");

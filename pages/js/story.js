@@ -1,4 +1,7 @@
 import { getStories } from "./API/story.js";
+import { userID } from "./userSession.js";
+
+console.log(userID);
 
 const leftArrow = document.querySelector("#leftArrow");
 const rightArrow = document.querySelector("#rightArrow");

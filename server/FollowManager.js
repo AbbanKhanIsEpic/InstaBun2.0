@@ -5,7 +5,7 @@ class FollowManager {
   //Save that the user (follwerID) is following the user(followingID)
   async follow(followerID, followingID) {
     try {
-      const query = `INSERT INTO instabun.Follows (FollowerID, FollowingID) VALUES (?, ?);`;
+      const query = `INSERT INTO instabun.followers (FollowerID, FollowingID) VALUES (?, ?);`;
       await update(query, [followerID, followingID]);
       return "Follow operation successful";
     } catch (error) {
@@ -16,7 +16,7 @@ class FollowManager {
   //Save that the user (follwerID) is no more following the user(followingID)
   async unfollow(followerID, followingID) {
     try {
-      const query = `DELETE FROM instabun.Follows WHERE (FollowerID =?) and (FollowingID = ?);`;
+      const query = `DELETE FROM instabun.followers WHERE (FollowerID =?) and (FollowingID = ?);`;
       await update(query, [followerID, followingID]);
       return "Unfollow operation successful";
     } catch (error) {
@@ -27,7 +27,7 @@ class FollowManager {
   //Check if the user(followerID) is following user(followingID)
   async isFollowing(followerID, followingID) {
     try {
-      const query = `SELECT count(*) FROM instabun.Follows where FollowerID = ? AND FollowingID = ?;`;
+      const query = `SELECT count(*) FROM instabun.followers where FollowerID = ? AND FollowingID = ?;`;
       const [result] = await select(query, [followerID, followingID]);
       return result["count(*)"] == 1;
     } catch (error) {
@@ -38,7 +38,7 @@ class FollowManager {
   //Return an array of users' ID of user(followingID) who the user follows
   async getFollowings(followerID) {
     try {
-      const query = `SELECT FollowingID FROM instabun.Follows where FollowerID = ?;`;
+      const query = `SELECT FollowingID FROM instabun.followers where FollowerID = ?;`;
       const result = await select(query, [followerID]);
       //Convert JSON to array for easy reading
       const followings = result.map((row) => row.FollowingID);

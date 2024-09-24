@@ -322,7 +322,7 @@ class PostManager {
               uploader,
             ]);
 
-            const uploadDetailQuery = `SELECT 
+            const uploadDetailQuery = `SELECT
             isVideo,
             PostLink,
             Title,
@@ -393,36 +393,73 @@ class PostManager {
   }
 
   //This is for the main screen
-  async getFollowingPost(userID, page) {
+  async getFollowingPost(userID) {
     try {
-      const follow = new FollowManager();
+      const query = `SELECT 
+    postID AS id,
+    users.userID,
+    users.profileIcon,
+    users.displayName,
+    postLink,
+    isVideo,
+    uploadDate,
+    (SELECT 
+            COUNT(*)
+        FROM
+            likepost
+        WHERE
+            likepost.postID = id) AS totalLike,
+    (SELECT 
+            COUNT(*)
+        FROM
+            likepost
+        WHERE
+            postID = id AND likepost.userID = ?) AS hasLiked,
+    (SELECT 
+            COUNT(*)
+        FROM
+            commentpost
+        WHERE
+            commentpost.postID = id) AS totalComment,
+    (SELECT 
+            COUNT(*)
+        FROM
+            bookmark
+                INNER JOIN
+            bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID
+        WHERE
+            userID = ? AND bookmarkpost.postID = id) AS hasBookmarked
+FROM
+    instabun.post
+        INNER JOIN
+    users ON post.userID = users.userID
+WHERE
+    post.userID IN (SELECT 
+            FollowingID
+        FROM
+            followers
+        WHERE
+            FollowerID = ?)
+        AND post.postVisibility <= (SELECT 
+            COUNT(*)
+        FROM
+            followers
+        WHERE
+            (followers.followerID = ?
+                AND FollowingID = post.userID)
+                OR (FollowerID = post.userID
+                AND FollowingID = ?))
+ORDER BY uploadDate DESC;`;
 
-      const followingArray = await follow.getFollowings(userID);
-
-      if (followingArray.length === 0) {
-        return new Error(
-          "Can not get post of users when user does not follow anyone"
-        );
-      }
-
-      const query = `SELECT idPost FROM instabun.Post WHERE UserID IN (?);`;
-
-      const followingsPostID = await select(query, [followingArray]);
-
-      //Convert JSON to array for easy reading
-      const followingsPostIDArray = followingsPostID.map((postID) => {
-        return postID.idPost;
-      });
-
-      const filteredPost = await this.#filterPost(
+      const result = await select(query, [
         userID,
-        followingsPostIDArray,
-        page
-      );
+        userID,
+        userID,
+        userID,
+        userID,
+      ]);
 
-      const postDetailsArray = await this.#getPostDetails(userID, filteredPost);
-
-      return postDetailsArray;
+      return result;
     } catch (error) {
       return error;
     }

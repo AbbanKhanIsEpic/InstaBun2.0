@@ -525,12 +525,12 @@ app.delete("/api/follow/:requestingUserID/:targetUserID", (req, res) => {
 
 //Post
 app.get("/api/post/followings", (req, res) => {
-  const { userID, page } = req.query;
+  const { userID } = req.query;
 
   const post = new PostManager();
 
   post
-    .getFollowingPost(userID, page)
+    .getFollowingPost(userID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

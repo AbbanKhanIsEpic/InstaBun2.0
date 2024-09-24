@@ -5,13 +5,13 @@
     >
       <div class="uploader">
         <img
-          src={{profileLink}}
+          src="{{profileIcon}}"
           alt=""
           width="32"
           height="32"
           class="rounded-circle"
         />
-        <span>{{name}}</span>
+        <span>{{username}}</span>
         <span><svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -22,22 +22,22 @@
           >
             <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
           </svg></span>
-        <span>{{postAge}}</span>
+        <span>{{postAge uploadDate}}</span>
       </div>
     </div>
     <div class="contentContainer">
       {{#if isVideo}}
         <video controls class="border-1 border user-select-none">
-          <source src="{{mediaSrc}}" />
+          <source src="{{postLink}}" />
         </video>
       {{else}}
-        <img src="{{mediaSrc}}" class="border-1 border user-select-none" />
+        <img src="{{postLink}}" class="border-1 border user-select-none" />
       {{/if}}
     </div>
     <div class="interactions d-flex flex-row justify-content-between mt-2">
       <div class="d-flex flex-row gap-3 align-items-center">
         <div class="like-button">
-          {{#if like}}
+          {{#if hasLiked}}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -100,7 +100,7 @@
         </div>
       </div>
       <div role="button" class="bookmarkButton">
-        {{#if bookmark}}
+        {{#if hasBookmarked}}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -135,13 +135,13 @@
       data-bs-toggle="modal"
       data-bs-target="#viewLikedList"
     >
-      <span class="likeCounter">{{likeCount}}</span>
+      <span class="likeCounter">{{totalLike}}</span>
       likes
     </div>
     <div class="text-white mt-2 description">
-      <span class="fw-bold" role="button">{{name}} </span>{{description}}
+      <span class="fw-bold" role="button">{{username}} </span>{{description}}
     </div>
-    {{#ifEquals commentCount 1}}
+    {{#ifEquals totalComment 1}}
       <div
         class="text-white-50 mt-2"
         role="button"
@@ -149,14 +149,23 @@
         data-bs-target="#viewComments"
       >View the only comment</div>
     {{else}}
-      <div
-        class="text-white-50 mt-2"
-        role="button"
-        data-bs-toggle="modal"
-        data-bs-target="#viewComments"
-      >View all
-        <span>{{commentCount}}</span>
-        comments</div>
+      {{#ifEquals totalComment 0}}
+        <div
+          class="text-white-50 mt-2"
+          role="button"
+          data-bs-toggle="modal"
+          data-bs-target="#viewComments"
+        >There is no comment D:</div>
+      {{else}}
+        <div
+          class="text-white-50 mt-2"
+          role="button"
+          data-bs-toggle="modal"
+          data-bs-target="#viewComments"
+        >View all
+          <span>{{commentCount}}</span>
+          comments</div>
+      {{/ifEquals}}
     {{/ifEquals}}
     <div class="mt-2 d-flex flex-row">
       <form class="input-group">

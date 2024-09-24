@@ -1,52 +1,23 @@
+import { getFollowingPost } from "./API/post.js";
 import { userID } from "./userSession.js";
-let messageTextArea;
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   //Helper
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+  });
+
+  Handlebars.registerHelper("postAge", function (uploadDate) {
+    return postAge(uploadDate);
   });
 
   // Compile the template
   const template = Handlebars.templates["post-home"];
 
   // Define the data
-  const data = {
-    post: [
-      {
-        id: 1,
-        name: "Hi",
-        profileLink:
-          "https://www.wfla.com/wp-content/uploads/sites/71/2023/05/GettyImages-1389862392.jpg?w=876&h=493&crop=1",
-        postAge: "17h",
-        isVideo: 0,
-        mediaSrc:
-          "https://people.com/thmb/wJx2vVl2-Yrf71f_flBx91f77GE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(723x121:725x123):format(webp)/wisp-the-cat-from-tiktok-092823-1-74797b02afe7475295e1478b2cdf2883.jpg",
-        likeCount: 100000,
-        description: "Look at my beutifical cat :D",
-        commentCount: 9999,
-        like: 1,
-        bookmark: 0,
-      },
-      {
-        id: 4,
-        name: "Hello World",
-        profileLink: "https://github.com/mdo.png",
-        postAge: "20h",
-        isVideo: 1,
-        mediaSrc:
-          "https://firebasestorage.googleapis.com/v0/b/cogent-osprey-390319.appspot.com/o/video%2FP1%3A6?alt=media&token=c6fc3d02-cb0a-48a6-a5dc-439bf66cccae",
-        likeCount: 100,
-        description: "Stolen Video >:D",
-        commentCount: 1,
-        like: 0,
-        bookmark: 1,
-      },
-    ],
-  };
-
+  const data = await getFollowingPost(userID);
   // Render the template with data
-  const htmlOutput = template(data);
+  const htmlOutput = template({ post: data });
 
   // Insert the HTML into the DOM
   document.getElementById("posts").innerHTML = htmlOutput;
@@ -60,8 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const bookmarkButton = post.querySelector(".bookmarkButton");
     const commentArea = post.querySelector(".commentTextArea");
     const sendQuickComment = post.querySelector(".sendQuickComment");
-    const likeCounter = post.querySelector("div:has(> .likeCounter)");
-    const emojiBtn = post.querySelector(".emojiBtn");
+    const likeCounter = post.querySelector(".likeCounter");
     const postID = post.getAttribute("data-post-id");
 
     //Event listeners
@@ -81,16 +51,12 @@ document.addEventListener("DOMContentLoaded", function () {
         likeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-heart-fill like" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
                       </svg>`;
-        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+        likeCounter.innerHTML = Number(likeCounter.textContent) + 1;
       }
     });
 
     //Bookmark and unbookmark
     bookmarkButton.addEventListener("click", function (event) {});
-
-    emojiBtn.addEventListener("click", function () {
-      messageTextArea = commentArea;
-    });
 
     //Typing a quick comment -> changing the span display value
     commentArea.addEventListener("input", function () {
@@ -111,3 +77,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+//Better this
+function postAge(timestamp) {
+  const timeDiffInSec = (new Date() - new Date(timestamp)) / 1000;
+
+  const minute = Math.floor(timeDiffInSec / 60);
+  const hour = Math.floor(timeDiffInSec / (60 * 60));
+  const days = Math.floor(timeDiffInSec / (60 * 60 * 24));
+  const months = Math.floor(timeDiffInSec / (60 * 60 * 24 * 30));
+
+  console.log(days);
+
+  if (hour == 0) {
+    return minute + " mins";
+  } else if (days == 0) {
+    return hour + " hr";
+  } else if (months == 0) {
+    return days + " days";
+  } else {
+    return months + " months";
+  }
+}

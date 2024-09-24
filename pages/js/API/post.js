@@ -11,16 +11,13 @@ export async function createPost(formData) {
   }
 }
 
-// async function getFollowingPost(userID) {
-//   const server = "http://127.0.0.1:5000/api/message/group";
-//   const query = `?userID=${encodeURIComponent(
-//     userID
-//   )}&groupID=${encodeURIComponent(groupID)}`;
-
-//   let result;
-//   await fetch(server + query)
-//     .then((response) => response.json())
-//     .then((data) => {
-//       result = data;
-//     });
-// }
+export async function getFollowingPost(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/followings`, {
+      params: { userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

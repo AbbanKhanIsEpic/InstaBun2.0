@@ -13,8 +13,8 @@
   margin: 0%;
 }
 
-.contentContainer video,
-.contentContainer img {
+.contentContainer video.post,
+.contentContainer img.post {
   width: 470px;
   height: 500px;
   object-fit: contain;

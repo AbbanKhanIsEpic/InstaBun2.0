@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return age(uploadDate);
   });
 
-  const templatePost = Handlebars.templates["post-home"];
+  const templatePost = Handlebars.templates["post-explore"];
 
   const data = await getFollowingPost(userID);
 
@@ -40,11 +40,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const likeButton = post.querySelector(".likeButton");
     const uploader = post.querySelector(".uploader");
     const bookmarkButton = post.querySelector(".bookmarkButton");
-    const commentArea = post.querySelector(".commentTextArea");
-    const sendQuickComment = post.querySelector(".sendQuickComment");
     const likeCounter = post.querySelector(".likeCounter");
-    const viewCommentCount = post.querySelector("#viewCommentCount");
-    const viewComment = post.querySelector("#viewComment");
     postID = post.id;
 
     //Event listeners
@@ -57,10 +53,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         const response = await unlikePost(postID, userID);
         if (response.status == "200") {
           likeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white"
-          class="bi bi-heart postInteraction" viewBox="0 0 16 16">
-          <path
-              d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
-      </svg>`;
+            class="bi bi-heart postInteraction" viewBox="0 0 16 16">
+            <path
+                d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+        </svg>`;
           likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
         } else {
           alert("Error has occured, try again");
@@ -69,22 +65,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         const response = await likePost(postID, userID);
         if (response.status == "200") {
           likeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-heart-fill like" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
-        </svg>`;
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+          </svg>`;
           likeCounter.innerHTML = Number(likeCounter.textContent) + 1;
         } else {
           alert("Error has occured, try again");
         }
       }
-    });
-
-    viewComment.addEventListener("click", function () {
-      postID = post.id;
-      populateCommentModal(postID, userID);
-    });
-    viewCommentCount.addEventListener("click", function () {
-      postID = post.id;
-      populateCommentModal(postID, userID);
     });
 
     //Showing a list of people who liked the post
@@ -105,41 +92,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     //Bookmark and unbookmark
     bookmarkButton.addEventListener("click", function (event) {});
 
-    //Typing a quick comment -> changing the span display value
-    commentArea.addEventListener("input", function () {
-      const comment = commentArea.innerHTML;
-      if (comment == 0) {
-        sendQuickComment.classList.add("invisible");
-      } else {
-        sendQuickComment.classList.remove("invisible");
-      }
-    });
-
-    sendQuickComment.addEventListener("click", async function () {
-      const quickComment = commentArea.textContent;
-      if (quickComment.length >= 300) {
-        alert("You are over the limit");
-        return;
-      }
-      const status = await comment(postID, userID, quickComment);
-      if (status == "200") {
-        if (viewCommentCount.textContent == "There is no comment D:") {
-          viewCommentCount.textContent = "View the only comment";
-        } else if (viewCommentCount.textContent == "View the only comment") {
-          const count = document.createElement("SPAN");
-          count.innerHTML = 2;
-          viewCommentCount.innerHTML = "View all ";
-          viewCommentCount.appendChild(count);
-          viewCommentCount.innerHTML += " comments";
-        } else {
-          const count = viewCommentCount.querySelector("span");
-          count.textContent = Number(count.textContent) + 1;
-        }
-      } else {
-        alert("Unable to comment, try again");
-      }
-    });
-
     //Send user to the profile of the sender
     uploader.addEventListener("click", function () {});
   });
@@ -158,22 +110,7 @@ commentBtn.addEventListener("click", async function () {
     return;
   }
   const status = await comment(postID, userID, commentText);
-  const viewCommentCount = document
-    .querySelector(`#\\3${postID}`)
-    .querySelector("#viewCommentCount");
   if (status == "200") {
-    if (viewCommentCount.textContent == "There is no comment D:") {
-      viewCommentCount.textContent = "View the only comment";
-    } else if (viewCommentCount.textContent == "View the only comment") {
-      const count = document.createElement("SPAN");
-      count.innerHTML = 2;
-      viewCommentCount.innerHTML = "View all ";
-      viewCommentCount.appendChild(count);
-      viewCommentCount.innerHTML += " comments";
-    } else {
-      const count = viewCommentCount.querySelector("span");
-      count.textContent = Number(count.textContent) + 1;
-    }
     populateCommentModal(postID, userID);
   } else {
     alert("Unable to comment, try again");

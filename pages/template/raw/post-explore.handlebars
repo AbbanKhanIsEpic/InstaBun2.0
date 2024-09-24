@@ -1,20 +1,40 @@
 {{#each post}}
   <div
     class="card bg-black post d-flex flex-row mb-4 w-100 justify-content-center"
-    data-post-id={{id}}
+    id={{id}}
   >
-    <div class="contentContainer">
+    <div class="contentContainer position-relative">
       {{#if isVideo}}
-        <video controls class="border-1 border user-select-none">
-          <source src="{{mediaSrc}}" />
+        <video controls class="border-1 border user-select-none post">
+          <source src="{{postLink}}" />
         </video>
       {{else}}
-        <img src="{{mediaSrc}}" class="border-1 border user-select-none" />
+        <img src="{{postLink}}" class="border-1 border user-select-none post" />
       {{/if}}
+      <div class="uploader z-3 position-absolute bottom-0">
+        <img
+          src="{{profileIcon}}"
+          alt=""
+          width="32"
+          height="32"
+          class="rounded-circle"
+        />
+        <span>{{username}}</span>
+        <span><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-dot"
+            viewBox="0 0 16 16"
+          >
+            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+          </svg></span>
+      </div>
     </div>
     <div class="side-interactions d-flex flex-column ms-2 justify-content-end">
-      <div class="like-button">
-        {{#if like}}
+      <div class="likeButton">
+        {{#if hasLiked}}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -43,7 +63,9 @@
           </svg>
         {{/if}}
       </div>
-      <div class="text-white d-flex justify-content-center mb-3">4k</div>
+      <div
+        class="text-white d-flex justify-content-center mb-3 likeCounter pointer"
+      >{{totalLike}}</div>
       <div role="button" class="mb-3">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +95,7 @@
         </svg>
       </div>
       <div role="button" class="bookmarkButton">
-        {{#if bookmark}}
+        {{#if hasBookmarked}}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

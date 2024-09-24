@@ -79,9 +79,8 @@
           </button>
           <hr class="w-100 border-white border-2" />
         </div>
-        <div class="modal-body d-flex w-100 flex-column m-0 p-0 overflow-y-scroll" id="hiddenMessageList"></div>
+        <div class="modal-body d-flex w-100 flex-column m-0 p-0 overflow-y-scroll" id="likedList"></div>
         <div class="modal-footer w-100 p-0 border-0">
-          <button class="btn btn-primary w-100 visually-hidden">Chat</button>
         </div>
       </div>
     </div>
@@ -130,7 +129,8 @@
           </div>
         </div>
         <div class="modal-footer w-100 p-0 border-0">
-          <button class="btn btn-primary w-100 visually-hidden">Chat</button>
+          <input type="text" class="form-control" placeholder="Add a comment..." id="commentInput">
+          <button class="btn btn-primary w-100" id="commentBtn">Comment</button>
         </div>
       </div>
     </div>
@@ -140,8 +140,10 @@
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"></script>
   <script src="/pages/template/pre-compiled/sidebar.precompiled.js"></script>
+  <script src="/pages/template/pre-compiled/like-list.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/emoji-button.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/story.precompiled.js"></script>
+  <script src="/pages/template/pre-compiled/comment.precompiled.js"></script>
   <script src="/pages/template/pre-compiled/post-home.precompiled.js"></script>
   <script src="/pages/js/Components/sidebar.js"></script>
   <script src="/pages/js/Components/emoji.js"></script>

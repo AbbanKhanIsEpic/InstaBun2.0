@@ -602,22 +602,6 @@ app.get("/api/post/search", (req, res) => {
     });
 });
 
-app.get("/api/post/comment", (req, res) => {
-  const { postID, userID } = req.query;
-
-  const post = new CommentManager();
-
-  post
-    .getComments(postID, userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
 app.get("/api/post/placeholder", (req, res) => {
   const { userID, page } = req.query;
 
@@ -650,17 +634,6 @@ app.get("/api/post/select", (req, res) => {
     });
 });
 
-app.post("/api/post/comment", (req, res) => {
-  const postID = req.body.postID;
-  const userID = req.body.userID;
-  const comment = req.body.comment;
-
-  const post = new CommentManager();
-  post.comment(postID, userID, comment);
-
-  res.json({ message: "Data received and processed successfully" });
-});
-
 app.post("/api/post/like", (req, res) => {
   const postID = req.body.postID;
   const userID = req.body.userID;
@@ -671,14 +644,36 @@ app.post("/api/post/like", (req, res) => {
   res.json({ message: "Data received and processed successfully" });
 });
 
-app.post("/api/post/unlike", (req, res) => {
-  const postID = req.body.postID;
-  const userID = req.body.userID;
+app.get("/api/post/like", (req, res) => {
+  const { userID, postID } = req.query;
 
   const post = new PostManager();
-  post.unlike(postID, userID);
 
-  res.json({ message: "Data received and processed successfully" });
+  post
+    .getLikedList(postID, userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send({ users: jsonifiedResult });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.delete("/api/post/like/:postID/:userID", (req, res) => {
+  const { postID, userID } = req.params;
+  const post = new PostManager();
+
+  try {
+    post.unlike(postID, userID);
+
+    res.json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
+  }
 });
 
 app.get("/api/post/share", (req, res) => {
@@ -811,7 +806,10 @@ app.delete("/api/message/direct/:messageID", (req, res) => {
 
     res.json({ message: "Data received and processed successfully" });
   } catch (error) {
-    return error;
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while removing the dislike",
+    });
   }
 });
 
@@ -1001,8 +999,8 @@ app.post("/api/comment/like", async (req, res) => {
 });
 
 //Remove record that user liked the comment
-app.delete("/api/comment/unlike", async (req, res) => {
-  const { userID, commentID } = req.query;
+app.delete("/api/comment/like/:userID/:commentID", async (req, res) => {
+  const { userID, commentID } = req.params;
 
   const commentManager = new CommentManager();
 
@@ -1049,6 +1047,37 @@ app.delete("/api/comment/dislike", async (req, res) => {
       message: "Error occurred while removing the dislike",
     });
   }
+});
+
+app.post("/api/comment", (req, res) => {
+  try {
+    const postID = req.body.postID;
+    const userID = req.body.userID;
+    const comment = req.body.comment;
+
+    const commentManager = new CommentManager();
+    commentManager.comment(postID, userID, comment);
+
+    res.json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    return error;
+  }
+});
+
+app.get("/api/comment", (req, res) => {
+  const { postID, userID } = req.query;
+
+  const post = new CommentManager();
+
+  post
+    .getComments(postID, userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
 });
 
 //Create server

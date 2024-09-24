@@ -374,7 +374,7 @@ class PostManager {
 
   async like(postID, userID) {
     try {
-      const query = `Insert into PostLike(postID,userID) Values(?,?);`;
+      const query = `Insert into likepost(postID,userID) Values(?,?);`;
       await update(query, [postID, userID]);
       return "Like post operation successful";
     } catch (error) {
@@ -384,9 +384,31 @@ class PostManager {
 
   async unlike(postID, userID) {
     try {
-      const query = `Delete from PostLike where postID = ? AND userID = ?;`;
+      const query = `Delete from likepost where postID = ? AND userID = ?;`;
       await update(query, [postID, userID]);
       return "Unlike post operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getLikedList(postID, userID) {
+    try {
+      const query = `SELECT 
+    likepost.userID, username, displayName,profileIcon,
+    (SELECT 
+            COUNT(*)
+        FROM
+            followers
+        WHERE
+            FollowerID = ? AND followingID = likepost.userID) AS isFollowing
+FROM
+    likepost
+	INNER JOIN users on users.userID = likepost.userID
+WHERE
+    postID = ? ORDER BY isFollowing DESC;`;
+      const result = await select(query, [userID, postID]);
+      return result;
     } catch (error) {
       return error;
     }

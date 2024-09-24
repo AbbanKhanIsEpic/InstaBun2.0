@@ -436,7 +436,7 @@ async function setMessageContainer(
 
   sendMessageBtn.addEventListener("click", async function () {
     console.log("Hello");
-    const message = document.querySelector("#messageTextArea").innerHTML;
+    const message = document.querySelector("#messageTextArea").textContent;
     const resultStatus = (
       isGroup
         ? await sendGroupMessage(communicatingToID, userID, message)

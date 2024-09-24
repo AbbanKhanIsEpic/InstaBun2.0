@@ -21,3 +21,37 @@ export async function getFollowingPost(userID) {
     console.error(error);
   }
 }
+
+export async function likePost(postID, userID) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/like`, {
+      postID,
+      userID,
+    });
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function unlikePost(postID, userID) {
+  try {
+    const response = await axios.delete(
+      `${API_BASE_URL}/like/${postID}/${userID}`
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getLikeList(postID, userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/like`, {
+      params: { postID, userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

@@ -74,7 +74,6 @@ export async function getGroupMessages(userID, groupID) {
 export async function deleteDirectMessage(messageID) {
   try {
     const response = await axios.delete(`${API_BASE_URL}/direct/${messageID}`);
-    console.log("Hello");
     return response;
   } catch (error) {
     console.error(error);

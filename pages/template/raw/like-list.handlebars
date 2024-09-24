@@ -1,0 +1,36 @@
+{{#each users as |user|}}
+  <div
+    class="user d-flex flex-row justify-content-between align-items-center w-100 pt-2 pb-2"
+  >
+    <div class="d-flex flex-row ms-4">
+      <img
+        src="{{user.profileIcon}}"
+        height="50"
+        width="50"
+        alt=""
+        class="rounded-circle profileIcon"
+      />
+      <div class="d-flex flex-column ms-3">
+        <div class="displayName">
+          <strong>{{user.displayName}}</strong>
+        </div>
+        <div class="username text-white-50 h5">
+          {{user.username}}
+        </div>
+      </div>
+    </div>
+    {{#ifNotCurrentUser user.userID}}
+      {{#if user.isFollowing}}
+        <button
+          class="btn bg-dark-subtle h-75 w-25 me-4"
+          id="{{user.userID}}"
+        >Unfollow</button>
+      {{else}}
+        <button
+          class="btn bg-primary h-75 w-25 me-4"
+          id="{{user.userID}}"
+        >Follow</button>
+      {{/if}}
+    {{/ifNotCurrentUser}}
+  </div>
+{{/each}}

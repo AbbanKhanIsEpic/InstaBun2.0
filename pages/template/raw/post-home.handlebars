@@ -1,5 +1,5 @@
 {{#each post}}
-  <div class="card bg-black post" data-post-id={{id}}>
+  <div class="card bg-black post" id={{id}}>
     <div
       class="card-header d-flex flex-row justify-content-between text-white mb-2"
     >
@@ -70,6 +70,7 @@
           role="button"
           data-bs-toggle="modal"
           data-bs-target="#viewComments"
+          id="viewComment"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -147,6 +148,7 @@
         role="button"
         data-bs-toggle="modal"
         data-bs-target="#viewComments"
+        id="viewCommentCount"
       >View the only comment</div>
     {{else}}
       {{#ifEquals totalComment 0}}
@@ -155,6 +157,7 @@
           role="button"
           data-bs-toggle="modal"
           data-bs-target="#viewComments"
+          id="viewCommentCount"
         >There is no comment D:</div>
       {{else}}
         <div
@@ -162,18 +165,20 @@
           role="button"
           data-bs-toggle="modal"
           data-bs-target="#viewComments"
+          id="viewCommentCount"
         >View all
-          <span>{{commentCount}}</span>
+          <span>{{totalComment}}</span>
           comments</div>
       {{/ifEquals}}
     {{/ifEquals}}
     <div class="mt-2 d-flex flex-row">
       <form class="input-group">
         <div
-          type="textarea"
           class="text-white bg-black border-0 d-flex form-control noBoxShadow ps-0 pe-0 me-0 ms-0 overflow-y-auto overflow-x-hidden text-wrap text-break commentTextArea input"
           data-placeholder="Send a comment..."
           contenteditable="true"
+          role="textbox"
+          aria-multiline="true"
         ></div>
       </form>
       <div class="d-flex flex-row">

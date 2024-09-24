@@ -17,8 +17,10 @@ class CommentManager {
     try {
       const query = `
       SELECT 
-      collectionpost.commentID,
-      collectionpost.commentpost,
+      commentpost.commentID,
+      commentpost.comment,
+      commentpost.commentDate,
+      users.userID,
       users.username,
       users.displayName,
       users.profileIcon,
@@ -56,7 +58,7 @@ class CommentManager {
       PostID = ?
   ORDER BY ((totalLike + 1) / (totalDislike + 1)) DESC;`;
       const result = await select(query, [userID, userID, postID]);
-
+      console.log(result);
       return result;
     } catch (error) {
       return error;

@@ -1,14 +1,15 @@
 //Import
 const { select, update } = require("./DB");
-const UserManager = require("./UserManager.cjs");
+const BlockManager = require("./BlockManager.js");
+const UserManager = require("./UserManager.js");
 
 class DirectMessage {
   //Save the message to database
   async sendMessage(senderID, receiverID, message) {
     try {
       const query = `
-        INSERT INTO instabun.DirectMessages (SenderID, RecieverID, Time, Message)
-        VALUES (?, ?, NOW(), ?);`;
+        INSERT INTO instabun.DirectMessages (SenderID, RecieverID, Message)
+        VALUES (?, ?, ?);`;
       await update(query, [senderID, receiverID, message]);
       return "Send message operation successful";
     } catch (error) {
@@ -23,43 +24,6 @@ class DirectMessage {
       `;
       await update(query, [messageID]);
       return "Delete message operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Check if either of them has blocked each other
-  //If so: user can not send message
-  //If not: check if there is a DM limit
-  //If pass the dm limit: user can send message
-  async hasAbilityToSend(senderID, receiverID) {
-    try {
-      const user = new UserManager();
-      let hasSenderBlock = await user.isUserBlocked(receiverID, senderID);
-      if (!hasSenderBlock) {
-        let hasReceiverBlock = await user.isUserBlocked(senderID, receiverID);
-        if (!hasReceiverBlock) {
-          //Since the DM limit is:
-          //0 -> Everyone
-          //1 -> Followers
-          //2 -> Mutural / Friends
-          //3 -> No one
-          //It is easy to do comparison with counting who follow who
-          //0 -> Neither of them follow each other
-          //1 -> Only one of them follows
-          //2 -> Both of them follow each other
-          //3 -> Impossible
-          const receiverDMLimit = await user.getDMLimit(receiverID);
-          const query = `SELECT COUNT(*) FROM instabun.Follows WHERE FollowerID = ? AND FollowingID = ? OR FollowerID = ? AND FollowingID = ?;`;
-          const [status] = (
-            await select(query, [senderID, receiverID, receiverID, senderID])
-          )["COUNT(*)"];
-          if (status >= receiverDMLimit) {
-            return true;
-          }
-        }
-      }
-      return false;
     } catch (error) {
       return error;
     }

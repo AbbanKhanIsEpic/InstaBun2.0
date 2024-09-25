@@ -13,8 +13,12 @@
   margin: 0%;
 }
 
-.contentContainer video.post,
-.contentContainer img.post {
+.modal-body {
+  height: 400px;
+}
+
+.contentContainer video.content,
+.contentContainer img.content {
   width: 470px;
   height: 500px;
   object-fit: contain;

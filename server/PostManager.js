@@ -421,9 +421,10 @@ WHERE
     postID AS id,
     users.userID,
     users.profileIcon,
-    users.displayName,
+    users.username,
     postLink,
     isVideo,
+    description,
     uploadDate,
     (SELECT 
             COUNT(*)

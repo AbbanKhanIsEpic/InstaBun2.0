@@ -24,11 +24,11 @@ class FollowManager {
     }
   }
 
-  //Check if the user(followerID) is following user(followingID)
-  async isFollowing(followerID, followingID) {
+  //Check if the requesting user following the target user
+  async isFollowing(requestingUserID, targetUserID) {
     try {
       const query = `SELECT count(*) FROM instabun.followers where FollowerID = ? AND FollowingID = ?;`;
-      const [result] = await select(query, [followerID, followingID]);
+      const [result] = await select(query, [requestingUserID, targetUserID]);
       return result["count(*)"] == 1;
     } catch (error) {
       return error;
@@ -40,9 +40,7 @@ class FollowManager {
     try {
       const query = `SELECT FollowingID FROM instabun.followers where FollowerID = ?;`;
       const result = await select(query, [followerID]);
-      //Convert JSON to array for easy reading
-      const followings = result.map((row) => row.FollowingID);
-      return followings;
+      return result;
     } catch (error) {
       return error;
     }
@@ -56,6 +54,39 @@ class FollowManager {
       //Convert JSON to array for easy reading
       const followers = result.map((row) => row.FollowerID);
       return followers;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns true or false if they are close friends
+  async isCloseFriend(requestingUserID, targetUserID) {
+    try {
+      const query = `SELECT COUNT(*) FROM followers WHERE (FollowingID = ? AND FollowerID = ? OR (FollowingID = ? AND FollowerID = ?`;
+      const [result] = await select(query, [
+        requestingUserID,
+        targetUserID,
+        targetUserID,
+        requestingUserID,
+      ]);
+      return result["count(*)"] == 2;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Since if they were close friends, they both will be a follower and following of each other
+  async getCloseFriend(userID) {
+    try {
+      const following = await this.getFollowings(userID);
+      for (let i = 0; i < following.length; i++) {
+        const followingUserID = following[i]["FollowingID"];
+        const isCloseFriend = await this.isCloseFriend(userID, followingUserID);
+        if (!isCloseFriend) {
+          following.splice(i, 1);
+        }
+      }
+      return following;
     } catch (error) {
       return error;
     }

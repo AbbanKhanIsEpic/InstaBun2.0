@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const uploader = post.querySelector(".uploader");
     const bookmarkButton = post.querySelector(".bookmarkButton");
     const likeCounter = post.querySelector(".likeCounter");
+    const commentButton = post.querySelector(".commentButton");
     postID = post.id;
 
     //Event listeners
@@ -92,6 +93,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     //Bookmark and unbookmark
     bookmarkButton.addEventListener("click", function (event) {});
 
+    commentButton.addEventListener(
+      "click",
+      populateCommentModal(postID, userID)
+    );
     //Send user to the profile of the sender
     uploader.addEventListener("click", function () {});
   });

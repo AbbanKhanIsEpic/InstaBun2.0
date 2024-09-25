@@ -2,34 +2,7 @@ const { select, update } = require("./DB.js");
 const FollowManager = require("./FollowManager.js");
 
 //Imports
-
 class UserManager {
-  //Update the user's profile
-  //I believe I will need to seperate this into its individual methods
-  async updateProfile(
-    userID,
-    newDisplayName,
-    newBio,
-    newProfileIconLink,
-    newVisibility,
-    newDMLimit
-  ) {
-    try {
-      const query = `UPDATE instabun.users SET displayName = ?, bio = ?, profileIconLink = ?, visibility = ?, DMLimit = ?  WHERE (userID = ?)`;
-      await update(query, [
-        newDisplayName,
-        newBio,
-        newProfileIconLink,
-        newVisibility,
-        newDMLimit,
-        userID,
-      ]);
-      return "Update profile operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
   //Creates an account
   async createAccount(username, emailAddress, password) {
     try {
@@ -40,45 +13,7 @@ class UserManager {
     }
   }
 
-  //Block control
-  //Check if user has been blocked
-  async isUserBlocked(blockedUserID, blockerUserID) {
-    try {
-      const query = `SELECT count(*) FROM instabun.block where blockedUserID = ? AND blockerUserID = ?;`;
-      const [result] = await select(query, [blockedUserID, blockerUserID]);
-      return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Blocks the user
-  async block(blockerUserID, blockedUserID) {
-    try {
-      const query = `INSERT INTO BlockUser(BlockerUserID,BlockedUserID) VALUE(?,?);`;
-      await update(query, [blockerUserID, blockedUserID]);
-      //When user block someone, they want no association with them
-      //So therefore, they will not be following them
-      const follow = new FollowManager();
-      follow.unfollow(blockerUserID, blockedUserID);
-      return "Block operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Deletes the block
-  async unblock(blockerUserID, blockedUserID) {
-    try {
-      const query = `DELETE FROM instabun.block WHERE blockerUserID = ? AND blockedUserID = ?;`;
-      await update(query, [blockerUserID, blockedUserID]);
-      return "Unblock operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Get section
+  //Returns userID
   async getUserID(userIdentifier) {
     if (userIdentifier.includes("@")) {
       try {
@@ -101,6 +36,7 @@ class UserManager {
     }
   }
 
+  //Returns username
   async getUsername(userID) {
     try {
       const query = `SELECT Username FROM instabun.Users where UserID = ?`;
@@ -111,6 +47,7 @@ class UserManager {
     }
   }
 
+  //Returns email
   async getEmail(username) {
     try {
       const query = `SELECT Email FROM instabun.Users where Username = ?`;
@@ -121,8 +58,7 @@ class UserManager {
     }
   }
 
-  //Checking if the email address is the user's email
-  //This is used to allow user to login if they forgot their password
+  //Returns display name
   async getDisplayName(userID) {
     try {
       const query = `SELECT DisplayName FROM instabun.Users where UserID = ?`;
@@ -133,26 +69,46 @@ class UserManager {
     }
   }
 
-  async getUserProfile(userID) {
+  //Returns profile icon link
+  async getProfileIcon(userID) {
     try {
-      const query = `SELECT Username,DisplayName,ProfileIconLink,Bio FROM instabun.Users where UserID = ?;`;
-      const [result] = await select(query, [userID]);
-      return result;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async getUserProfileIconLink(userID) {
-    try {
-      const query = `SELECT ProfileIconLink FROM instabun.Users where UserID = ?`;
+      const query = `SELECT profileIcon FROM instabun.Users where UserID = ?`;
       const [result] = await select(query, [userID]);
       //This happens if the userID does not exists
       //When created an account, a user will a profile icon
       if (result.length === 0) {
         return new Error("Unable to get the link of the user's profile icon");
       }
-      return result["ProfileIconLink"];
+      return result["profileIcon"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns bio
+  async getBio(userID) {
+    try {
+      const query = `SELECT bio FROM instabun.Users where UserID = ?`;
+      const [result] = await select(query, [userID]);
+      //This happens if the userID does not exists
+      if (result.length === 0) {
+        return new Error("Unable to get user's bio");
+      }
+      return result["bio"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getDMLimit(userID) {
+    try {
+      const query = `SELECT DML FROM instabun.Users where UserID = ?`;
+      const [result] = await select(query, [userID]);
+      //This happens if the userID does not exists
+      if (result.length === 0) {
+        return new Error("Unable to get user's direct message limit");
+      }
+      return result["DML"];
     } catch (error) {
       return error;
     }
@@ -160,31 +116,24 @@ class UserManager {
 
   //Users can search for other users by username or display name
   async getListOfUsers(searchQuery, userID) {
-    //The apart of the username could be in the front, end or middle
-    //This is to give a better result
-    searchQuery = searchQuery + "%";
+    //Username or display name starting with the search query
+    searchQuery += "%";
     try {
-      const query = `SELECT 
-    username, displayName, profileIcon,
-    userID,
-    (SELECT 
-            COUNT(*)
-        FROM
-            followers
-        WHERE
-            FollowerID = ? AND FollowingID = userID) AS isFollowing
-FROM
-    users
-WHERE
-    (username LIKE ?
-        OR displayNAme LIKE ?) AND userID != ?;`;
-      const result = await select(query, [
-        userID,
-        searchQuery,
-        searchQuery,
-        userID,
-      ]);
-      return result;
+      //When searching for users, you are able to search yourself
+      const query = `SELECT userID, username, displayName, profileIcon FROM users WHERE (username LIKE ? OR displayName LIKE ?);`;
+      const listOfUsers = await select(query, [searchQuery, searchQuery]);
+      //Iterating through the listOfUsers
+      for (let i = 0; i < listOfUsers.length; i++) {
+        const searchedUserID = listOfUsers[i]["userID"];
+
+        const followManager = new FollowManager();
+
+        listOfUsers[i]["isFollowing"] = await followManager.isFollowing(
+          userID,
+          searchedUserID
+        );
+      }
+      return listOfUsers;
     } catch (error) {
       return error;
     }

@@ -27,11 +27,14 @@
     </div>
     <div class="contentContainer">
       {{#if isVideo}}
-        <video controls class="border-1 border user-select-none">
+        <video controls class="border-1 border user-select-none content">
           <source src="{{postLink}}" />
         </video>
       {{else}}
-        <img src="{{postLink}}" class="border-1 border user-select-none" />
+        <img
+          src="{{postLink}}"
+          class="border-1 border user-select-none content"
+        />
       {{/if}}
     </div>
     <div class="interactions d-flex flex-row justify-content-between mt-2">

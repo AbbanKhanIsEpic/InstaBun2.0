@@ -1,45 +1,51 @@
 {{#each post}}
   <div
-    class="card bg-black post d-flex flex-row mb-4 w-100 justify-content-center"
+    class="card bg-black post d-flex flex-row mb-4 w-100 justify-content-center mt-4"
     id={{id}}
   >
     <div class="contentContainer position-relative">
       {{#if isVideo}}
-        <video controls class="border-1 border user-select-none post">
+        <video controls class="border-1 border user-select-none content">
           <source src="{{postLink}}" />
         </video>
       {{else}}
-        <img src="{{postLink}}" class="border-1 border user-select-none post" />
+        <img
+          src="{{postLink}}"
+          class="border-1 border user-select-none content"
+        />
       {{/if}}
       <div class="uploader z-3 position-absolute bottom-0">
-        <img
-          src="{{profileIcon}}"
-          alt=""
-          width="32"
-          height="32"
-          class="rounded-circle"
-        />
-        <span>{{username}}</span>
-        <span><svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-dot"
-            viewBox="0 0 16 16"
-          >
-            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
-          </svg></span>
+        <div class="mb-4 ms-2">
+          <img
+            src="{{profileIcon}}"
+            alt=""
+            width="32"
+            height="32"
+            class="rounded-circle"
+          />
+          <span><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-dot"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+            </svg></span>
+          <span class="text-white">{{username}}</span>
+        </div>
       </div>
     </div>
     <div class="side-interactions d-flex flex-column ms-2 justify-content-end">
-      <div class="likeButton">
+      <div class="likeButton pointer">
         {{#if hasLiked}}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
             fill="red"
+            role="button"
             class="bi bi-heart-fill like"
             viewBox="0 0 16 16"
           >
@@ -54,6 +60,7 @@
             width="24"
             height="24"
             fill="white"
+            role="button"
             class="bi bi-heart postInteraction"
             viewBox="0 0 16 16"
           >
@@ -64,9 +71,17 @@
         {{/if}}
       </div>
       <div
-        class="text-white d-flex justify-content-center mb-3 likeCounter pointer"
+        class="text-white d-flex justify-content-center mb-3 likeCounter"
+        role="button"
+        data-bs-toggle="modal"
+        data-bs-target="#viewLikedList"
       >{{totalLike}}</div>
-      <div role="button" class="mb-3">
+      <div
+        role="button"
+        class="mb-3 commentButton"
+        data-bs-toggle="modal"
+        data-bs-target="#viewComments"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -80,7 +95,7 @@
           />
         </svg>
       </div>
-      <div role="button" class="mb-3">
+      <div role="button" class="mb-3 shareButton" role="button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -94,7 +109,7 @@
           />
         </svg>
       </div>
-      <div role="button" class="bookmarkButton">
+      <div role="button" class="bookmarkButton" role="button">
         {{#if hasBookmarked}}
           <svg
             xmlns="http://www.w3.org/2000/svg"

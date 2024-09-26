@@ -3,6 +3,8 @@ const { select, update } = require("./DB.js");
 const sha1 = require("sha1");
 const FirebaseStorageManager = require("./FirebaseStorageManager");
 const FollowManager = require("./FollowManager.js");
+const CommentManager = require("./CommentManager.js");
+const BookmarkManager = require("./BookmarkManager.js");
 
 class PostManager {
   async upload(userID, file, tags, description, visibility) {
@@ -70,8 +72,6 @@ class PostManager {
     }
   }
 
-  //This function get the postID of the post that contains all the tags that the user is searching for
-
   //User will upload a post at a time
   //The latest postID is the post the user just uploaded
   async #getLatestPostID(userID) {
@@ -100,7 +100,7 @@ class PostManager {
   }
 
   //Get the posts from the tags the user entered
-  async getPostViaTags(userID, tags, page) {
+  async getPostViaTags(userID, tags) {
     try {
       //It is a promise because this needs to run first
       //Because we might have a post attached to the tag the user search for
@@ -123,9 +123,9 @@ class PostManager {
 
       const tagIDsArray = await this.#getTagIDs(tags);
 
-      const filteredPost = await this.#getPostForAll(tagIDsArray, page);
+      const filteredPost = await this.#getPostForAll(tagIDsArray);
 
-      const postDetailsArray = await this.#getPostDetails(userID, filteredPost);
+      const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
 
       return postDetailsArray;
     } catch (error) {
@@ -138,11 +138,9 @@ class PostManager {
   //This small algorithm to get popular videos that:
   //If user has liked no post: show them what most people like
   //If user has liked post: show them a mix of what they like and people really like
-  async getPostBasedLike(userID, page) {
+  async getPostBasedLike(userID) {
     try {
-      const query = `
-      SELECT 
-      PostTags.tagID as currentTag,
+      const query = `SELECT PostTags.tagID as currentTag,
       COUNT(PostTags.tagID) AS TotalLike,
       (SELECT 
       (count(*)*100) 
@@ -168,9 +166,9 @@ class PostManager {
       //Convert JSOn to array for easy reading
       const tagIDsArray = tagIDsResultSet.map((element) => element.currentTag);
 
-      const filteredPost = await this.#getPostForAll(tagIDsArray, page);
+      const filteredPost = await this.#getPostForAll(tagIDsArray);
 
-      const postDetailsArray = await this.#getPostDetails(userID, filteredPost);
+      const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
 
       return postDetailsArray;
     } catch (error) {
@@ -183,106 +181,61 @@ class PostManager {
   //If the uploader(the user who created the post) does not allow everyone to see
   //The post will not be included
   //This method is used for the explore screen
-  async #getPostForAll(tagsArray, page) {
-    const postPerPage = 3;
-    page *= postPerPage;
+  async #getPostForAll(tagsArray) {
     try {
-      const query = `
-      SELECT 
-      postID,
-      Post.UserID,
-      Users.Visibility,
-      COUNT(DISTINCT tagID) AS total
-  FROM
-      instabun.PostTags
-  INNER JOIN
-      Post ON Post.idPost = PostTags.postID
-  INNER JOIN
-      Users ON Users.UserID = Post.UserID
-  WHERE
-      tagID IN (?)
-      AND Users.Visibility = 0
-  GROUP BY postID
-  ORDER BY total DESC
-  LIMIT ${page},${postPerPage}
-  `;
+      const query = `SELECT tagpost.postID, userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY postID ORDER BY COUNT(DISTINCT tagID) DESC`;
 
       const result = await select(query, [tagsArray]);
 
-      //Filter and only return what is important
-      //Not important to return the setting of the uploader
-      //Import to return the postID and who uploaded the post
-      const postIDAndUserIDArray = result.map((element) => {
-        const postIDAndUserID = {
-          postID: element.postID,
-          userID: element.UserID,
-        };
-        return postIDAndUserID;
-      });
-
-      return postIDAndUserIDArray;
+      return result;
     } catch (error) {
       return error;
     }
   }
 
-  //This method is used for the main screen and profile scren
-  //The method filters the post of the uploader(the user who uploaded the video)
-  //The uploader might have said that not everyone can see but only friends
-  //This deals with that
-  async #filterPost(userID, postIDsArray, page) {
-    const postPerPage = 3;
-    page *= postPerPage;
-    //Since the PostVisibility is:
-    //0 -> Everyone
-    //1 -> Followers
-    //2 -> Mutural / Friends
-    //3 -> No one
-    //It is easy to do comparison with counting who follow who
-    //0 -> Neither of them follow each other
-    //1 -> Only one of them follows
-    //2 -> Both of them follow each other
-    //3 -> Impossible
+  //The posts should include a key value for the visibility
+  //After filtering, the visibility will be removed because it is just for filtering purpose
+  async #filterPost(userID, posts) {
     try {
-      const query = `
-    SELECT 
-      Post.idPost,
-      Users.UserID,
-      Users.Visibility,
-      (SELECT 
-      COUNT(*)
-        FROM
-        instabun.Follows
-        WHERE
-          (FollowerID = ?
-          AND FollowingID = Users.UserID)
-          OR (FollowerID = Users.UserID
-          AND FollowingID = ?))
-      AS Status
-        FROM
-        instabun.Post
-        INNER JOIN
-          Users ON Users.UserID = Post.UserID
-        WHERE
-          Post.idPost IN (?)
-        HAVING Status >= Users.Visibility
-        ORDER BY Post.idPost DESC
-        LIMIT ${page},${postPerPage};`;
-      const result = await select(query, [userID, userID, postIDsArray]);
+      //Managers
+      const followManager = new FollowManager();
+      //Array for filtered post
+      const filteredPost = [];
+      //Iterating through posts
+      const promises = posts.map(async (post) => {
+        const postVisibility = post["postVisibility"];
+        const uploaderUserID = post["userID"];
 
-      //Filter and only return what is important
-      //Not important to return the relationship between the two users
-      //Not important to return the setting of the uploader
-      //Import to return the postID and who uploaded the post
-      const postIDAndUserIDArray = result.map((element) => {
-        const postIDAndUserID = {
-          postID: element.idPost,
-          userID: element.UserID,
-        };
-        return postIDAndUserID;
+        // Handle public posts
+        if (postVisibility === 0) {
+          delete post["postVisibility"];
+          filteredPost.push(post);
+        } else if (postVisibility === 1) {
+          // Check if user is following the uploader
+          const isFollowing = await followManager.isFollowing(
+            userID,
+            uploaderUserID
+          );
+          if (isFollowing) {
+            delete post["postVisibility"];
+            filteredPost.push(post);
+          }
+        } else if (postVisibility === 2) {
+          //Checks if the two users are close friends
+          const isCloseFriend = await followManager.isCloseFriend(
+            userID,
+            uploaderUserID
+          );
+          if (isCloseFriend) {
+            delete post["postVisibility"];
+            filteredPost.push(post);
+          }
+        }
       });
 
-      return postIDAndUserIDArray;
+      // Wait for all promises to complete
+      await Promise.all(promises);
+      return filteredPost;
     } catch (error) {
       return error;
     }
@@ -291,9 +244,11 @@ class PostManager {
   //This function is used to get the post from the link they shared
   async getSingularPost(userID, postID) {
     try {
-      const filteredPost = await this.#filterPost(userID, postID, 0);
+      //The uploader may have changed the permission of the video
+      //So we have to take that into account
+      const filteredPost = await this.#filterPost(userID, postID);
 
-      const postDetailsArray = await this.#getPostDetails(userID, filteredPost);
+      const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
 
       return postDetailsArray;
     } catch (error) {
@@ -302,59 +257,29 @@ class PostManager {
   }
 
   //The function returns all the important information about the post
-  //The information are:
-  //The postID
-  //The uploader's username and link to the profile icon
-  //If the user liked the post
-  //How many people liked the post
-  //How many people commented in the post
-  //How many people shared the post
-  async #getPostDetails(userID, filteredPost) {
+  async #addPostDetails(userID, filteredPost) {
     try {
-      const postDetailsArray = await Promise.all(
-        filteredPost.map(async (element) => {
-          const uploader = element.userID;
-          const upload = element.postID;
+      //Managers
+      const commentManager = new CommentManager();
+      const bookmarkManager = new BookmarkManager();
 
-          try {
-            const uploaderDetailQuery = `SELECT Username, ProfileIconLink FROM instabun.Users WHERE UserID = ?;`;
-            const [uploaderDetail] = await select(uploaderDetailQuery, [
-              uploader,
-            ]);
+      const promises = filteredPost.map(async (post) => {
+        const postID = post["id"];
+        const [totalLike, hasLiked, totalComment, hasBookmarked] =
+          await Promise.all([
+            this.getTotalLike(postID),
+            this.hasLiked(postID, userID),
+            commentManager.getTotalComment(postID),
+            bookmarkManager.hasBookmarked(userID, postID),
+          ]);
 
-            const uploadDetailQuery = `SELECT
-            isVideo,
-            PostLink,
-            Title,
-            (SELECT COUNT(*) FROM PostLike WHERE PostLike.postID = ? AND PostLike.userID = ?) AS didUserLike,
-            (SELECT COUNT(*) FROM PostLike INNER JOIN Post ON PostLike.postID = Post.idPost WHERE Post.idPost = ?) AS likeCount,
-            (SELECT COUNT(*) FROM PostShare INNER JOIN Post ON PostShare.postID = Post.idPost WHERE Post.idPost = ?) AS shareCount,
-            (SELECT COUNT(*) FROM PostComment INNER JOIN Post ON PostComment.postID = Post.idPost WHERE Post.idPost = ?) AS commentCount
-            FROM Post
-            WHERE Post.idPost = ?;`;
-            const [uploadDetail] = await select(uploadDetailQuery, [
-              upload,
-              userID,
-              upload,
-              upload,
-              upload,
-              upload,
-            ]);
-
-            const details = {
-              postID: upload,
-              uploadDetail: uploadDetail,
-              uploaderDetail: uploaderDetail,
-            };
-
-            return details;
-          } catch (error) {
-            return error;
-          }
-        })
-      );
-
-      return postDetailsArray;
+        post["totalLike"] = totalLike;
+        post["hasLiked"] = hasLiked;
+        post["totalComment"] = totalComment;
+        post["hasBookmarked"] = hasBookmarked;
+      });
+      await Promise.all(promises);
+      return filteredPost;
     } catch (error) {
       return error;
     }
@@ -392,22 +317,45 @@ class PostManager {
     }
   }
 
+  //Return an int of total likes
+  async getTotalLike(postID) {
+    try {
+      const query = "SELECT COUNT(*) FROM likepost WHERE postID = ?;";
+      const [result] = await select(query, [postID]);
+      return result["COUNT(*)"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async hasLiked(postID, userID) {
+    try {
+      const query =
+        "SELECT COUNT(*) FROM likepost WHERE postID = ? AND likepost.userID = ?";
+      const [result] = await select(query, [postID, userID]);
+      return result["COUNT(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
   async getLikedList(postID, userID) {
     try {
-      const query = `SELECT 
-    likepost.userID, username, displayName,profileIcon,
-    (SELECT 
-            COUNT(*)
-        FROM
-            followers
-        WHERE
-            FollowerID = ? AND followingID = likepost.userID) AS isFollowing
-FROM
-    likepost
-	INNER JOIN users on users.userID = likepost.userID
-WHERE
-    postID = ? ORDER BY isFollowing DESC;`;
+      //Manager
+      const followManager = new FollowManager();
+
+      const query = `SELECT likepost.userID, username, displayName,profileIcon, FROM likepost INNER JOIN users on users.userID = likepost.userID WHERE postID = ? ORDER BY isFollowing DESC;`;
+
       const result = await select(query, [userID, postID]);
+
+      const promises = result.map(async (user) => {
+        const liker = user["userID"];
+        const isFollowing = await followManager.isFollowing(userID, liker);
+        user["isFollowing"] = isFollowing;
+      });
+
+      await Promise.all(promises);
+
       return result;
     } catch (error) {
       return error;
@@ -417,78 +365,26 @@ WHERE
   //This is for the main screen
   async getFollowingPost(userID) {
     try {
-      const query = `SELECT 
-    postID AS id,
-    users.userID,
-    users.profileIcon,
-    users.username,
-    postLink,
-    isVideo,
-    description,
-    uploadDate,
-    (SELECT 
-            COUNT(*)
-        FROM
-            likepost
-        WHERE
-            likepost.postID = id) AS totalLike,
-    (SELECT 
-            COUNT(*)
-        FROM
-            likepost
-        WHERE
-            postID = id AND likepost.userID = ?) AS hasLiked,
-    (SELECT 
-            COUNT(*)
-        FROM
-            commentpost
-        WHERE
-            commentpost.postID = id) AS totalComment,
-    (SELECT 
-            COUNT(*)
-        FROM
-            bookmark
-                INNER JOIN
-            bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID
-        WHERE
-            userID = ? AND bookmarkpost.postID = id) AS hasBookmarked
-FROM
-    instabun.post
-        INNER JOIN
-    users ON post.userID = users.userID
-WHERE
-    post.userID IN (SELECT 
-            FollowingID
-        FROM
-            followers
-        WHERE
-            FollowerID = ?)
-        AND post.postVisibility <= (SELECT 
-            COUNT(*)
-        FROM
-            followers
-        WHERE
-            (followers.followerID = ?
-                AND FollowingID = post.userID)
-                OR (FollowerID = post.userID
-                AND FollowingID = ?))
-ORDER BY uploadDate DESC;`;
+      //Manager
+      const followManager = new FollowManager();
 
-      const result = await select(query, [
-        userID,
-        userID,
-        userID,
-        userID,
-        userID,
-      ]);
+      const followingList = await followManager.getFollowings(userID);
 
-      return result;
+      const query = `SELECT postID AS id, users.userID, users.profileIcon, users.username, postLink,isVideo, description, uploadDate,post.postVisibility FROM instabun.post INNER JOIN users ON post.userID = users.userID WHERE post.userID IN (?) ORDER BY uploadDate DESC;`;
+
+      const result = await select(query, [followingList]);
+
+      const filteredPosts = await this.#filterPost(userID, result);
+
+      const completedPosts = await this.#addPostDetails(userID, filteredPosts);
+
+      return completedPosts;
     } catch (error) {
       return error;
     }
   }
 
-  async getProfilePost(viewerID, profileUserID, page) {
+  async getProfilePost(viewerID, profileUserID) {
     try {
       const postIDsResultSet = await select(
         `SELECT Post.idPost FROM instabun.Users INNER JOIN Post ON Post.UserID = Users.UserID WHERE Users.UserID = ?;`,
@@ -511,7 +407,7 @@ ORDER BY uploadDate DESC;`;
           page
         );
 
-        const postDetailsArray = await this.#getPostDetails(
+        const postDetailsArray = await this.#addPostDetails(
           viewerID,
           filteredPost
         );
@@ -544,7 +440,7 @@ ORDER BY uploadDate DESC;`;
           };
           return postIDAndUserID;
         });
-        const postDetailsArray = await this.#getPostDetails(
+        const postDetailsArray = await this.#addPostDetails(
           viewerID,
           postIDAndUserIDArray
         );
@@ -556,9 +452,10 @@ ORDER BY uploadDate DESC;`;
     }
   }
 
+  //Returns true or false if the user has shared
   async hasShared(userID, postID) {
     try {
-      const query = `SELECT count(*) FROM instabun.PostShare where postID = ? AND userID = ?;`;
+      const query = `SELECT count(*) FROM sharepost where postID = ? AND userID = ?;`;
       const [result] = await select(query, [postID, userID]);
       return result["count(*)"] == 1;
     } catch (error) {
@@ -566,11 +463,15 @@ ORDER BY uploadDate DESC;`;
     }
   }
 
+  //Save that the user shared the post
   async share(userID, postID) {
     try {
-      const query = `INSERT INTO PostShare(postID,userID) Values(?,?);`;
-      await update(query, [postID, userID]);
-      return "Record share action operation successful";
+      const hasShared = await this.hasShared(userID, postID);
+      if (hasShared) {
+        const query = `INSERT INTO sharepost(postID,userID) Values(?,?);`;
+        await update(query, [postID, userID]);
+        return "Record share action operation successful";
+      }
     } catch (error) {
       return error;
     }

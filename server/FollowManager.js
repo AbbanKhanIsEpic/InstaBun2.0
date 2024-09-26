@@ -51,9 +51,7 @@ class FollowManager {
     try {
       const query = `SELECT FollowerID FROM instabun.Follows where FollowingID = ?;`;
       const result = await select(query, [followingID]);
-      //Convert JSON to array for easy reading
-      const followers = result.map((row) => row.FollowerID);
-      return followers;
+      return result;
     } catch (error) {
       return error;
     }

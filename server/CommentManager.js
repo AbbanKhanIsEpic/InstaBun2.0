@@ -25,6 +25,7 @@ class CommentManager {
 
   //Get the comments from the post
   async getComments(postID, userID) {
+    //Get comments
     try {
       const query = `
       SELECT 
@@ -42,28 +43,27 @@ class CommentManager {
       WHERE
         PostID = ?
     `;
-      const comments = await select(query, [userID, userID, postID]);
+      const comments = await select(query, [postID]);
       //Going through JSON object array
-      for (let i = 0; i < comments.length; i++) {
-        //Getting the IDs
-        const commenterID = comments[i]["userID"];
-        const commentID = comments[i]["commentID"];
+      await Promise.all(
+        comments.map(async (comment) => {
+          const commentID = comment["commentID"];
 
-        //Adding total like
-        comments[i]["totalLike"] = await this.totalLike(commentID);
+          const [totalLike, totalDislike, hasLiked, hasDisliked] =
+            await Promise.all([
+              this.totalLike(commentID),
+              this.totalDislike(commentID),
+              this.hasLiked(commentID, userID),
+              this.hasDisliked(commentID, userID),
+            ]);
 
-        //Adding total dislike
-        comments[i]["totalDislike"] = await this.totalDislike(commentID);
+          comment["totalLike"] = totalLike;
+          comment["totalDislike"] = totalDislike;
+          comment["hasLiked"] = hasLiked;
+          comment["hasDisliked"] = hasDisliked;
+        })
+      );
 
-        //Adding hasLiked
-        comments[i]["hasLiked"] = await this.hasLiked(commentID, commenterID);
-
-        //Adding hasDisliked
-        comments[i]["hasDisliked"] = await this.hasDisliked(
-          commentID,
-          commenterID
-        );
-      }
       return comments;
     } catch (error) {
       return error;
@@ -97,7 +97,7 @@ class CommentManager {
   //Returns a number representing the total number of dislikes
   async totalDislike(commentID) {
     try {
-      const query = `SELECT COUNT(*) FROM commentdislike WHERE commentLike = ?`;
+      const query = `SELECT COUNT(*) FROM commentdislike WHERE commentID = ?`;
       const [result] = await select(query, [commentID]);
       return result["COUNT(*)"];
     } catch (error) {
@@ -106,7 +106,7 @@ class CommentManager {
   }
 
   //Returns true or false if the user liked the comment or not
-  async didLike(commentID, userID) {
+  async hasLiked(commentID, userID) {
     try {
       const query = `SELECT COUNT(*) FROM commentLike WHERE commentID = ? AND userID = ?`;
       const [result] = await select(query, [commentID, userID]);
@@ -117,7 +117,7 @@ class CommentManager {
   }
 
   //Returns true or false if the user disliked the comment or not
-  async didDislike(commentID, userID) {
+  async hasDisliked(commentID, userID) {
     try {
       const query = `SELECT COUNT(*) FROM commentdislike WHERE commentID = ? AND userID = ?`;
       const [result] = await select(query, [commentID, userID]);
@@ -159,6 +159,16 @@ class CommentManager {
       return "Remove dislike operation successful";
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getTotalComment(postID) {
+    try {
+      const query = `SELECT COUNT(*) FROM commentpost WHERE postID = ?`;
+      const [result] = await select(query, [postID]);
+      return result["COUNT(*)"];
+    } catch (error) {
+      return error;
     }
   }
 }

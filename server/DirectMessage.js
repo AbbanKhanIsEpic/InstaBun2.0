@@ -1,5 +1,5 @@
 //Import
-const { select, update } = require("./DB");
+const { select, update } = require("./DB.js");
 const BlockManager = require("./BlockManager.js");
 const UserManager = require("./UserManager.js");
 
@@ -7,9 +7,7 @@ class DirectMessage {
   //Save the message to database
   async sendMessage(senderID, receiverID, message) {
     try {
-      const query = `
-        INSERT INTO instabun.DirectMessages (SenderID, RecieverID, Message)
-        VALUES (?, ?, ?);`;
+      const query = `INSERT INTO directmessage (senderID,receiverID,message) VALUES (?, ?, ?);`;
       await update(query, [senderID, receiverID, message]);
       return "Send message operation successful";
     } catch (error) {
@@ -20,88 +18,191 @@ class DirectMessage {
   //Remove the message from the database
   async deleteMessage(messageID) {
     try {
-      const query = `DELETE FROM DirectMessages WHERE MessageID = ?;
-      `;
+      const query = `DELETE FROM directmessage WHERE (messageID = ?);`;
       await update(query, [messageID]);
-      return "Delete message operation successful";
+      return "Delete direct message operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns latest message
+  async getLatestMessage(senderID, receiverID) {
+    try {
+      const clearMessageTime =
+        (await this.getWhenMessageCleared(senderID, receiverID)) || 0; //This is because there is a case where time is null and MySQL does not return anything when comparing with null
+
+      const query = `SELECT *  FROM instabun.directmessage  WHERE time > ?  AND ((senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?)) ORDER BY messageID DESC LIMIT 1;`;
+
+      const [result] = await select(query, [
+        clearMessageTime,
+        senderID,
+        receiverID,
+        receiverID,
+        senderID,
+      ]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Get a list of people who the user has communicated with
+  async getCommunicatedWithList(userID) {
+    try {
+      const query =
+        "SELECT distinct CASE WHEN senderID = ? THEN receiverID ELSE senderID END as id FROM directmessage WHERE senderID = ? OR receiverID = ? ORDER BY messageID DESC;";
+
+      const result = await select(query, [userID, userID, userID]);
+
+      return result;
     } catch (error) {
       return error;
     }
   }
 
   //Get list of people who has communicated with the user
+  //This will only include messages between two users if either of them are blocked
+  async getBlockedMessageList(userID) {
+    try {
+      //Managers :D
+      const userManager = new UserManager();
+      const blockManager = new BlockManager();
+
+      //Get a list of people who the user has communicated with
+      const communicatedWithList = await this.getCommunicatedWithList(userID);
+
+      // Filter out blocked users
+      const filteredList = [];
+
+      for (const { id: messagedUserID } of communicatedWithList) {
+        const isCurrentUserBlocked = await blockManager.isUserBlocked(
+          messagedUserID,
+          userID
+        );
+        const isMessagedUserBlocked = await blockManager.isUserBlocked(
+          userID,
+          messagedUserID
+        );
+
+        if (!(isMessagedUserBlocked || isCurrentUserBlocked)) {
+          continue; // Skip non-blocked users
+        }
+
+        // Fetch additional user data concurrently
+        const [displayName, profileIcon, latestMessage] = await Promise.all([
+          userManager.getDisplayName(messagedUserID),
+          userManager.getProfileIcon(messagedUserID),
+          this.getLatestMessage(userID, messagedUserID),
+        ]);
+
+        const senderName = await userManager.getDisplayName(
+          latestMessage.senderID
+        );
+
+        latestMessage["senderName"] = senderName;
+
+        const clearMessageTime =
+          (await this.getWhenMessageCleared(userID, messagedUserID)) || 0;
+
+        filteredList.push({
+          id: messagedUserID,
+          icon: profileIcon,
+          name: displayName,
+          senderID: latestMessage["senderID"],
+          senderName: latestMessage["senderName"],
+          message: latestMessage["message"],
+          time:
+            latestMessage["time"] > clearMessageTime
+              ? latestMessage["time"]
+              : clearMessageTime,
+        });
+      }
+
+      // Use filteredList for further processing or return it
+      return filteredList;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Get list of people who has communicated with the user
+  //This will only exlude messages between two users if either of them are blocked
   async getDirectList(userID) {
     try {
-      const user = new UserManager();
+      //Managers :D
+      const userManager = new UserManager();
+      const blockManager = new BlockManager();
 
-      const query = `
-      SELECT distinct RecieverID FROM DirectMessages WHERE SenderID = ? 
-      UNION 
-      SELECT distinct SenderID FROM DirectMessages WHERE RecieverID = ?;`;
-      const dmList = await select(query, [userID, userID]);
+      //Get a list of people who the user has communicated with
+      const communicatedWithList = await this.getCommunicatedWithList(userID);
 
-      const directList = [];
+      // Filter out blocked users
+      const filteredList = [];
 
-      const directListPromises = dmList.map(async (interaction) => {
-        const recipientID = interaction["RecieverID"];
-        try {
-          const [profileIcon, displayName, username] = await Promise.all([
-            user.getUserProfileIconLink(recipientID),
-            user.getDisplayName(recipientID),
-            user.getUsername(recipientID),
-          ]);
-          directList.push({
-            userID: recipientID,
-            profileIconLink: profileIcon,
-            displayName: displayName,
-            username: username,
-          });
-        } catch (error) {
-          throw error;
+      for (const { id: messagedUserID } of communicatedWithList) {
+        const isCurrentUserBlocked = await blockManager.isUserBlocked(
+          messagedUserID,
+          userID
+        );
+        const isMessagedUserBlocked = await blockManager.isUserBlocked(
+          userID,
+          messagedUserID
+        );
+
+        if (isMessagedUserBlocked || isCurrentUserBlocked) {
+          continue; // Skip blocked users
         }
-      });
 
-      await Promise.all(directListPromises);
+        // Fetch additional user data concurrently
+        const [displayName, profileIcon, latestMessage] = await Promise.all([
+          userManager.getDisplayName(messagedUserID),
+          userManager.getProfileIcon(messagedUserID),
+          this.getLatestMessage(userID, messagedUserID),
+        ]);
 
-      return directList;
+        const senderName = await userManager.getDisplayName(
+          latestMessage.senderID
+        );
+
+        const clearMessageTime =
+          (await this.getWhenMessageCleared(userID, messagedUserID)) || 0;
+
+        filteredList.push({
+          id: messagedUserID,
+          icon: profileIcon,
+          name: displayName,
+          senderID: latestMessage["senderID"],
+          senderName: senderName,
+          message: latestMessage["message"],
+          time: Math.max(latestMessage["time"], clearMessageTime),
+        });
+      }
+      return filteredList;
     } catch (error) {
       return error;
     }
   }
 
   //Get the messages
-  async getMessage(senderID, recieverID, messageID) {
+  async getMessage(senderID, receiverID) {
     try {
-      const query = `
-    SELECT DirectMessages.*, Users.Username FROM DirectMessages 
-    INNER JOIN
-        Users ON Users.UserID = DirectMessages.SenderID
-    LEFT JOIN
-      ClearDirectMessage ON ClearDirectMessage.SenderID = ? AND ClearDirectMessage.RecieverID = ?
-    WHERE
-    (DirectMessages.SenderID = ?
-        AND DirectMessages.RecieverID = ?
-        OR DirectMessages.SenderID = ?
-        AND DirectMessages.RecieverID = ?)
-        AND DirectMessages.MessageID > ?
-        AND (ClearDirectMessage.Time IS NULL OR ClearDirectMessage.Time < DirectMessages.Time);`;
+      const clearMessageTime =
+        (await this.getWhenMessageCleared(senderID, receiverID)) || 0;
 
-      const messages = await select(query, [
+      const query = `SELECT directmessage.* FROM directmessage WHERE time > ?  AND ((senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?)) ORDER BY time;`;
+      const result = await select(query, [
+        clearMessageTime,
         senderID,
-        recieverID,
+        receiverID,
+        receiverID,
         senderID,
-        recieverID,
-        recieverID,
-        senderID,
-        messageID,
       ]);
-
-      return messages;
+      return result;
     } catch (error) {
       return error;
     }
   }
-
   //Save when the user cleared the message
   //Does not actually clear the message (will just appear as if on the client side of who wanted to clear the message)
   async clearMessage(senderID, recieverID) {
@@ -128,6 +229,17 @@ class DirectMessage {
       const query = `SELECT count(*) FROM instabun.ClearDirectMessage WHERE SenderID = ? AND RecieverID = ?;`;
       const [result] = await select(query, [senderID, recieverID]);
       return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns the time when user cleared the message
+  async getWhenMessageCleared(senderID, receiverID) {
+    try {
+      const query = `SELECT time FROM cleardirectmessage where senderID = ? AND receiverID = ?;`;
+      const [result] = await select(query, [senderID, receiverID]);
+      return result["time"];
     } catch (error) {
       return error;
     }

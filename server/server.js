@@ -20,7 +20,6 @@ const StoryManager = require("./StoryManager.js");
 const GroupManager = require("./GroupManager.js");
 const CommentManager = require("./CommentManager.js");
 const EmailManager = require("./EmailManager.js");
-const MessageManager = require("./MessageManager.js");
 
 app.use(cors()); // Enable CORS for all routes
 
@@ -1067,12 +1066,12 @@ app.post("/api/comment", (req, res) => {
 app.get("/api/comment", (req, res) => {
   const { postID, userID } = req.query;
 
-  const post = new CommentManager();
+  const commentManager = new CommentManager();
 
-  post
+  commentManager
     .getComments(postID, userID)
     .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
+      res.status(200).json(jsonifiedResult);
     })
     .catch((error) => {
       console.error(error);

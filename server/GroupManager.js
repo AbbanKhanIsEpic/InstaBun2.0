@@ -2,6 +2,7 @@
 const { select, update } = require("./DB.js");
 const sha1 = require("sha1");
 const FirebaseStorageManager = require("./FirebaseStorageManager");
+const GroupMessageManager = require("./GroupMessageManager");
 
 class GroupManager {
   //Create a new group
@@ -19,7 +20,7 @@ class GroupManager {
         mimetype
       );
 
-      const query = `INSERT INTO instabun.community (ownerID, groupName,groupProfileIcon) VALUES (?,?,?);`;
+      const query = `INSERT INTO instabun.groupdb (ownerID, groupName,groupProfileIcon) VALUES (?,?,?);`;
       await update(query, [createrUserID, groupName, firebaseURL]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
@@ -57,7 +58,7 @@ class GroupManager {
   //Get the latest group's id
   async #getLatestGroupID(createrUserID) {
     try {
-      const query = `SELECT groupID FROM instabun.community WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
+      const query = `SELECT groupID FROM instabun.groupdb WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
       return result["groupID"];
     } catch (error) {
@@ -68,11 +69,11 @@ class GroupManager {
   //Return a list users who are members of the group (groupID)
   async getGroupMembers(groupID) {
     try {
-      const query = `SELECT Users.UserID, Users.Username, Users.DisplayName, Users.ProfileIconLink FROM instabun.GroupMembers
+      const query = `SELECT users.userID, users.username, users.displayName, users.profileIcon FROM instabun.GroupMembers
     INNER JOIN
-     Users ON Users.UserID = GroupMembers.UserID
+     users ON users.userID = groupMembers.userID
     INNER JOIN
-     Collective ON Collective.GroupID = GroupMembers.GroupID
+     groupdb ON groupdb.groupID = GroupMembers.groupID
     WHERE
      GroupMembers.GroupID = ?;`;
       const groupMembers = await select(query, [groupID]);
@@ -96,7 +97,7 @@ class GroupManager {
   //Remove everything related to the group(groupID)
   async deleteGroup(groupID, groupMembers) {
     try {
-      const groupMessage = new GroupMessage();
+      const groupMessage = new GroupMessageManager();
       await groupMessage.deleteGroupMessages(groupID);
       await groupMessage.deleteClearMessages(groupID);
       for (const groupMember of groupMembers) {

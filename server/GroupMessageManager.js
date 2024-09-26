@@ -27,8 +27,6 @@ class GroupMessageManager {
         result[index]["displayName"] = displayName;
         result[index]["icon"] = profileIcon;
       }
-
-      console.log(result);
       return result;
     } catch (error) {
       return error;

@@ -1,0 +1,6 @@
+.deleteComment {
+  visibility: hidden;
+}
+.commenter:hover .deleteComment {
+  visibility: visible;
+}

@@ -18,7 +18,7 @@ export async function like(userID, commentID) {
   }
 }
 
-export async function unlike(userID, commentID) {
+export async function removeLike(userID, commentID) {
   try {
     const response = await axios.delete(
       `${API_BASE_URL}/like/${userID}/${commentID}`
@@ -55,11 +55,28 @@ export async function dislike(userID, commentID) {
   }
 }
 
-export async function unDislike(userID, commentID) {
+export async function removeDislike(userID, commentID) {
   try {
     const response = await axios.delete(
       `${API_BASE_URL}/dislike/${userID}/${commentID}`
     );
+    return response.status;
+  } catch (error) {
+    if (error.response) {
+      console.error("Unfollow error:", error.response.data);
+      return error.response.status;
+    } else {
+      console.error("Unexpected error:", error.message);
+      throw new Error(
+        "Failed to unfollow due to network error or server issue."
+      );
+    }
+  }
+}
+
+export async function removeComment(commentID) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/${commentID}`);
     return response.status;
   } catch (error) {
     if (error.response) {

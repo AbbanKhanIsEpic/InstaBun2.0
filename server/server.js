@@ -820,50 +820,53 @@ app.get("/api/message/group", (req, res) => {
 app.delete("/api/message/direct/:messageID", (req, res) => {
   const { messageID } = req.params;
 
-  // try {
-  //   const messageManager = new MessageManager();
-  //   messageManager.deleteDirectMessage(messageID);
+  const directMessageManager = new DirectMessageManager();
 
-  //   res.json({ message: "Data received and processed successfully" });
-  // } catch (error) {
-  //   res.status(500).json({
-  //     error: error.message || error,
-  //     message: "Error occurred while removing the dislike",
-  //   });
-  // }
-});
-
-app.post("/api/message/direct", (req, res) => {
-  const { senderID, receiverID, message } = req.body;
-
-  // const messageManager = new MessageManager();
-
-  // try {
-  //   messageManager.sendDirectMessage(senderID, receiverID, message);
-  //   res
-  //     .status(200)
-  //     .json({ message: "Data received and processed successfully" });
-  // } catch (error) {
-  //   res.status(500).json({
-  //     error: error.message || error,
-  //     message: "Error occurred while removing the dislike",
-  //   });
-  // }
-});
-
-app.post("/api/message/group", (req, res) => {
-  const { groupID, senderID, message } = req.body;
-
-  const messageManager = new MessageManager();
   try {
-    messageManager.sendGroupMessage(groupID, senderID, message);
+    directMessageManager.deleteMessage(messageID);
     res
       .status(200)
       .json({ message: "Data received and processed successfully" });
   } catch (error) {
     res.status(500).json({
       error: error.message || error,
-      message: "Error occurred while removing the dislike",
+      message: "Error occurred while deleting a direct message",
+    });
+  }
+});
+
+app.post("/api/message/direct", (req, res) => {
+  const { senderID, receiverID, message } = req.body;
+
+  const directMessageManager = new DirectMessageManager();
+
+  try {
+    directMessageManager.sendMessage(senderID, receiverID, message);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while sending a direct message",
+    });
+  }
+});
+
+app.post("/api/message/group", (req, res) => {
+  const { groupID, senderID, message } = req.body;
+
+  const groupMessageManager = new GroupMessageManager();
+
+  try {
+    groupMessageManager.sendMessage(senderID, groupID, message);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while sending a group message",
     });
   }
 });
@@ -871,17 +874,17 @@ app.post("/api/message/group", (req, res) => {
 app.delete("/api/message/group/:messageID", (req, res) => {
   const { messageID } = req.params;
 
-  const messageManager = new MessageManager();
+  const groupMessageManager = new GroupMessageManager();
 
   try {
-    messageManager.deleteGroupMessage(messageID);
+    groupMessageManager.deleteGroupMessages(messageID);
     res
       .status(200)
       .json({ message: "Data received and processed successfully" });
   } catch (error) {
     res.status(500).json({
       error: error.message || error,
-      message: "Error occurred while removing the dislike",
+      message: "Error occurred while sending a group message",
     });
   }
 });
@@ -1053,8 +1056,8 @@ app.post("/api/comment/dislike", async (req, res) => {
 });
 
 //Remove the record that user dislike the comment
-app.delete("/api/comment/dislike", async (req, res) => {
-  const { userID, commentID } = req.query;
+app.delete("/api/comment/dislike/:userID/:commentID", async (req, res) => {
+  const { userID, commentID } = req.params;
 
   const commentManager = new CommentManager();
 
@@ -1075,8 +1078,22 @@ app.post("/api/comment", (req, res) => {
     const userID = req.body.userID;
     const comment = req.body.comment;
 
+    console.log("Hello");
+
     const commentManager = new CommentManager();
-    commentManager.comment(postID, userID, comment);
+    commentManager.addComment(postID, userID, comment);
+
+    res.json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    return error;
+  }
+});
+
+app.delete("/api/comment/:commentID", (req, res) => {
+  const { commentID } = req.params;
+  try {
+    const commentManager = new CommentManager();
+    commentManager.removeComment(commentID);
 
     res.json({ message: "Data received and processed successfully" });
   } catch (error) {

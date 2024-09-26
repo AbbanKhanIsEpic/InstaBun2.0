@@ -5,7 +5,11 @@
   >
     <div class="contentContainer position-relative">
       {{#if isVideo}}
-        <video controls class="border-1 border user-select-none content">
+        <video
+          class="border-1 border user-select-none content"
+          onclick="changeState(this)"
+          loop
+        >
           <source src="{{postLink}}" />
         </video>
       {{else}}

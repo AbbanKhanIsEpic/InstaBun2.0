@@ -13,9 +13,33 @@ class CommentManager {
   }
 
   //Remove the comment from the database
+  //In order to do this, we have to delete all record related to commentID in commentlike and commentdislike
   async removeComment(commentID) {
     try {
+      await this.#removeAllLike(commentID);
+      await this.#removeAllDislike(commentID);
       const query = `DELETE FROM commentpost WHERE commentID = ?;`;
+      await update(query, [commentID]);
+      return "Remove post from collection operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Remove all comment like
+  async #removeAllLike(commentID) {
+    try {
+      const query = `DELETE FROM commentLike WHERE commentID = ?;`;
+      await update(query, [commentID]);
+      return "Remove post from collection operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async #removeAllDislike(commentID) {
+    try {
+      const query = `DELETE FROM commentDislike WHERE commentID = ?;`;
       await update(query, [commentID]);
       return "Remove post from collection operation successful";
     } catch (error) {
@@ -64,6 +88,13 @@ class CommentManager {
         })
       );
 
+      comments.sort((a, b) => {
+        const aRatio = this.#getRatio(a["totalLike"], a["totalDislike"]);
+        const bRatio = this.#getRatio(b["totalLike"], b["totalDislike"]);
+
+        return bRatio - aRatio;
+      });
+
       return comments;
     } catch (error) {
       return error;
@@ -80,6 +111,18 @@ class CommentManager {
       return "Like comment operation successful";
     } catch (error) {
       return error;
+    }
+  }
+
+  #getRatio(likes, dislikes) {
+    if (likes === 0 && dislikes === 0) {
+      return 0; // No likes or dislikes, neutral
+    } else if (dislikes === 0) {
+      return Infinity; // No dislikes, treat as highest possible ratio
+    } else if (likes === 0 && dislikes !== 0) {
+      return -Infinity; // No likes, treat as lowest possible ratio
+    } else {
+      return likes / dislikes; // Regular ratio calculation
     }
   }
 

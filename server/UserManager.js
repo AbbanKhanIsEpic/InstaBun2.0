@@ -61,9 +61,9 @@ class UserManager {
   //Returns display name
   async getDisplayName(userID) {
     try {
-      const query = `SELECT DisplayName FROM instabun.Users where UserID = ?`;
+      const query = `SELECT displayName FROM users where userID = ?`;
       const [result] = await select(query, [userID]);
-      return result["DisplayName"];
+      return result["displayName"];
     } catch (error) {
       return error;
     }
@@ -72,14 +72,9 @@ class UserManager {
   //Returns profile icon link
   async getProfileIcon(userID) {
     try {
-      const query = `SELECT profileIcon FROM instabun.Users where UserID = ?`;
+      const query = `SELECT profileIcon FROM users where UserID = ?`;
       const [result] = await select(query, [userID]);
-      //This happens if the userID does not exists
-      //When created an account, a user will a profile icon
-      if (result.length === 0) {
-        return new Error("Unable to get the link of the user's profile icon");
-      }
-      return result["profileIcon"];
+      return result ? result["profileIcon"] : null;
     } catch (error) {
       return error;
     }

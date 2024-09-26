@@ -204,6 +204,7 @@ class PostManager {
       //Iterating through posts
       const promises = posts.map(async (post) => {
         const postVisibility = post["postVisibility"];
+        console.log(postVisibility);
         const uploaderUserID = post["userID"];
 
         // Handle public posts
@@ -235,6 +236,10 @@ class PostManager {
 
       // Wait for all promises to complete
       await Promise.all(promises);
+      //Resorting the list because promises does not keep it original order
+      filteredPost.sort(
+        (a, b) => new Date(b["uploadDate"]) - new Date(a["uploadDate"])
+      );
       return filteredPost;
     } catch (error) {
       return error;
@@ -339,14 +344,16 @@ class PostManager {
     }
   }
 
+  //Return a list of people who liked the post
   async getLikedList(postID, userID) {
     try {
+      console.log(postID);
       //Manager
       const followManager = new FollowManager();
 
-      const query = `SELECT likepost.userID, username, displayName,profileIcon, FROM likepost INNER JOIN users on users.userID = likepost.userID WHERE postID = ? ORDER BY isFollowing DESC;`;
+      const query = `SELECT likepost.userID, username, displayName,profileIcon FROM likepost INNER JOIN users on users.userID = likepost.userID WHERE postID = ?`;
 
-      const result = await select(query, [userID, postID]);
+      const result = await select(query, [postID]);
 
       const promises = result.map(async (user) => {
         const liker = user["userID"];
@@ -355,6 +362,8 @@ class PostManager {
       });
 
       await Promise.all(promises);
+
+      result.sort((a, b) => a["isFollowing"] > b["isFollowing"]);
 
       return result;
     } catch (error) {
@@ -368,7 +377,9 @@ class PostManager {
       //Manager
       const followManager = new FollowManager();
 
-      const followingList = await followManager.getFollowings(userID);
+      const followingList = (await followManager.getFollowings(userID)).map(
+        (element) => element["FollowingID"]
+      );
 
       const query = `SELECT postID AS id, users.userID, users.profileIcon, users.username, postLink,isVideo, description, uploadDate,post.postVisibility FROM instabun.post INNER JOIN users ON post.userID = users.userID WHERE post.userID IN (?) ORDER BY uploadDate DESC;`;
 
@@ -377,6 +388,8 @@ class PostManager {
       const filteredPosts = await this.#filterPost(userID, result);
 
       const completedPosts = await this.#addPostDetails(userID, filteredPosts);
+
+      console.log(followingList);
 
       return completedPosts;
     } catch (error) {

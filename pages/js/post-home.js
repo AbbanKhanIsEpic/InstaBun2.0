@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         return arg1 != userID ? options.fn(this) : options.inverse(this);
       });
 
-      const list = await getLikeList(postID, userID);
+      const list = await getLikeList(post.id, userID);
 
       const templateList = Handlebars.templates["like-list"];
       const likedList = document.querySelector("#likedList");

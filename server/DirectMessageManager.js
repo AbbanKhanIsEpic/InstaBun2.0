@@ -3,7 +3,7 @@ const { select, update } = require("./DB.js");
 const BlockManager = require("./BlockManager.js");
 const UserManager = require("./UserManager.js");
 
-class DirectMessage {
+class DirectMessageManager {
   //Save the message to database
   async sendMessage(senderID, receiverID, message) {
     try {
@@ -141,6 +141,7 @@ class DirectMessage {
       const filteredList = [];
 
       for (const { id: messagedUserID } of communicatedWithList) {
+        console.log(messagedUserID);
         const isCurrentUserBlocked = await blockManager.isUserBlocked(
           messagedUserID,
           userID
@@ -175,7 +176,12 @@ class DirectMessage {
           senderID: latestMessage["senderID"],
           senderName: senderName,
           message: latestMessage["message"],
-          time: Math.max(latestMessage["time"], clearMessageTime),
+          time: new Date(
+            Math.max(
+              new Date(latestMessage["time"]),
+              new Date(clearMessageTime)
+            )
+          ),
         });
       }
       return filteredList;
@@ -239,11 +245,11 @@ class DirectMessage {
     try {
       const query = `SELECT time FROM cleardirectmessage where senderID = ? AND receiverID = ?;`;
       const [result] = await select(query, [senderID, receiverID]);
-      return result["time"];
+      return result ? result["time"] : null;
     } catch (error) {
       return error;
     }
   }
 }
 
-module.exports = DirectMessage;
+module.exports = DirectMessageManager;

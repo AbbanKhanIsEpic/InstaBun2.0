@@ -25,8 +25,10 @@ class GroupMessageManager {
         ]);
 
         result[index]["displayName"] = displayName;
-        result[index]["profileIcon"] = profileIcon;
+        result[index]["icon"] = profileIcon;
       }
+
+      console.log(result);
       return result;
     } catch (error) {
       return error;
@@ -117,7 +119,7 @@ class GroupMessageManager {
     try {
       const query = `SELECT time FROM cleargroupmessage where userID = ? AND groupID = ?;`;
       const [result] = await select(query, [groupID, userID]);
-      return result["time"];
+      return result ? result["time"] : null;
     } catch (error) {
       return error;
     }
@@ -146,20 +148,29 @@ class GroupMessageManager {
         // Fetch additional user data concurrently
         const latestMessage = await this.getLatestMessage(groupID, userID);
 
-        const senderID = latestMessage.senderID;
-        const senderName =
-          senderID != null ? await userManager.getDisplayName(senderID) : null;
+        const hasLastMessage = latestMessage?.["messageID"] ? true : false;
 
-        const clearMessageTime =
-          (await this.getWhenMessageCleared(groupID, userID)) || 0;
+        const senderID = hasLastMessage ? latestMessage["senderID"] : null;
 
-        result[index]["senderID"] = latestMessage["userID"];
+        const senderName = hasLastMessage
+          ? await userManager.getDisplayName(senderID)
+          : null;
+
+        const message = hasLastMessage ? latestMessage["message"] : null;
+
+        const clearMessageTime = await this.getWhenMessageCleared(
+          groupID,
+          userID
+        );
+
+        const time = hasLastMessage
+          ? new Date(Math.max(latestMessage["time"], clearMessageTime))
+          : result[index]["time"];
+
+        result[index]["senderID"] = senderID;
         result[index]["senderName"] = senderName;
-        result[index]["message"] = latestMessage["userID"];
-        result[index]["time"] =
-          latestMessage["time"] != null
-            ? Math.max(latestMessage["time"], clearMessageTime)
-            : result[index]["time"];
+        result[index]["message"] = message;
+        result[index]["time"] = time;
       }
       return result;
     } catch (error) {
@@ -188,6 +199,7 @@ class GroupMessageManager {
         const query = `SELECT *  FROM groupmessages  WHERE time > ?  AND groupID = ? ORDER BY messageID DESC LIMIT 1;`;
 
         const [result] = await select(query, [clearMessageTime, groupID]);
+
         return result;
       } catch (error) {
         return error;

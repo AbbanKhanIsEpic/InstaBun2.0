@@ -19,6 +19,9 @@ const PostManager = require("./PostManager.js");
 const StoryManager = require("./StoryManager.js");
 const GroupManager = require("./GroupManager.js");
 const CommentManager = require("./CommentManager.js");
+const BookmarkManager = require("./BookmarkManager.js");
+const DirectMessageManager = require("./DirectMessageManager.js");
+const GroupMessageManager = require("./GroupMessageManager.js");
 const EmailManager = require("./EmailManager.js");
 
 app.use(cors()); // Enable CORS for all routes
@@ -747,29 +750,47 @@ app.get("/api/story", (req, res) => {
 
 //Message
 
-app.get("/api/message/list", (req, res) => {
+app.get("/api/message/list", async (req, res) => {
   const { userID } = req.query;
 
-  const messageManager = new MessageManager();
+  const directMessageManager = new DirectMessageManager();
+  const groupMessageManager = new GroupMessageManager();
 
-  messageManager
-    .getMessageList(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  try {
+    const directList = await directMessageManager.getDirectList(userID);
+
+    const directPromises = directList.map(async (element) => {
+      element["isGroup"] = false;
     });
+
+    const groupList = await groupMessageManager.getGroupList(userID);
+
+    const groupPromises = groupList.map(async (element) => {
+      element["isGroup"] = true;
+    });
+
+    await Promise.all([directPromises, groupPromises]);
+
+    const combinedList = directList.concat(groupList);
+
+    combinedList.sort((a, b) => new Date(b["time"]) - new Date(a["time"]));
+
+    res.status(200).send(combinedList);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while getting list",
+    });
+  }
 });
 
 app.get("/api/message/direct", (req, res) => {
   const { requestingUserID, targetUserID } = req.query;
 
-  const messageManager = new MessageManager();
+  const directMessageManager = new DirectMessageManager();
 
-  messageManager
-    .getDirectMessage(requestingUserID, targetUserID)
+  directMessageManager
+    .getMessage(requestingUserID, targetUserID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -782,10 +803,10 @@ app.get("/api/message/direct", (req, res) => {
 app.get("/api/message/group", (req, res) => {
   const { userID, groupID } = req.query;
 
-  const messageManager = new MessageManager();
+  const groupMessageManager = new GroupMessageManager();
 
-  messageManager
-    .getGroupMessage(userID, groupID)
+  groupMessageManager
+    .getMessage(userID, groupID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })
@@ -799,35 +820,35 @@ app.get("/api/message/group", (req, res) => {
 app.delete("/api/message/direct/:messageID", (req, res) => {
   const { messageID } = req.params;
 
-  try {
-    const messageManager = new MessageManager();
-    messageManager.deleteDirectMessage(messageID);
+  // try {
+  //   const messageManager = new MessageManager();
+  //   messageManager.deleteDirectMessage(messageID);
 
-    res.json({ message: "Data received and processed successfully" });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message || error,
-      message: "Error occurred while removing the dislike",
-    });
-  }
+  //   res.json({ message: "Data received and processed successfully" });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     error: error.message || error,
+  //     message: "Error occurred while removing the dislike",
+  //   });
+  // }
 });
 
 app.post("/api/message/direct", (req, res) => {
   const { senderID, receiverID, message } = req.body;
 
-  const messageManager = new MessageManager();
+  // const messageManager = new MessageManager();
 
-  try {
-    messageManager.sendDirectMessage(senderID, receiverID, message);
-    res
-      .status(200)
-      .json({ message: "Data received and processed successfully" });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message || error,
-      message: "Error occurred while removing the dislike",
-    });
-  }
+  // try {
+  //   messageManager.sendDirectMessage(senderID, receiverID, message);
+  //   res
+  //     .status(200)
+  //     .json({ message: "Data received and processed successfully" });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     error: error.message || error,
+  //     message: "Error occurred while removing the dislike",
+  //   });
+  // }
 });
 
 app.post("/api/message/group", (req, res) => {
@@ -1004,7 +1025,7 @@ app.delete("/api/comment/like/:userID/:commentID", async (req, res) => {
   const commentManager = new CommentManager();
 
   try {
-    await commentManager.unLike(commentID, userID);
+    await commentManager.removeLike(commentID, userID);
     res.json({ message: "Data received and processed successfully" });
   } catch (error) {
     res.status(500).json({
@@ -1038,7 +1059,7 @@ app.delete("/api/comment/dislike", async (req, res) => {
   const commentManager = new CommentManager();
 
   try {
-    await commentManager.unDisLike(commentID, userID);
+    await commentManager.removeDislike(commentID, userID);
     res.status(200).json({ message: "Remove comment dislike successfully" });
   } catch (error) {
     res.status(500).json({

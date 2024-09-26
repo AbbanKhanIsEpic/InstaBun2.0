@@ -60,7 +60,7 @@ class FollowManager {
   //Returns true or false if they are close friends
   async isCloseFriend(requestingUserID, targetUserID) {
     try {
-      const query = `SELECT COUNT(*) FROM followers WHERE (FollowingID = ? AND FollowerID = ? OR (FollowingID = ? AND FollowerID = ?`;
+      const query = `Select count(*) FROM followers WHERE (FollowingID = ? AND FollowerID = ?) OR (FollowingID = ? AND FollowerID = ?);`;
       const [result] = await select(query, [
         requestingUserID,
         targetUserID,

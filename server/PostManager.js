@@ -123,54 +123,74 @@ class PostManager {
 
       const tagIDsArray = await this.#getTagIDs(tags);
 
-      const filteredPost = await this.#getPostForAll(tagIDsArray);
+      const posts = await this.#getPostForAll(tagIDsArray);
 
-      const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
+      const filteredPost = await this.#addUploaderDetails(posts);
 
-      return postDetailsArray;
+      const completePosts = await this.#addPostDetails(userID, filteredPost);
+
+      return completePosts;
     } catch (error) {
       return error;
     }
   }
 
-  //This is used when the user open the explore screen and have searched for nothing
-  //Rather than just having a blank screen
-  //This small algorithm to get popular videos that:
-  //If user has liked no post: show them what most people like
-  //If user has liked post: show them a mix of what they like and people really like
+  //Small algorithm to get post to recommend
+  //1 -> get top 10 tags
+  //2 -> get post that contains that tags
+  //3 -> get post that user has not liked
   async getPostBasedLike(userID) {
     try {
-      const query = `SELECT PostTags.tagID as currentTag,
-      COUNT(PostTags.tagID) AS TotalLike,
-      (SELECT 
-      (count(*)*100) 
-      FROM 
-        PostLike 
-        INNER JOIN 
-          PostTags ON PostTags.postID = PostLike.postID 
-        WHERE 
-          PostTags.tagID = currentTag AND PostLike.userID = ?
-      ) as TotalUserLike
-      FROM
-      PostLike
-        INNER JOIN
-          PostTags ON PostTags.postID = PostLike.postID
-        INNER JOIN
-          Tag ON PostTags.tagID = Tag.idTag
-        GROUP BY currentTag
-        ORDER BY  TotalUserLike DESC, TotalLike DESC
-        LIMIT 10;`;
+      const top10TagIDs = (await this.#getPersonalTop10TagIDs(userID)).map(
+        (element) => element?.["tagID"]
+      );
+      if (!top10TagIDs.length) {
+        return new Error("User has not liked any post");
+      }
+      const unLikedPostIDs = (
+        await this.#getUnlikedPostsByTags(top10TagIDs)
+      ).map((element) => element?.["postID"]);
 
-      const tagIDsResultSet = await select(query, [userID]);
+      const posts = await this.#addUploaderDetails(unLikedPostIDs);
 
-      //Convert JSOn to array for easy reading
-      const tagIDsArray = tagIDsResultSet.map((element) => element.currentTag);
+      const filteredPost = await this.#filterPost(userID, posts);
 
-      const filteredPost = await this.#getPostForAll(tagIDsArray);
+      const completePost = await this.#addPostDetails(userID, filteredPost);
 
-      const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
+      return completePost;
+    } catch (error) {
+      return error;
+    }
+  }
 
-      return postDetailsArray;
+  async getPopularPost(userID) {
+    try {
+      const top10TagIDs = (await this.#getTop10TagIDs(userID)).map(
+        (element) => element?.["tagID"]
+      );
+
+      const unLikedPostIDs = (
+        await this.#getUnlikedPostsByTags(top10TagIDs)
+      ).map((element) => element?.["postID"]);
+
+      const posts = await this.#addUploaderDetails(unLikedPostIDs);
+
+      const filteredPosts = await this.#filterPost(userID, posts);
+
+      const completePosts = await this.#addPostDetails(userID, filteredPosts);
+
+      return completePosts;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Post that is not liked based on the tagID
+  async #getUnlikedPostsByTags(tagIDs) {
+    try {
+      const query = `SELECT DISTINCT tagpost.postID FROM tagpost LEFT JOIN likepost on likepost.postID = tagpost.postID where tagID IN (?) AND likepost.postID IS NULL ;`;
+      const result = await select(query, [tagIDs]);
+      return result;
     } catch (error) {
       return error;
     }
@@ -183,10 +203,43 @@ class PostManager {
   //This method is used for the explore screen
   async #getPostForAll(tagsArray) {
     try {
-      const query = `SELECT tagpost.postID, userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY postID ORDER BY COUNT(DISTINCT tagID) DESC`;
+      const query = `SELECT tagpost.postID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY postID ORDER BY COUNT(DISTINCT tagID) DESC`;
 
       const result = await select(query, [tagsArray]);
 
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Help to get post to recommendard -> user's top 10
+  async #getPersonalTop10TagIDs(userID) {
+    try {
+      const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID where userID = ? group by tagID order by count(*) DESC LIMIT 10`;
+      const result = await select(query, [userID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Help to get post to recommendard -> based on what everyone like
+  //This will be used to help when the user is new and/or has no like
+  async #getTop10TagIDs() {
+    try {
+      const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID where group by tagID order by count(*) DESC LIMIT 10`;
+      const result = await select(query);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async #addUploaderDetails(postIDs) {
+    try {
+      const query = `SELECT postID AS id, users.userID, users.profileIcon, users.username, postLink,isVideo, description, uploadDate,post.postVisibility FROM instabun.post INNER JOIN users on users.userID = post.userID where postID IN (?) ORDER BY uploadDate DESC`;
+      const result = await select(query, [postIDs]);
       return result;
     } catch (error) {
       return error;
@@ -251,6 +304,8 @@ class PostManager {
     try {
       //The uploader may have changed the permission of the video
       //So we have to take that into account
+      const post = await this.#addUploaderDetails(postID);
+
       const filteredPost = await this.#filterPost(userID, postID);
 
       const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
@@ -399,67 +454,29 @@ class PostManager {
 
   async getProfilePost(viewerID, profileUserID) {
     try {
-      const postIDsResultSet = await select(
-        `SELECT Post.idPost FROM instabun.Users INNER JOIN Post ON Post.UserID = Users.UserID WHERE Users.UserID = ?;`,
-        [profileUserID]
-      );
+      const postIDs = (
+        await select(`SELECT postID FROM instabun.post where userID = ?;`, [
+          profileUserID,
+        ])
+      ).map((element) => element?.["postID"]);
 
-      //Convert JSON to array for easy reading
-      const postIDsArray = postIDsResultSet.map((element) => element.idPost);
-
-      //The return will be undefined
-      if (postIDsArray.length === 0) {
-        throw new Error("User does not have any post");
+      if (!postIDs.length) {
+        return new Error("The user does not have any posts");
       }
 
-      //If the user is not looking at their own post
-      if (viewerID != profileUserID) {
-        const filteredPost = await this.#filterPost(
-          viewerID,
-          postIDsArray,
-          page
-        );
+      const posts = await this.#addUploaderDetails(postIDs);
 
-        const postDetailsArray = await this.#addPostDetails(
-          viewerID,
-          filteredPost
-        );
+      if (viewerID == profileUserID) {
+        const completePosts = await this.#addPostDetails(viewerID, posts);
 
-        return postDetailsArray;
-      } else {
-        const postPerPage = 3;
-        page *= postPerPage;
-        //The user should be able to view their own post
-        //Even if they are allowed no one to see it
-        const filteringPost = await select(
-          `SELECT 
-        Post.idPost,
-        Users.UserID
-          FROM
-          instabun.Post
-          INNER JOIN
-            Users ON Users.UserID = Post.UserID
-          WHERE
-            Post.idPost IN (?)
-          ORDER BY Post.idPost DESC
-          LIMIT ${page},${postPerPage};`,
-          [postIDsArray]
-        );
-
-        const postIDAndUserIDArray = filteringPost.map((element) => {
-          const postIDAndUserID = {
-            postID: element.idPost,
-            userID: element.UserID,
-          };
-          return postIDAndUserID;
-        });
-        const postDetailsArray = await this.#addPostDetails(
-          viewerID,
-          postIDAndUserIDArray
-        );
-
-        return postDetailsArray;
+        return completePosts;
       }
+
+      const filteredPosts = await this.#filterPost(viewerID, posts);
+
+      const completePosts = await this.#addPostDetails(viewerID, filteredPosts);
+
+      return completePosts;
     } catch (error) {
       return error;
     }

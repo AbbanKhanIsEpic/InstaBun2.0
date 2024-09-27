@@ -131,8 +131,15 @@ uploadButton.addEventListener("click", async function () {
         })
       );
 
-      createPost(formData);
       uploadButton.classList.add("disabled");
+      const response = await createPost(formData);
+      if (response.status == "200") {
+        alert("The story has been uploaded");
+        window.open("http://127.0.0.1:5500/pages/create.html", "_self");
+      } else {
+        alert("Error has occured, try again");
+        window.open("http://127.0.0.1:5500/pages/create.html", "_self");
+      }
     }
   } else {
     const formData = new FormData();
@@ -160,7 +167,6 @@ uploadButton.addEventListener("click", async function () {
     if (response.status == "200") {
       alert("The story has been uploaded");
       window.open("http://127.0.0.1:5500/pages/create.html", "_self");
-      window.re;
     } else {
       alert("Error has occured, try again");
       window.open("http://127.0.0.1:5500/pages/create.html", "_self");
@@ -207,13 +213,7 @@ function displayVideo(video) {
 }
 
 function displayAddedTag(tag) {
-  // Get the template source
-  const templateSource = document.getElementById(
-    "selected-tag-template"
-  ).innerHTML;
-
-  // Compile the template
-  const template = Handlebars.compile(templateSource);
+  const template = Handlebars.templates["selected-tag"];
   const data = { tag: tag };
 
   // Render the template with data

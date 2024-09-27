@@ -1,5 +1,11 @@
 //Imports
-import { getRecommend, likePost, unlikePost, getLikeList } from "./API/post.js";
+import {
+  getRecommend,
+  likePost,
+  unlikePost,
+  getLikeList,
+  getSearchedPost,
+} from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
 import {
@@ -14,6 +20,9 @@ import {
 
 const commentModal = document.querySelector("#comments");
 const commentBtn = document.querySelector("#commentBtn");
+
+const searchPostButton = document.querySelector("#searchPostButton");
+const searchPostInput = document.querySelector("#searchPostInput");
 
 //For deleting comment
 let deleteCommentID = null;
@@ -97,65 +106,34 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const posts = document.getElementsByClassName("post");
 
-  Array.from(posts).forEach((post) => {
-    //Declaring all interactables
-    const likeButton = post.querySelector(".likeButton");
-    const uploader = post.querySelector(".uploader");
-    const bookmarkButton = post.querySelector(".bookmarkButton");
-    const likeCounter = post.querySelector(".likeCounter");
-    const commentButton = post.querySelector(".commentButton");
-    postID = post.id;
+  attachEventHandlersToPost(posts);
+});
 
-    //Event listeners
-
-    //Like and unlike post
-    likeButton.addEventListener("click", async function (event) {
-      const didLike =
-        event.currentTarget.children[0].classList.contains("like");
-      if (didLike) {
-        const response = await unlikePost(post.id, userID);
-        if (response.status == "200") {
-          likeButton.innerHTML = `${notActiveLikePost}`;
-          likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
-        } else {
-          alert("Error has occured, try again");
-        }
-      } else {
-        const response = await likePost(post.id, userID);
-        if (response.status == "200") {
-          likeButton.innerHTML = `${activeLikePost}`;
-          likeCounter.innerHTML = Number(likeCounter.textContent) + 1;
-        } else {
-          alert("Error has occured, try again");
-        }
-      }
-    });
-
-    //Showing a list of people who liked the post
-    likeCounter.parentElement.addEventListener("click", async function () {
-      Handlebars.registerHelper("ifNotCurrentUser", function (arg1, options) {
-        return arg1 != userID ? options.fn(this) : options.inverse(this);
-      });
-
-      const list = await getLikeList(post.id, userID);
-
-      const templateList = Handlebars.templates["like-list"];
-      const likedList = document.querySelector("#likedList");
-      const htmlOutput = templateList(list);
-      likedList.innerHTML = htmlOutput;
-      attachEventHandlersToFollow(likedList);
-    });
-
-    //Bookmark and unbookmark
-    bookmarkButton.addEventListener("click", function (event) {});
-
-    commentButton.addEventListener("click", function () {
-      postID = post.id;
-      populateCommentModal(postID, userID);
-    });
-    //Send user to the profile of the sender
-    uploader.addEventListener("click", function () {});
+searchPostButton.addEventListener("click", async function () {
+  const tags = searchPostInput.value.split(" ").filter((element) => {
+    console.log(element.length > 0);
+    return element.length > 0;
   });
+
+  Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+  });
+
+  Handlebars.registerHelper("postAge", function (uploadDate) {
+    return age(uploadDate);
+  });
+
+  const templatePost = Handlebars.templates["post-explore"];
+
+  const data = await getSearchedPost(userID, tags);
+
+  const htmlOutput = templatePost({ post: data });
+
+  document.getElementById("posts").innerHTML = htmlOutput;
+
+  const posts = document.getElementsByClassName("post");
+
+  attachEventHandlersToPost(posts);
 });
 
 commentBtn.addEventListener("click", async function () {
@@ -337,5 +315,67 @@ function attachEventHandlersToCommenters() {
         }
       }
     });
+  });
+}
+
+function attachEventHandlersToPost(posts) {
+  Array.from(posts).forEach((post) => {
+    //Declaring all interactables
+    const likeButton = post.querySelector(".likeButton");
+    const uploader = post.querySelector(".uploader");
+    const bookmarkButton = post.querySelector(".bookmarkButton");
+    const likeCounter = post.querySelector(".likeCounter");
+    const commentButton = post.querySelector(".commentButton");
+    postID = post.id;
+
+    //Event listeners
+
+    //Like and unlike post
+    likeButton.addEventListener("click", async function (event) {
+      const didLike =
+        event.currentTarget.children[0].classList.contains("like");
+      if (didLike) {
+        const response = await unlikePost(post.id, userID);
+        if (response.status == "200") {
+          likeButton.innerHTML = `${notActiveLikePost}`;
+          likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+        } else {
+          alert("Error has occured, try again");
+        }
+      } else {
+        const response = await likePost(post.id, userID);
+        if (response.status == "200") {
+          likeButton.innerHTML = `${activeLikePost}`;
+          likeCounter.innerHTML = Number(likeCounter.textContent) + 1;
+        } else {
+          alert("Error has occured, try again");
+        }
+      }
+    });
+
+    //Showing a list of people who liked the post
+    likeCounter.parentElement.addEventListener("click", async function () {
+      Handlebars.registerHelper("ifNotCurrentUser", function (arg1, options) {
+        return arg1 != userID ? options.fn(this) : options.inverse(this);
+      });
+
+      const list = await getLikeList(post.id, userID);
+
+      const templateList = Handlebars.templates["like-list"];
+      const likedList = document.querySelector("#likedList");
+      const htmlOutput = templateList(list);
+      likedList.innerHTML = htmlOutput;
+      attachEventHandlersToFollow(likedList);
+    });
+
+    //Bookmark and unbookmark
+    bookmarkButton.addEventListener("click", function (event) {});
+
+    commentButton.addEventListener("click", function () {
+      postID = post.id;
+      populateCommentModal(postID, userID);
+    });
+    //Send user to the profile of the sender
+    uploader.addEventListener("click", function () {});
   });
 }

@@ -123,7 +123,9 @@ class PostManager {
 
       const tagIDsArray = await this.#getTagIDs(tags);
 
-      const posts = await this.#getPostForAll(tagIDsArray);
+      const posts = (await this.#getPostForAll(tagIDsArray)).map(
+        (element) => element?.["postID"]
+      );
 
       const filteredPost = await this.#addUploaderDetails(posts);
 

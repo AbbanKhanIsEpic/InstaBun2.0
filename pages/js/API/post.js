@@ -68,3 +68,14 @@ export async function getRecommend(userID) {
     console.error(error);
   }
 }
+
+export async function getSearchedPost(userID, tags) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/search`, {
+      params: { userID, tags },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

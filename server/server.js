@@ -587,14 +587,14 @@ app.post("/api/post", upload.single("file"), async (req, res) => {
 });
 
 app.get("/api/post/search", (req, res) => {
-  const { userID, tags, page } = req.query;
+  const { userID, tags } = req.query;
 
-  const tagsArray = tags.split(",");
+  console.log(tags);
 
   const post = new PostManager();
 
   post
-    .getPostViaTags(userID, tagsArray, page)
+    .getPostViaTags(userID, tags)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

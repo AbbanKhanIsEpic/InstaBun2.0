@@ -19,16 +19,18 @@
         </div>
       </div>
     </div>
-    {{#if user.isFollowing}}
-      <button
-        class="btn bg-dark-subtle h-75 w-25 me-4"
-        id="{{user.userID}}"
-      >Unfollow</button>
-    {{else}}
-      <button
-        class="btn bg-primary h-75 w-25 me-4"
-        id="{{user.userID}}"
-      >Follow</button>
+    {{#if (isCurrentUser user.userID)}}{{else}}
+      {{#if user.isFollowing}}
+        <button
+          class="btn bg-dark-subtle h-75 w-25 me-4"
+          id="{{user.userID}}"
+        >Unfollow</button>
+      {{else}}
+        <button
+          class="btn bg-primary h-75 w-25 me-4"
+          id="{{user.userID}}"
+        >Follow</button>
+      {{/if}}
     {{/if}}
   </div>
 {{/each}}

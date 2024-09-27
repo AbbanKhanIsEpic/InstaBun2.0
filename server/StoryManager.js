@@ -55,7 +55,7 @@ select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJEC
                     storyLink,
                     'uploadDate',
                     uploadDate, 
-                    'visibility',storyVisibility))) as stories, MAX(storyVisibility) = 2 as hasCloseFriend from filterStories INNER JOIN users on users.userID = filterStories.userID GROUP BY filterStories.userID ORDER BY CASE WHEN users.userID = ? THEN 1 ELSE 0 END DESC`;
+                    'isCloseFriend',storyVisibility = 2))) as stories, MAX(storyVisibility) = 2 as hasCloseFriend from filterStories INNER JOIN users on users.userID = filterStories.userID GROUP BY filterStories.userID ORDER BY CASE WHEN users.userID = ? THEN 1 ELSE 0 END DESC`;
       const result = await select(query, [userID, userID, userID, userID]);
       console.log(result);
       return result;

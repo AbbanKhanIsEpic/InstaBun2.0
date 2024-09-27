@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const stories = await getStories(userID);
 
+  console.log(stories);
+
   // Define the data
   const data = { users: stories };
 

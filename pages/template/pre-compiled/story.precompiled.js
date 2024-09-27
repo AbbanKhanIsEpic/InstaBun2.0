@@ -66,8 +66,8 @@ templates['story'] = template({"1":function(container,depth0,helpers,partials,da
         return undefined
     };
 
-  return "                    <div class=\"carousel-item "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(data && lookupProperty(data,"first")),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":85,"column":46},"end":{"line":85,"column":75}}})) != null ? stack1 : "")
+  return "                    <div class=\"carousel-item"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(data && lookupProperty(data,"first")),{"name":"if","hash":{},"fn":container.program(8, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":85,"column":45},"end":{"line":85,"column":74}}})) != null ? stack1 : "")
     + " w-100 h-100\">\r\n                      <div class=\"d-flex justify-content-center align-items-center h-100 user-select-none\">\r\n"
     + ((stack1 = (lookupProperty(helpers,"ifEquals")||(depth0 && lookupProperty(depth0,"ifEquals"))||container.hooks.helperMissing).call(alias1,(depth0 != null ? lookupProperty(depth0,"isVideo") : depth0),1,{"name":"ifEquals","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":87,"column":24},"end":{"line":91,"column":37}}})) != null ? stack1 : "")
     + "                      </div>\r\n                    </div>\r\n";

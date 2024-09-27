@@ -82,7 +82,7 @@
                 <div id="carouselStory-{{@index}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
                   <div class="carousel-inner h-100 w-100">
                     {{#each stories}}
-                    <div class="carousel-item {{#if @first}} active {{/if}} w-100 h-100">
+                    <div class="carousel-item{{#if @first}} active {{/if}} w-100 h-100">
                       <div class="d-flex justify-content-center align-items-center h-100 user-select-none">
                         {{#ifEquals this.isVideo 1}}
                         <video  controls src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{@index}}"></video>

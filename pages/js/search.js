@@ -3,6 +3,10 @@ import { follow, unfollow } from "./API/follow.js";
 import { userID } from "./userSession.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
+  Handlebars.registerHelper("isCurrentUser", function (senderID) {
+    return senderID == userID;
+  });
+
   const template = Handlebars.templates["search-user"];
   const userList = document.querySelector("#userList");
 

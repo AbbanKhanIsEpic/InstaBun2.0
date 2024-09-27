@@ -1,10 +1,5 @@
 //Imports
-import {
-  getFollowingPost,
-  likePost,
-  unlikePost,
-  getLikeList,
-} from "./API/post.js";
+import { getRecommend, likePost, unlikePost, getLikeList } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
 import {
@@ -94,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const templatePost = Handlebars.templates["post-explore"];
 
-  const data = await getFollowingPost(userID);
+  const data = await getRecommend(userID);
 
   const htmlOutput = templatePost({ post: data });
 

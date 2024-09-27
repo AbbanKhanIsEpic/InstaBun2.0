@@ -604,13 +604,13 @@ app.get("/api/post/search", (req, res) => {
     });
 });
 
-app.get("/api/post/placeholder", (req, res) => {
-  const { userID, page } = req.query;
+app.get("/api/post/recommend", (req, res) => {
+  const { userID } = req.query;
 
   const post = new PostManager();
 
   post
-    .getPostBasedLike(userID, page)
+    .getPostBasedLike(userID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

@@ -21,7 +21,7 @@
 .contentContainer img.content {
   width: 470px;
   height: 500px;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .commentTextArea[data-placeholder]:empty::before {

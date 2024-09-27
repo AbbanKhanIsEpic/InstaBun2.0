@@ -45,7 +45,6 @@ class StoryManager {
               OR (FollowerID = story.userID
               AND FollowingID = ?))
           AS Status from story
-          WHERE timestampdiff(hour,uploadDate,now()) <= 24
           HAVING storyVisibility <= status OR userID = ?
 )
 select users.userID, users.username, users.profileIcon,(json_arrayagg(JSON_OBJECT('id',

@@ -1,4 +1,3 @@
-.collections {
-  min-height: 110px;
-  max-height: 110px;
+.collection {
+  height: 90px;
 }

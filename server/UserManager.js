@@ -80,6 +80,21 @@ class UserManager {
     }
   }
 
+  //Return Profile
+  async getProfile(userID) {
+    const username = await this.getUsername(userID);
+    const displayName = await this.getDisplayName(userID);
+    const profileIcon = await this.getProfileIcon(userID);
+    const bio = await this.getBio(userID);
+    return {
+      userID: userID,
+      username: username,
+      displayName: displayName,
+      profileIcon: profileIcon,
+      bio: bio ? bio : "",
+    };
+  }
+
   //Returns bio
   async getBio(userID) {
     try {

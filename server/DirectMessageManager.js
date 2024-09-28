@@ -2,6 +2,7 @@
 const { select, update } = require("./DB.js");
 const BlockManager = require("./BlockManager.js");
 const UserManager = require("./UserManager.js");
+const FollowManager = require("./FollowManager.js");
 
 class DirectMessageManager {
   //Save the message to database
@@ -246,6 +247,35 @@ class DirectMessageManager {
       const query = `SELECT time FROM cleardirectmessage where senderID = ? AND receiverID = ?;`;
       const [result] = await select(query, [senderID, receiverID]);
       return result ? result["time"] : null;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Checks if user can message the user
+  async canUserMessage(requestingUserID, targetUserID) {
+    try {
+      //Managers
+      const userManager = new UserManager();
+      const followManager = new FollowManager();
+
+      const dmLimit = await userManager.getDMLimit(targetUserID);
+      if (dmLimit == 0) {
+        return true;
+      } else if (dmLimit == 1) {
+        const isFollowing = followManager.isFollowing(
+          requestingUserID,
+          targetUserID
+        );
+        return isFollowing;
+      } else if (dmLimit == 2) {
+        const isCloseFriend = followManager.isCloseFriend(
+          requestingUserID,
+          targetUserID
+        );
+        return isCloseFriend;
+      }
+      return false;
     } catch (error) {
       return error;
     }

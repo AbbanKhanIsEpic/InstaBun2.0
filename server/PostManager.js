@@ -438,6 +438,12 @@ class PostManager {
         (element) => element["FollowingID"]
       );
 
+      if (!followingList.length) {
+        return new Error(
+          "Unable to get following post because user is not following anyone"
+        );
+      }
+
       const query = `SELECT postID AS id, users.userID, users.profileIcon, users.username, postLink,isVideo, description, uploadDate,post.postVisibility FROM instabun.post INNER JOIN users ON post.userID = users.userID WHERE post.userID IN (?) ORDER BY uploadDate DESC;`;
 
       const result = await select(query, [followingList]);
@@ -467,6 +473,8 @@ class PostManager {
       }
 
       const posts = await this.#addUploaderDetails(postIDs);
+
+      console.log(posts);
 
       if (viewerID == profileUserID) {
         const completePosts = await this.#addPostDetails(viewerID, posts);

@@ -89,6 +89,26 @@ class FollowManager {
       return error;
     }
   }
+
+  async getTotalFollowing(userID) {
+    try {
+      const query = `SELECT count(*) FROM instabun.followers where FollowerID = ?`;
+      const [result] = await select(query, [userID]);
+      return result["count(*)"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getTotalFollowers(userID) {
+    try {
+      const query = `SELECT count(*) FROM instabun.followers where FollowingID = ?`;
+      const [result] = await select(query, [userID]);
+      return result["count(*)"];
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
 module.exports = FollowManager;

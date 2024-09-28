@@ -19,7 +19,9 @@ const PostManager = require("./PostManager.js");
 const StoryManager = require("./StoryManager.js");
 const GroupManager = require("./GroupManager.js");
 const CommentManager = require("./CommentManager.js");
+const BlockManager = require("./BlockManager.js");
 const BookmarkManager = require("./BookmarkManager.js");
+const CollectionManager = require("./CollectionManager.js");
 const DirectMessageManager = require("./DirectMessageManager.js");
 const GroupMessageManager = require("./GroupMessageManager.js");
 const EmailManager = require("./EmailManager.js");
@@ -298,20 +300,75 @@ app.get("/api/user/recommended", async (req, res) => {
 });
 
 //Returns the user's profile
-app.get("/api/user/profile", (req, res) => {
-  const { userID } = req.query;
+app.get("/api/user/profile", async (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
-  const user = new UserManager();
+  const userManager = new UserManager();
+  const followManager = new FollowManager();
+  const blockManager = new BlockManager();
+  const directMessageManager = new DirectMessageManager();
+  const collectionManager = new CollectionManager();
+  const postManager = new PostManager();
 
-  user
-    .getUserProfile(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  // Validate user IDs
+  if (!requestingUserID || !targetUserID) {
+    return res.status(400).json({ message: "Invalid user IDs provided" });
+  }
+
+  try {
+    const data = {};
+    Object.assign(data, await userManager.getProfile(targetUserID));
+
+    if (requestingUserID !== targetUserID) {
+      Object.assign(data, {
+        isFollowing: await followManager.isFollowing(
+          requestingUserID,
+          targetUserID
+        ),
+      });
+      Object.assign(data, {
+        hasBlockedUser: await blockManager.isUserBlocked(
+          targetUserID,
+          requestingUserID
+        ),
+      });
+      Object.assign(data, {
+        canMessage: await directMessageManager.canUserMessage(
+          requestingUserID,
+          targetUserID
+        ),
+      });
+    }
+
+    Object.assign(data, {
+      collections: await collectionManager.getCollections(
+        requestingUserID,
+        targetUserID
+      ),
     });
+    const post = await postManager.getProfilePost(
+      requestingUserID,
+      targetUserID
+    );
+    Object.assign(data, {
+      posts: post,
+    });
+    Object.assign(data, {
+      totalFollowings: await followManager.getTotalFollowing(targetUserID),
+    });
+    Object.assign(data, {
+      totalFollowers: await followManager.getTotalFollowers(targetUserID),
+    });
+
+    // Send the response back to the client
+    return res.json(data);
+  } catch (error) {
+    console.error("Error fetching user profile:", error); // Log the error for debugging
+    res.status(500).json({
+      error: error.message || "Internal Server Error",
+      message: "Error occurred while getting the user's profile",
+    });
+  }
 });
 
 //Returns user's profile icon
@@ -533,22 +590,6 @@ app.get("/api/post/followings", (req, res) => {
 
   post
     .getFollowingPost(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
-});
-
-app.get("/api/post/profile", (req, res) => {
-  const { userID, profileUserID, page } = req.query;
-
-  const post = new PostManager();
-
-  post
-    .getProfilePost(userID, profileUserID, page)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

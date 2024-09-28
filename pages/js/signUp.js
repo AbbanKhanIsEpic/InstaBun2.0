@@ -1,5 +1,5 @@
 import { getLocation } from "./API/location.js";
-import { sendCreationCode } from "./API/location.js";
+import { sendCreationCode } from "./API/email.js";
 import { createUserSession } from "./userSession.js";
 
 //Declaring elements

@@ -64,7 +64,19 @@ export async function getUserID(userIdentifier) {
       params: { userIdentifier },
     });
     console.log(response);
-    return response;
+    return response["data"]["userID"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getProfile(requestingUserID, targetUserID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/profile`, {
+      params: { requestingUserID, targetUserID },
+    });
+    console.log(response);
+    return response["data"];
   } catch (error) {
     console.error(error);
   }

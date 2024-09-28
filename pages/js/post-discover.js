@@ -301,20 +301,22 @@ function attachEventHandlersToCommenters() {
       }
     });
 
-    deleteComment.addEventListener("click", async function () {
-      if (deleteCommentID == null || deleteCommentID != commentID) {
-        alert("Are you sure? If so, click the bin again");
-        deleteCommentID = commentID;
-      } else {
-        const status = await removeComment(commentID);
-        if (status == "200") {
-          deleteCommentID = null;
-          populateCommentModal(postID, userID);
+    if (deleteComment) {
+      deleteComment.addEventListener("click", async function () {
+        if (deleteCommentID == null || deleteCommentID != commentID) {
+          alert("Are you sure? If so, click the bin again");
+          deleteCommentID = commentID;
         } else {
-          alert("Unable to delete the comment, try again");
+          const status = await removeComment(commentID);
+          if (status == "200") {
+            deleteCommentID = null;
+            populateCommentModal(postID, userID);
+          } else {
+            alert("Unable to delete the comment, try again");
+          }
         }
-      }
-    });
+      });
+    }
   });
 }
 

@@ -27,7 +27,11 @@ class CollectionManager {
             return element["storyID"];
           });
 
+          console.log(storyIDs);
+
           const storiesWithDetails = await storyManager.addDetails(storyIDs);
+
+          console.log(storiesWithDetails[0]);
 
           collection["stories"] = storiesWithDetails[0]["stories"];
         });
@@ -130,7 +134,7 @@ class CollectionManager {
 
   async getStoryIDs(collectionID) {
     try {
-      const query = `SELECT storyID FROM collection INNER JOIN collectionstory ON collection.collectionID = collectionstory.collectionID Where collection.collectionID = ?`;
+      const query = `SELECT storyID FROM collection INNER JOIN collectionstory ON collection.collectionID = collectionstory.collectionID Where collection.collectionID = ? ORDER BY storyID`;
       const result = await select(query, [collectionID]);
       return result;
     } catch (error) {

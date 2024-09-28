@@ -109,6 +109,14 @@ class FollowManager {
       return error;
     }
   }
+
+  async isVisibleToUser(userID, uploaderUserID, visibility) {
+    if (visibility == 0) return true; // Public
+    if (visibility == 1) return await this.isFollowing(userID, uploaderUserID); // Followers
+    if (visibility == 2)
+      return await this.isCloseFriend(userID, uploaderUserID); // Close Friends
+    return false;
+  }
 }
 
 module.exports = FollowManager;

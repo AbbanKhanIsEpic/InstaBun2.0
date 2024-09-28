@@ -55,9 +55,19 @@ class StoryManager {
 
       const storyIDs = await select(getStoryIDQuery, [followingList]);
 
+      if (!storyIDs.length) {
+        return new Error("There are  no stories");
+      }
+
       const filteredStoryIDs = await this.filter(userID, storyIDs);
 
+      if (!filteredStoryIDs.length) {
+        return new Error("There are  no stories");
+      }
+
       const compeleteStories = await this.addDetails(filteredStoryIDs);
+
+      console.log(compeleteStories);
 
       return compeleteStories;
     } catch (error) {
@@ -80,24 +90,14 @@ class StoryManager {
       if (uploaderUserID == userID) {
         filteredPost.push(storyID);
       } else {
-        if (visibility == 0) {
+        if (
+          await followManager.isVisibleToUser(
+            userID,
+            uploaderUserID,
+            visibility
+          )
+        ) {
           filteredPost.push(storyID);
-        } else if (visibility == 1) {
-          const isFollowing = await followManager.isFollowing(
-            userID,
-            uploaderUserID
-          );
-          if (isFollowing) {
-            filteredPost.push(storyID);
-          }
-        } else if (visibility == 2) {
-          const isCloseFriend = await followManager.isCloseFriend(
-            userID,
-            uploaderUserID
-          );
-          if (isCloseFriend) {
-            filteredPost.push(storyID);
-          }
         }
       }
     });

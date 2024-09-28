@@ -40,8 +40,12 @@
 <div
   class="collections d-flex flex-row align-items-center gap-4 ms-5 w-100 overflow-x-auto mt-2"
 >{{#each collections}}
-    <div class="collection">
-      <div class="d-flex justify-content-center">
+    <div class="collection" role="button">
+      <div
+        class="d-flex justify-content-center"
+        data-bs-toggle="modal"
+        data-bs-target="#storyModal-{{@index}}"
+      >
         <img
           src="{{coverPhoto}}"
           alt=""
@@ -51,7 +55,96 @@
         />
       </div>
       <div class="ellipsis text-center">{{collectionTitle}}</div>
-    </div>{{/each}}
+    </div>
+    <div
+          class="modal fade overflow-hidden glassmorph"
+          id="storyModal-{{@index}}"
+          tabindex="-1"
+          aria-hidden="true"
+          data-bs-backdrop="static"
+        >
+          <div class="modal-dialog modal-dialog-centered position-relative">
+            <div class="modal-content bg-transparent border-0">
+              <div class="modal-header border-0 d-flex flex-column m-0 p-0">
+                <div class="d-flex flex-row justify-content-between w-100">
+                  <div>
+                    <img
+                      src="{{../profileIcon}}"
+                      alt=""
+                      width="32"
+                      height="32"
+                      class="rounded-circle"
+                    />
+                    <span>{{../username}}</span>
+                    <span><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-dot"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                      </svg></span>
+                    <span class="storyAge">{{storyAge stories.0.uploadDate}}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="bg-transparent border-0"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="white"
+                      class="bi bi-x-lg"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                        stroke="white"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="w-100 d-flex flex-row gap-1">
+                {{#each stories}}
+                <button data-bs-target="#carouselStory-{{@index}}" data-bs-slide-to="{{@index}}"  class="border-0 custom-carousel-indicator mt-2 mb-2 {{#if @first}}active{{/if}}"
+                  aria-label="Slide {{@index}}" style = "width : {{width ../stories.length}}" disabled></button>
+                  {{/each}}
+                </div>
+              </div>
+              <div class="modal-body p-0 m-0 bg-black bg-opacity-25">
+                <div id="carouselStory-{{@index}}" class="carousel carousel-dark slide w-100 h-100 d-flex flex-row">
+                  <div class="carousel-inner h-100 w-100">
+                    {{#each stories}}
+                    <div class="carousel-item{{#if @first}} active {{/if}} w-100 h-100">
+                      <div class="d-flex justify-content-center align-items-center h-100 user-select-none">
+                        {{#ifEquals this.isVideo 1}}
+                        <video  controls src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{@index}}"></video>
+                        {{else}}
+                        <img src="{{this.url}}" class="d-block h-100 object-fit-cover" id="{{@index}}">
+                        {{/ifEquals}}
+                      </div>
+                    </div>
+                    {{/each}}
+                  </div>
+                </div>
+                <div class="position-absolute top-50 start-0 leftStory visually-hidden pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="gray" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+                  </svg></div>
+                <div class="position-absolute top-50 end-0 rightStory {{#ifEquals stories.length 1}}visually-hidden{{/ifEquals}} pointer"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="gray" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                  <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+                </svg></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    {{/each}}
 </div>
 <div id="posts" class="align-items-center overflow-y-auto">
   {{#each posts}}

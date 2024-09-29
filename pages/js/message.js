@@ -138,6 +138,17 @@ infoModal.addEventListener("click", async function () {
 
 viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
   document.getElementById("hiddenMessageColumn").innerHTML = "";
+  document.getElementById("conversationContainer").innerHTML = "";
+  document.getElementById(
+    "hiddenConversationContainer"
+  ).innerHTML = `<div class="w-100 h-100 d-flex justify-content-center align-items-center flex-column">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                class="bi bi-chat-text-fill" viewBox="0 0 16 16">
+                <path
+                  d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M4.5 5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1z" />
+              </svg>
+              <h3 class="mt-2">View hidden messages</h3>
+            </div>`;
   const template = Handlebars.templates["message-selection"];
 
   const data = { messageList: await getHiddenMessageList(userID) };
@@ -154,9 +165,9 @@ viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
 
   let selectedMessage;
 
-  Array.from(messageSelections).forEach((messageSelection) => {
-    const id = messageSelection.id;
-    const isDirect = messageSelection.classList.contains("direct");
+  Array.from(messageSelections).forEach((messageSelection, index) => {
+    const id = data["messageList"][index]["id"];
+    const isDirect = !data["messageList"][index]["isGroup"];
     if (id == communicatingToID) {
       if (isDirect != isGroup) {
         messageSelection.classList.add("selected");
@@ -164,12 +175,11 @@ viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
       }
     }
     messageSelection.addEventListener("click", function () {
-      const id = messageSelection.id;
-      const isDirect = messageSelection.classList.contains("direct");
-      const icon = messageSelection.querySelector("img").src;
-      const name = messageSelection.querySelector(
-        '[aria-label="name"]'
-      ).innerHTML;
+      const id = data["messageList"][index]["id"];
+      const isDirect = !data["messageList"][index]["isGroup"];
+      const icon = data["messageList"][index]["icon"];
+      const name = data["messageList"][index]["name"];
+      const username = data["messageList"][index]["username"];
       if (selectedMessage != undefined) {
         selectedMessage.classList.remove("selected");
       }
@@ -257,6 +267,7 @@ startConversationButton.addEventListener("click", function () {
     alert("You need to select someone to message to");
   } else if (numSelected == 1) {
     const selectedUser = selectedArray[0];
+    console.log(selectedUser);
     const id = selectedUser.id;
     const profileIcon = selectedUser.profileIcon;
     const displayName = selectedUser.DisplayName;
@@ -415,9 +426,9 @@ async function displayMessageLists(userID) {
 
   let selectedMessage;
 
-  Array.from(messageSelections).forEach((messageSelection) => {
-    const id = messageSelection.id;
-    const isDirect = messageSelection.classList.contains("direct");
+  Array.from(messageSelections).forEach((messageSelection, index) => {
+    const id = data["messageList"][index]["id"];
+    const isDirect = !data["messageList"][index]["isGroup"];
     if (id == communicatingToID) {
       if (isDirect != isGroup) {
         messageSelection.classList.add("selected");
@@ -425,12 +436,11 @@ async function displayMessageLists(userID) {
       }
     }
     messageSelection.addEventListener("click", function () {
-      const id = messageSelection.id;
-      const isDirect = messageSelection.classList.contains("direct");
-      const icon = messageSelection.querySelector("img").src;
-      const name = messageSelection.querySelector(
-        '[aria-label="name"]'
-      ).innerHTML;
+      const id = data["messageList"][index]["id"];
+      const isDirect = !data["messageList"][index]["isGroup"];
+      const icon = data["messageList"][index]["icon"];
+      const name = data["messageList"][index]["name"];
+      const username = data["messageList"][index]["username"];
       if (selectedMessage != undefined) {
         selectedMessage.classList.remove("selected");
       }
@@ -446,56 +456,77 @@ async function setMessageContainer(
   isDirect,
   toID,
   toName,
-  toProfileIcon
+  toProfileIcon,
+  hidden = false
 ) {
   isGroup = !isDirect;
   communicatingToID = toID;
 
-  const template = Handlebars.templates["message-container"];
+  const template = hidden
+    ? Handlebars.templates["hidden-container"]
+    : Handlebars.templates["message-container"];
 
   const data = { name: toName, profileIcon: toProfileIcon };
 
   // Render the template with data
   const htmlOutput = template(data);
 
-  // Insert the HTML into the DOM
-  document.getElementById("conversationContainer").innerHTML = htmlOutput;
+  const conversationContainer = hidden
+    ? document.getElementById("hiddenConversationContainer")
+    : document.getElementById("conversationContainer");
+
+  conversationContainer.innerHTML = htmlOutput;
 
   const messageTextArea = document.querySelector("#messageTextArea");
 
   const sendMessageBtn = document.querySelector("#sendMessageBtn");
 
-  displayMessages(userID, toID, isDirect);
+  const moreInfo = document.querySelector("#moreInfo");
 
-  messageTextArea.addEventListener("input", function () {
-    if (messageTextArea.childNodes.length == 0) {
-      sendMessageBtn.classList.add("invisible");
+  moreInfo.addEventListener("click", function () {
+    if (isDirect) {
+      window.open(
+        "http://127.0.0.1:5500/pages/profile.html?username=Killerbunny1619",
+        "_self"
+      );
     } else {
-      sendMessageBtn.classList.remove("invisible");
+      infoModal.style.display = "block";
     }
   });
 
-  sendMessageBtn.addEventListener("click", async function () {
-    console.log("Hello");
-    const message = document.querySelector("#messageTextArea").textContent;
-    const resultStatus = (
-      isGroup
-        ? await sendGroupMessage(communicatingToID, userID, message)
-        : await sendDirectMessage(userID, communicatingToID, message)
-    )["status"];
-    if (resultStatus == 200) {
-      displayMessages(userID, communicatingToID, !isGroup);
-      displayMessageLists(userID);
-    } else {
-      alert("Unable to send message");
-    }
-  });
+  displayMessages(userID, toID, isDirect, hidden);
+
+  if (!hidden) {
+    messageTextArea.addEventListener("input", function () {
+      if (messageTextArea.childNodes.length == 0) {
+        sendMessageBtn.classList.add("invisible");
+      } else {
+        sendMessageBtn.classList.remove("invisible");
+      }
+    });
+
+    sendMessageBtn.addEventListener("click", async function () {
+      console.log("Hello");
+      const message = document.querySelector("#messageTextArea").textContent;
+      const resultStatus = (
+        isGroup
+          ? await sendGroupMessage(communicatingToID, userID, message)
+          : await sendDirectMessage(userID, communicatingToID, message)
+      )["status"];
+      if (resultStatus == 200) {
+        displayMessages(userID, communicatingToID, !isGroup);
+        displayMessageLists(userID);
+      } else {
+        alert("Unable to send message");
+      }
+    });
+  }
 }
 
-async function displayMessages(userID, toID, isDirect) {
-  console.log(userID);
-  console.log(toID);
-  console.log(isDirect);
+async function displayMessages(userID, toID, isDirect, hidden = false) {
+  const messageData = isDirect
+    ? await getDirectMessages(userID, toID)
+    : await getGroupMessages(userID, toID);
 
   Handlebars.registerHelper("isSendMessage", function (senderID) {
     return senderID == userID;
@@ -547,9 +578,7 @@ async function displayMessages(userID, toID, isDirect) {
     });
   });
 
-  const messageData = isDirect
-    ? await getDirectMessages(userID, toID)
-    : await getGroupMessages(userID, toID);
+  console.log(messageData);
 
   const messageTemplate = Handlebars.templates["message"];
 
@@ -561,18 +590,14 @@ async function displayMessages(userID, toID, isDirect) {
   const messageHtmlOutput = messageTemplate(data);
 
   // Insert the HTML into the DOM
-  document.getElementById("messageOutput").innerHTML = messageHtmlOutput;
+
+  console.log(viewHiddenMessages);
+  const messageOutput = hidden
+    ? viewHiddenMessages.querySelector("#hiddenMessageOutput")
+    : document.getElementById("messageOutput");
+  messageOutput.innerHTML = messageHtmlOutput;
 
   const sentMessages = document.querySelectorAll(".sendMessage");
-
-  const moreInfo = document.querySelector("#moreInfo");
-
-  moreInfo.addEventListener("click", function () {
-    if (isDirect) {
-    } else {
-      infoModal.style.display = "block";
-    }
-  });
 
   Array.from(sentMessages).forEach((sentMessage) => {
     const deleteMessage = sentMessage.querySelector(".deleteMessage");

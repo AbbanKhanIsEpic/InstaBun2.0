@@ -19,12 +19,14 @@ class GroupMessageManager {
 
       //Add display name and profile icon to each of the sender
       for (const [index, { senderID: senderID }] of result.entries()) {
-        const [displayName, profileIcon] = await Promise.all([
+        const [username, displayName, profileIcon] = await Promise.all([
+          userManager.getUsername(senderID),
           userManager.getDisplayName(senderID),
           userManager.getProfileIcon(senderID),
         ]);
 
         result[index]["displayName"] = displayName;
+        result[index]["username"] = username;
         result[index]["icon"] = profileIcon;
       }
       return result;
@@ -47,7 +49,7 @@ class GroupMessageManager {
   //Save the message
   async sendMessage(userID, groupID, message) {
     try {
-      const query = `INSERT INTO groupMessages (UserID, GroupID, Message) VALUES (?, ?,?);`;
+      const query = `INSERT INTO groupMessages (senderID, GroupID, Message) VALUES (?, ?,?);`;
       await update(query, [userID, groupID, message]);
       return "Send message operation successful";
     } catch (error) {

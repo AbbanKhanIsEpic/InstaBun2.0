@@ -36,6 +36,10 @@
   width: 10px;
 }
 
+#hiddenMessageOutput {
+  padding-bottom: 80px;
+}
+
 #messageBar {
   height: 74px;
 }

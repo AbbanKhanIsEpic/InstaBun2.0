@@ -920,6 +920,7 @@ app.get("/api/message/group", (req, res) => {
   groupMessageManager
     .getMessage(userID, groupID)
     .then((jsonifiedResult) => {
+      console.log(jsonifiedResult);
       res.status(200).send(jsonifiedResult);
     })
     .catch((error) => {

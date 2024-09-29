@@ -220,11 +220,13 @@ class DirectMessageManager {
         }
 
         // Fetch additional user data concurrently
-        const [displayName, profileIcon, latestMessage] = await Promise.all([
-          userManager.getDisplayName(messagedUserID),
-          userManager.getProfileIcon(messagedUserID),
-          this.getLatestMessage(userID, messagedUserID),
-        ]);
+        const [username, displayName, profileIcon, latestMessage] =
+          await Promise.all([
+            userManager.getUsername(messagedUserID),
+            userManager.getDisplayName(messagedUserID),
+            userManager.getProfileIcon(messagedUserID),
+            this.getLatestMessage(userID, messagedUserID),
+          ]);
 
         const senderName = await userManager.getDisplayName(
           latestMessage.senderID
@@ -235,6 +237,7 @@ class DirectMessageManager {
 
         filteredList.push({
           id: messagedUserID,
+          username: username,
           icon: profileIcon,
           name: displayName,
           senderID: latestMessage["senderID"],

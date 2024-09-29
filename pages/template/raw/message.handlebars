@@ -33,7 +33,10 @@
     </div>
   {{else}}
     {{#if icon}}
-      <div>
+      <div
+        onclick="window.open('http://127.0.0.1:5500/pages/profile.html?username={{username}}', '_self');"
+        role="button"
+      >
         <img
           src="{{message.icon}}"
           alt=""

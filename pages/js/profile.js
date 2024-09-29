@@ -360,11 +360,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             blockButton.classList.remove("btn-primary");
             blockButton.classList.add("btn-secondary");
             blockButton.innerHTML = "Unblock";
-            followButton.classList.add("btn-primary");
-            followButton.classList.remove("btn-secondary");
-            followButton.innerHTML = "Follow";
-            totalFollowersCount.innerHTML =
-              Number(totalFollowersCount.innerHTML) - 1;
+            const isFollowing = followButton.innerHTML == "Unfollow";
+            if (isFollowing) {
+              followButton.classList.add("btn-primary");
+              followButton.classList.remove("btn-secondary");
+              followButton.innerHTML = "Follow";
+              totalFollowersCount.innerHTML =
+                Number(totalFollowersCount.innerHTML) - 1;
+            }
           } else {
             alert("Unable to block, try again");
           }

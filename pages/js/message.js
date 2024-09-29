@@ -9,6 +9,7 @@ import {
   getGroupMessages,
   deleteDirectMessage,
   deleteGroupMessage,
+  getHiddenMessageList,
 } from "./API/message.js";
 import { userID } from "./userSession.js";
 //Declarations
@@ -135,7 +136,49 @@ infoModal.addEventListener("click", async function () {
   document.getElementById("messageColumn").innerHTML += htmlOutput;
 });
 
-viewHiddenMessages.addEventListener("shown.bs.modal", function () {});
+viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
+  document.getElementById("hiddenMessageColumn").innerHTML = "";
+  const template = Handlebars.templates["message-selection"];
+
+  const data = { messageList: await getHiddenMessageList(userID) };
+
+  console.log(data);
+
+  // Render the template with data
+  const htmlOutput = template(data);
+
+  // Insert the HTML into the DOM
+  document.getElementById("hiddenMessageColumn").innerHTML += htmlOutput;
+
+  const messageSelections = document.querySelectorAll(".message");
+
+  let selectedMessage;
+
+  Array.from(messageSelections).forEach((messageSelection) => {
+    const id = messageSelection.id;
+    const isDirect = messageSelection.classList.contains("direct");
+    if (id == communicatingToID) {
+      if (isDirect != isGroup) {
+        messageSelection.classList.add("selected");
+        selectedMessage = messageSelection;
+      }
+    }
+    messageSelection.addEventListener("click", function () {
+      const id = messageSelection.id;
+      const isDirect = messageSelection.classList.contains("direct");
+      const icon = messageSelection.querySelector("img").src;
+      const name = messageSelection.querySelector(
+        '[aria-label="name"]'
+      ).innerHTML;
+      if (selectedMessage != undefined) {
+        selectedMessage.classList.remove("selected");
+      }
+      setMessageContainer(userID, isDirect, id, name, icon);
+      messageSelection.classList.add("selected");
+      selectedMessage = messageSelection;
+    });
+  });
+});
 
 searchMessageModal.addEventListener("shown.bs.modal", defaultSearchMessage);
 
@@ -361,8 +404,6 @@ async function displayMessageLists(userID) {
   const template = Handlebars.templates["message-selection"];
 
   const data = { messageList: await getMessageLists(userID) };
-
-  console.log(data);
 
   // Render the template with data
   const htmlOutput = template(data);

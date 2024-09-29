@@ -2,6 +2,7 @@
 const { select, update } = require("./DB.js");
 const sha1 = require("sha1");
 const FirebaseStorageManager = require("./FirebaseStorageManager");
+const UserManager = require("./UserManager.js");
 const GroupMessageManager = require("./GroupMessageManager");
 
 class GroupManager {
@@ -61,6 +62,72 @@ class GroupManager {
       const query = `SELECT groupID FROM instabun.groupdb WHERE ownerID = ? Order by groupID DESC LIMIT 1;`;
       const [result] = await select(query, [createrUserID]);
       return result["groupID"];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns a list of groups
+  async getGroupList(userID) {
+    try {
+      //Manager
+      const userManager = new UserManager();
+      const groupMessageManager = new GroupMessageManager();
+      //Get when message was cleared
+      const groupIDList = (await this.getGroupIDList(userID)).map(
+        (g) => g.groupID
+      );
+      //Since null returns nothing -> user not being in a group will return NULL -> return nothing
+      if (!groupIDList.length) {
+        return [];
+      }
+
+      //Get group that has no messages
+      const query = `SELECT groupID as id, groupName as name, groupIcon as icon, groupCreationDate as time FROM groupdb where groupID IN (?)`;
+
+      const result = await select(query, [groupIDList]);
+
+      for (const [index, { id: groupID }] of result.entries()) {
+        // Fetch additional user data concurrently
+        const latestMessage = await groupMessageManager.getLatestMessage(
+          groupID,
+          userID
+        );
+
+        const hasLastMessage = latestMessage?.["messageID"] ? true : false;
+
+        const senderID = hasLastMessage ? latestMessage["senderID"] : null;
+
+        const senderName = hasLastMessage
+          ? await userManager.getDisplayName(senderID)
+          : null;
+
+        const message = hasLastMessage ? latestMessage["message"] : null;
+
+        const clearMessageTime =
+          await groupMessageManager.getWhenMessageCleared(groupID, userID);
+
+        const time = hasLastMessage
+          ? new Date(Math.max(latestMessage["time"], clearMessageTime))
+          : result[index]["time"];
+
+        result[index]["senderID"] = senderID;
+        result[index]["senderName"] = senderName;
+        result[index]["message"] = message;
+        result[index]["time"] = time;
+      }
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns a list of groupID that the user is in
+  async getGroupIDList(userID) {
+    try {
+      const query = "Select groupID from groupMembers where memberID = ?";
+      const result = await select(query, [userID]);
+      return result;
     } catch (error) {
       return error;
     }

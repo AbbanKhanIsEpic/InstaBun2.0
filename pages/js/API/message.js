@@ -49,6 +49,17 @@ export async function getMessageLists(userID) {
   }
 }
 
+export async function getHiddenMessageList(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/hiddenList`, {
+      params: { userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function getDirectMessages(requestingUserID, targetUserID) {
   try {
     const response = await axios.get(`${API_BASE_URL}/direct`, {

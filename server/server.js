@@ -837,12 +837,11 @@ app.get("/api/story", (req, res) => {
 });
 
 //Message
-
 app.get("/api/message/list", async (req, res) => {
   const { userID } = req.query;
 
   const directMessageManager = new DirectMessageManager();
-  const groupMessageManager = new GroupMessageManager();
+  const groupManager = new GroupManager();
 
   try {
     const directList = await directMessageManager.getDirectList(userID);
@@ -851,7 +850,7 @@ app.get("/api/message/list", async (req, res) => {
       element["isGroup"] = false;
     });
 
-    const groupList = await groupMessageManager.getGroupList(userID);
+    const groupList = await groupManager.getGroupList(userID);
 
     const groupPromises = groupList.map(async (element) => {
       element["isGroup"] = true;
@@ -864,6 +863,31 @@ app.get("/api/message/list", async (req, res) => {
     combinedList.sort((a, b) => new Date(b["time"]) - new Date(a["time"]));
 
     res.status(200).send(combinedList);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while getting list",
+    });
+  }
+});
+
+app.get("/api/message/hiddenList", async (req, res) => {
+  const { userID } = req.query;
+
+  const directMessageManager = new DirectMessageManager();
+
+  try {
+    const directList = await directMessageManager.getHiddenList(userID);
+
+    const directPromises = directList.map(async (element) => {
+      element["isGroup"] = false;
+    });
+
+    await Promise.all([directPromises]);
+
+    directList.sort((a, b) => new Date(b["time"]) - new Date(a["time"]));
+
+    res.status(200).send(directList);
   } catch (error) {
     res.status(500).json({
       error: error.message || error,

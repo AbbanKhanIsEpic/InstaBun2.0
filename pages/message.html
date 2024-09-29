@@ -18,7 +18,7 @@
 <body class="container-fluid min-vh-100 min-vw-100 overflow-hidden m-0 p-0 text-white text-decoration-none">
   <div class="row row-cols grid content">
     <div id="contentPage" class="col vh-100 w-100 d-flex flex-row">
-      <div id="messageSideBar" class="border-end border-dark overflow-y-auto user-select-none overflow-x-hidden">
+      <div class="messageSideBar border-end border-dark overflow-y-auto user-select-none overflow-x-hidden">
         <div class="border-bottom border-dark pt-2 ps-2 pb-2 pointer" data-bs-toggle="modal"
           data-bs-target="#newMessageModal">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-pencil-square"
@@ -150,7 +150,7 @@
     </div>
   </div>
   <div class="modal glassmorph" tabindex="-1" id="viewHiddenMessages">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-fullscreen modal-dialog-centered">
       <div class="modal-content bg-black text-white glassmorph">
         <div class="modal-header d-flex flex-column p-0 border-0 position-relative">
           <h5 class="modal-title pt-3">View hidden messages</h5>
@@ -165,13 +165,27 @@
           </button>
           <hr class="w-100 border-white border-2" />
         </div>
-        <div class="modal-body d-flex w-100 flex-column m-0 p-0 overflow-y-scroll" id="hiddenMessageList"></div>
-        <div class="modal-footer w-100 p-0 border-0">
-          <button class="btn btn-primary w-100 visually-hidden">Chat</button>
+        <div class="col vh-100 w-100 d-flex flex-row">
+          <div class="messageSideBar border-end border-dark overflow-y-auto user-select-none overflow-x-hidden">
+            <div id="hiddenMessageColumn"></div>
+          </div>
+          <div class="w-100 h-100 d-flex flex-column" id="hiddenConversationContainer">
+            <div class="w-100 h-100 d-flex justify-content-center align-items-center flex-column">
+              <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                class="bi bi-chat-text-fill" viewBox="0 0 16 16">
+                <path
+                  d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M4.5 5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 2.5a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1z" />
+              </svg>
+              <h3 class="mt-2">View hidden messages</h3>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer w-100 p-0 border-0 position-fixed bottom-0 d-flex">
         </div>
       </div>
     </div>
   </div>
+
   <div class="modal glassmorph overflow-hidden" tabindex="-1" id="createGroup">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-black text-white glassmorph">

@@ -62,9 +62,25 @@ class DirectMessageManager {
     }
   }
 
+  async #filterByDMLimit(senderID, receiverIDs, include = true) {
+    try {
+      const filtered = [];
+      for (const receiverID of receiverIDs) {
+        const canMessage = await this.canUserMessage(senderID, receiverID);
+        if (canMessage == include) {
+          filtered.push(receiverID);
+        }
+      }
+      return filtered;
+    } catch (error) {
+      return error;
+    }
+  }
+
   //Get list of people who has communicated with the user
   //This will only include messages between two users if either of them are blocked
-  async getBlockedList(userID) {
+  //Also include messages that the other party's dm limit is greater than the relationship both have
+  async getHiddenList(userID) {
     try {
       //Managers :D
       const userManager = new UserManager();
@@ -73,10 +89,15 @@ class DirectMessageManager {
       //Get a list of people who the user has communicated with
       const communicatedWithList = await this.#getMessagePartnerIDs(userID);
 
+      const canCommunicatedWithList = await this.#filterByDMLimit(
+        userID,
+        communicatedWithList
+      );
+
       // Filter out blocked users
       const filteredList = [];
 
-      for (const messagedUserID of communicatedWithList) {
+      for (const messagedUserID of canCommunicatedWithList) {
         const isCurrentUserBlocked = await blockManager.isUserBlocked(
           messagedUserID,
           userID
@@ -90,6 +111,43 @@ class DirectMessageManager {
           continue; // Skip non-blocked users
         }
 
+        // Fetch additional user data concurrently
+        const [displayName, profileIcon, latestMessage] = await Promise.all([
+          userManager.getDisplayName(messagedUserID),
+          userManager.getProfileIcon(messagedUserID),
+          this.getLatestMessage(userID, messagedUserID),
+        ]);
+
+        const senderName = await userManager.getDisplayName(
+          latestMessage.senderID
+        );
+
+        latestMessage["senderName"] = senderName;
+
+        const clearMessageTime =
+          (await this.getWhenMessageCleared(userID, messagedUserID)) || 0;
+
+        filteredList.push({
+          id: messagedUserID,
+          icon: profileIcon,
+          name: displayName,
+          senderID: latestMessage["senderID"],
+          senderName: latestMessage["senderName"],
+          message: latestMessage["message"],
+          time:
+            latestMessage["time"] > clearMessageTime
+              ? latestMessage["time"]
+              : clearMessageTime,
+        });
+      }
+
+      const dmLimitReachedUsers = await this.#filterByDMLimit(
+        userID,
+        communicatedWithList,
+        false
+      );
+
+      for (const messagedUserID of dmLimitReachedUsers) {
         // Fetch additional user data concurrently
         const [displayName, profileIcon, latestMessage] = await Promise.all([
           userManager.getDisplayName(messagedUserID),
@@ -138,10 +196,15 @@ class DirectMessageManager {
       //Get a list of people who the user has communicated with
       const communicatedWithList = await this.#getMessagePartnerIDs(userID);
 
+      const canCommunicatedWithList = await this.#filterByDMLimit(
+        userID,
+        communicatedWithList
+      );
+
       // Filter out blocked users
       const filteredList = [];
 
-      for (const messagedUserID of communicatedWithList) {
+      for (const messagedUserID of canCommunicatedWithList) {
         console.log(messagedUserID);
         const isCurrentUserBlocked = await blockManager.isUserBlocked(
           messagedUserID,

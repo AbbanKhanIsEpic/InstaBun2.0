@@ -10,11 +10,12 @@
   text-overflow: ellipsis !important;
 }
 
-#messageSideBar {
+.messageSideBar {
   width: 500px;
 }
 
-#messageColumn > :hover:not(.selected) {
+#messageColumn > :hover:not(.selected),
+#hiddenMessageColumn > :hover:not(.selected) {
   background: #1a1a1a;
   cursor: pointer;
 }
@@ -23,11 +24,11 @@
   background: #2e2e2e;
 }
 
-#messageSideBar:hover::-webkit-scrollbar {
+.messageSideBar:hover::-webkit-scrollbar {
   display: block;
 }
 
-#messageSideBar::-webkit-scrollbar {
+.messageSideBar::-webkit-scrollbar {
   display: none;
 }
 

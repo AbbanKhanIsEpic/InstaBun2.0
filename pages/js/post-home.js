@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const list = await getLikeList(post.id, userID);
 
-      const templateList = Handlebars.templates["like-list"];
+      const templateList = Handlebars.templates["user-list"];
       const likedList = document.querySelector("#likedList");
       const htmlOutput = templateList(list);
       likedList.innerHTML = htmlOutput;

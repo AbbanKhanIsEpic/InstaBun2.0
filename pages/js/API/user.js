@@ -81,3 +81,31 @@ export async function getProfile(requestingUserID, targetUserID) {
     console.error(error);
   }
 }
+
+export async function block(requestingUserID, targetUserID) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/block`, {
+      requestingUserID,
+      targetUserID,
+    });
+    return { status: 200, response: response };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      internalMessage: "Failed to send direct message",
+      error: error.message,
+    };
+  }
+}
+
+export async function unblock(requestingUserID, targetUserID) {
+  try {
+    const response = await axios.delete(
+      `${API_BASE_URL}/block/${requestingUserID}/${targetUserID}`
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}

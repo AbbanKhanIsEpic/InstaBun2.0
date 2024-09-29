@@ -157,14 +157,28 @@ app.patch("/api/user/changePassword", (req, res) => {
 });
 
 //Remove the block
-app.delete("/api/user/unblock", (req, res) => {
-  const requestingUserID = req.body.userID;
-  const targetUserID = req.body.profileUserID;
+app.delete("/api/user/block/:requestingUserID/:targetUserID", (req, res) => {
+  const { requestingUserID, targetUserID } = req.params;
 
   try {
-    const user = new UserManager();
-    user.unblock(requestingUserID, targetUserID);
+    const blockManager = new BlockManager();
+    blockManager.unblock(requestingUserID, targetUserID);
     res.status(200).json({ message: "User unblocked successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while unblocking the user",
+    });
+  }
+});
+
+app.post("/api/user/block", (req, res) => {
+  const { requestingUserID, targetUserID } = req.body;
+
+  try {
+    const blockManager = new BlockManager();
+    blockManager.block(requestingUserID, targetUserID);
+    res.status(200).json({ message: "User blocked successfully" });
   } catch (error) {
     res.status(500).json({
       error: error.message || error,
@@ -508,37 +522,77 @@ app.get("/api/follow/isFollowing", (req, res) => {
 });
 
 //Return the list of followers of the target user
-app.get("/api/follow/listOfFollowers", (req, res) => {
-  const { targetUserID } = req.query;
+app.get("/api/follow/followerList", async (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
-  const follow = new FollowManager();
+  const followManager = new FollowManager();
+  const userManager = new UserManager();
 
-  follow
-    .getFollowers(targetUserID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  try {
+    const followingIDs = await followManager.getFollowers(targetUserID);
+    const promises = followingIDs.map(async (userID) => {
+      const [username, displayName, profileIcon, isFollowing] =
+        await Promise.all([
+          userManager.getUsername(userID),
+          userManager.getDisplayName(userID),
+          userManager.getProfileIcon(userID),
+          followManager.isFollowing(requestingUserID, userID),
+        ]);
+      return {
+        userID: userID,
+        username: username,
+        displayName: displayName,
+        profileIcon: profileIcon,
+        isFollowing: isFollowing,
+      };
     });
+
+    const data = await Promise.all(promises);
+    console.log(data);
+    res.status(200).send(data); // Ensure data is returned to the client
+  } catch (error) {
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred",
+    });
+  }
 });
 
 //Returns the list of following of the target user
-app.get("/api/follow/listOfFollowings", (req, res) => {
-  const { targetUserID } = req.query;
+app.get("/api/follow/followingList", async (req, res) => {
+  const { requestingUserID, targetUserID } = req.query;
 
-  const follow = new FollowManager();
+  const followManager = new FollowManager();
+  const userManager = new UserManager();
 
-  follow
-    .getFollowings(targetUserID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
+  try {
+    const followingIDs = await followManager.getFollowings(targetUserID);
+    const promises = followingIDs.map(async (userID) => {
+      const [username, displayName, profileIcon, isFollowing] =
+        await Promise.all([
+          userManager.getUsername(userID),
+          userManager.getDisplayName(userID),
+          userManager.getProfileIcon(userID),
+          followManager.isFollowing(requestingUserID, userID),
+        ]);
+      return {
+        userID: userID,
+        username: username,
+        displayName: displayName,
+        profileIcon: profileIcon,
+        isFollowing: isFollowing,
+      };
     });
+
+    const data = await Promise.all(promises);
+    console.log(data);
+    res.status(200).send(data); // Ensure data is returned to the client
+  } catch (error) {
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred",
+    });
+  }
 });
 
 //

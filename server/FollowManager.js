@@ -49,7 +49,7 @@ class FollowManager {
   //Return an array of users' ID of user who follows the user(followingID)
   async getFollowers(followingID) {
     try {
-      const query = `SELECT FollowerID FROM instabun.Follows where FollowingID = ?;`;
+      const query = `SELECT FollowerID FROM instabun.followers where FollowingID = ?;`;
       const result = await select(query, [followingID]);
       return result ? result.map((element) => element["FollowerID"]) : null;
     } catch (error) {

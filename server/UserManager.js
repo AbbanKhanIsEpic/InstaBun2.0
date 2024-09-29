@@ -276,16 +276,6 @@ ORDER BY (COUNT(*)) DESC;`;
     }
   }
 
-  async getDMLimit(userID) {
-    try {
-      const query = `SELECT DMLimit FROM instabun.Users where UserID = ?;`;
-      const [result] = await select(query, [userID]);
-      return result["DMLimit"];
-    } catch (error) {
-      return error;
-    }
-  }
-
   //Login section
   //Check if the user's login credential is correct
   async userLogin(userIdentifier, password) {

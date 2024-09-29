@@ -1,7 +1,12 @@
-import { likePost, unlikePost, getLikeList } from "./API/post.js";
+import { likePost, unlikePost } from "./API/post.js";
 import { userID } from "./userSession.js";
-import { getUserID, getProfile } from "./API/user.js";
-import { follow, unfollow } from "./API/follow.js";
+import { getUserID, getProfile, block, unblock } from "./API/user.js";
+import {
+  follow,
+  unfollow,
+  getFollowingList,
+  getFollowerList,
+} from "./API/follow.js";
 import {
   comment,
   getComments,
@@ -137,6 +142,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const followButton = document.querySelector("#followButton");
 
     const blockButton = document.querySelector("#blockButton");
+
+    const totalFollowersCount = document.querySelector("#totalFollowersCount");
+
+    const followings = document.querySelector("#followings");
+
+    const followers = document.querySelector("#followers");
 
     Array.from(storiesModal).forEach((modal) => {
       const carouselInner = modal.querySelector(".carousel-inner");
@@ -299,51 +310,105 @@ document.addEventListener("DOMContentLoaded", async function () {
       });
     });
 
-    followButton.addEventListener("click", async function () {
-      const isFollowing = followButton.innerHTML == "Unfollow";
-      if (isFollowing) {
-        const status = await unfollow(userID, profileUserID);
-        if (status == "200") {
-          followButton.classList.add("btn-primary");
-          followButton.classList.remove("btn-secondary");
-          followButton.innerHTML = "Follow";
+    if (followButton && blockButton) {
+      followButton.addEventListener("click", async function () {
+        const isFollowing = followButton.innerHTML == "Unfollow";
+        if (isFollowing) {
+          const status = await unfollow(userID, profileUserID);
+          if (status == "200") {
+            followButton.classList.add("btn-primary");
+            followButton.classList.remove("btn-secondary");
+            followButton.innerHTML = "Follow";
+            totalFollowersCount.innerHTML =
+              Number(totalFollowersCount.innerHTML) - 1;
+          } else {
+            alert("Unable to unfollow, try again");
+          }
         } else {
-          alert("Unable to unfollow, try again");
+          const hasBlocked = blockButton.innerHTML == "Unblock";
+          if (hasBlocked) {
+            alert("Unblock and then you can follow");
+          } else {
+            const status = await follow(userID, profileUserID);
+            if (status == "200") {
+              followButton.classList.remove("btn-primary");
+              followButton.classList.add("btn-secondary");
+              followButton.innerHTML = "Unfollow";
+              totalFollowersCount.innerHTML =
+                Number(totalFollowersCount.innerHTML) + 1;
+            } else {
+              alert("Unable to follow, try again");
+            }
+          }
         }
-      } else {
-        const status = await follow(userID, profileUserID);
-        if (status == "200") {
-          followButton.classList.remove("btn-primary");
-          followButton.classList.add("btn-secondary");
-          followButton.innerHTML = "Unfollow";
+      });
+
+      blockButton.addEventListener("click", async function () {
+        const hasBlocked = blockButton.innerHTML == "Unblock";
+        if (hasBlocked) {
+          const status = (await unblock(userID, profileUserID))["status"];
+          if (status == "200") {
+            blockButton.classList.add("btn-primary");
+            blockButton.classList.remove("btn-secondary");
+            blockButton.innerHTML = "Block";
+          } else {
+            alert("Unable to unblock, try again");
+          }
         } else {
-          alert("Unable to unfollow, try again");
+          const status = (await block(userID, profileUserID))["status"];
+          if (status == "200") {
+            blockButton.classList.remove("btn-primary");
+            blockButton.classList.add("btn-secondary");
+            blockButton.innerHTML = "Unblock";
+            followButton.classList.add("btn-primary");
+            followButton.classList.remove("btn-secondary");
+            followButton.innerHTML = "Follow";
+            totalFollowersCount.innerHTML =
+              Number(totalFollowersCount.innerHTML) - 1;
+          } else {
+            alert("Unable to block, try again");
+          }
         }
-      }
+      });
+    }
+
+    followings.addEventListener("click", async function () {
+      Handlebars.registerHelper("ifNotCurrentUser", function (arg1, options) {
+        return arg1 != userID ? options.fn(this) : options.inverse(this);
+      });
+
+      const viewFollowingList = document.querySelector("#viewFollowingList");
+
+      const followingsTemplate = Handlebars.templates["user-list"];
+
+      const followingsData = await getFollowingList(userID, profileUserID);
+
+      const followingsOutput = followingsTemplate({ users: followingsData });
+
+      viewFollowingList.querySelector("#followerList").innerHTML =
+        followingsOutput;
+
+      new bootstrap.Modal(viewFollowingList).show();
     });
 
-    // blockButton.addEventListener("click", async function () {
-    //   const hasBlocked = blockButton.innerHTML == "Unblock";
-    //   if (hasBlocked) {
-    //     const status = await unfollow(userID, profileUserID);
-    //     if (status == "200") {
-    //       followButton.classList.add("btn-primary");
-    //       followButton.classList.remove("btn-secondary");
-    //       followButton.innerHTML = "Follow";
-    //     } else {
-    //       alert("Unable to unfollow, try again");
-    //     }
-    //   } else {
-    //     const status = await follow(userID, profileUserID);
-    //     if (status == "200") {
-    //       followButton.classList.remove("btn-primary");
-    //       followButton.classList.add("btn-secondary");
-    //       followButton.innerHTML = "Unfollow";
-    //     } else {
-    //       alert("Unable to unfollow, try again");
-    //     }
-    //   }
-    // });
+    followers.addEventListener("click", async function () {
+      Handlebars.registerHelper("ifNotCurrentUser", function (arg1, options) {
+        return arg1 != userID ? options.fn(this) : options.inverse(this);
+      });
+
+      const viewFollowerList = document.querySelector("#viewFollowerList");
+
+      const followersTemplate = Handlebars.templates["user-list"];
+
+      const followersData = await getFollowerList(userID, profileUserID);
+
+      const followersOutput = followersTemplate({ users: followersData });
+
+      viewFollowerList.querySelector("#followerList").innerHTML =
+        followersOutput;
+
+      new bootstrap.Modal(viewFollowerList).show();
+    });
   } catch (error) {
     console.error("Error fetching posts or rendering template:", error);
   }

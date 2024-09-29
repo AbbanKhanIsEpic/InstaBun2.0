@@ -36,3 +36,28 @@ export async function unfollow(requestingUserID, targetUserID) {
     }
   }
 }
+
+export async function getFollowingList(requestingUserID, targetUserID) {
+  try {
+    console.log("Hello");
+    const response = await axios.get(`${API_BASE_URL}/followingList`, {
+      params: { requestingUserID, targetUserID },
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+export async function getFollowerList(requestingUserID, targetUserID) {
+  try {
+    console.log("Hello");
+    const response = await axios.get(`${API_BASE_URL}/followerList`, {
+      params: { requestingUserID, targetUserID },
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

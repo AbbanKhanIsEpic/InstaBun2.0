@@ -13,64 +13,51 @@ class CollectionManager {
       const storyManager = new StoryManager();
 
       if (requestingUserID == targetUserID) {
-        const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ?;`;
-        const result = await select(query, [targetUserID]);
+        const userCollections = await this.getUserCollections(targetUserID);
 
-        if (!result.length) {
+        if (!userCollections.length) {
           return new Error("The user does not have any collection");
         }
 
-        const promises = result.map(async (collection) => {
+        const promises = userCollections.map(async (collection) => {
           const storyIDs = (
             await this.getStoryIDs(collection["collectionID"])
           ).map((element) => {
             return element["storyID"];
           });
 
-          console.log(storyIDs);
-
-          const storiesWithDetails = await storyManager.addDetails(storyIDs);
-
-          console.log(storiesWithDetails[0]);
+          const storiesWithDetails = await storyManager.getStories(storyIDs);
 
           collection["stories"] = storiesWithDetails[0]["stories"];
         });
 
         await Promise.all(promises);
 
-        return result;
+        return userCollections;
       } else {
-        const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ? AND isPublic = 1;`;
-        const result = await select(query, [targetUserID]);
+        const publicCollections = await this.getPublicCollections(targetUserID);
 
-        if (!result.length) {
-          return new Error("The user does not have any collection");
+        if (!publicCollections.length) {
+          return new Error(
+            "The target user does not have any collection that the requesting user can see"
+          );
         }
 
-        const collectionsWithDetails = await Promise.all(
-          result.map(async (collection) => {
-            const storyIDs = await this.getStoryIDs(
-              collection?.["collectionID"]
-            );
-            const filteredStoryIDs = await storyManager.filter(
-              requestingUserID,
-              storyIDs
-            );
-            const storiesWithDetails = await storyManager.addDetails(
-              filteredStoryIDs
-            );
-            return {
-              ...collection,
-              userID: storiesWithDetails["userID"],
-              username: storiesWithDetails["username"],
-              profileIcon: storiesWithDetails["profileIcon"],
-              stories: storiesWithDetails["stories"],
-              hasCloseFriend: storiesWithDetails["hasCloseFriend"],
-            };
-          })
-        );
+        const promises = publicCollections.map(async (collection) => {
+          const storyIDs = (
+            await this.getStoryIDs(collection["collectionID"])
+          ).map((element) => {
+            return element["storyID"];
+          });
 
-        return collectionsWithDetails;
+          const storiesWithDetails = await storyManager.getStories(storyIDs);
+
+          collection["stories"] = storiesWithDetails[0]["stories"];
+        });
+
+        await Promise.all(promises);
+
+        return publicCollections;
       }
     } catch (error) {
       return error;
@@ -136,6 +123,26 @@ class CollectionManager {
     try {
       const query = `SELECT storyID FROM collection INNER JOIN collectionstory ON collection.collectionID = collectionstory.collectionID Where collection.collectionID = ? ORDER BY storyID`;
       const result = await select(query, [collectionID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getPublicCollections(userID) {
+    try {
+      const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ? AND isPublic = 1;`;
+      const result = await select(query, [userID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getUserCollections(userID) {
+    try {
+      const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ?`;
+      const result = await select(query, [userID]);
       return result;
     } catch (error) {
       return error;

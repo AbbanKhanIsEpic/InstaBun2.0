@@ -46,7 +46,18 @@ class BlockManager {
     try {
       const query = `SELECT blockedUserID FROM instabun.block where blockerUserID = ?;`;
       const result = await select(query, [userID]);
-      return result;
+      return result ? result.map((element) => element["blockedUserID"]) : [];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  //Returns a list of users blocked the user
+  async getBlockedUsers(userID) {
+    try {
+      const query = `SELECT blockerUserID FROM instabun.block where blockedUserID = ?;`;
+      const result = await select(query, [userID]);
+      return result ? result.map((element) => element["blockerUserID"]) : [];
     } catch (error) {
       return error;
     }

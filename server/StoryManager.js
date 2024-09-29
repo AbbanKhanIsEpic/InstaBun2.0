@@ -2,6 +2,7 @@ const { select, update } = require("./DB.js");
 const sha1 = require("sha1");
 const FirebaseStorageManager = require("./FirebaseStorageManager");
 const FollowManager = require("./FollowManager.js");
+const UserManager = require("./UserManager.js");
 
 class StoryManager {
   async upload(userID, file, visibility) {
@@ -32,10 +33,11 @@ class StoryManager {
   //Get the details of the stories
   //Stories only last for a day
   //So it is only getting stories that is a less or equal to a day old
-  async getStories(userID) {
+  async getFollowingStory(userID) {
     try {
       //Manager
       const followManager = new FollowManager();
+      const userManager = new UserManager();
 
       const followingList = (await followManager.getFollowings(userID)).map(
         (element) => {
@@ -65,7 +67,24 @@ class StoryManager {
         return new Error("There are  no stories");
       }
 
-      const compeleteStories = await this.addDetails(filteredStoryIDs);
+      const stories = await this.getStories(userID, filteredStoryIDs);
+
+      const promises = stories.map(async (story) => {
+        const uploaderUserID = story["userID"];
+        const [username, profileIcon] = await Promise.all([
+          userManager.getUsername(uploaderUserID),
+          userManager.getProfileIcon(uploaderUserID),
+        ]);
+        return {
+          userID: uploaderUserID,
+          username: username,
+          profileIcon: profileIcon,
+          hasCloseFriend: story["hasCloseFriend"],
+          stories: story["stories"],
+        };
+      });
+
+      const compeleteStories = await Promise.all(promises);
 
       console.log(compeleteStories);
 
@@ -75,6 +94,7 @@ class StoryManager {
     }
   }
 
+  //Filter if the user can view the story
   async filter(userID, storyIDs) {
     //Managers
     const followManager = new FollowManager();
@@ -127,10 +147,10 @@ class StoryManager {
     }
   }
 
-  async addDetails(storyIDs) {
+  async getStories(userID, storyIDs) {
     try {
-      const query = `SELECT users.userID, users.username, users.profileIcon, (JSON_ARRAYAGG(JSON_OBJECT('id', storyID, 'isVideo', isVideo, 'url', storyLink, 'uploadDate', uploadDate, 'isCloseFriend', storyVisibility = 2))) AS stories, MAX(storyVisibility) = 2 AS hasCloseFriend FROM instabun.story INNER JOIN users ON users.userID = story.userID WHERE story.storyID IN (?) GROUP BY story.userID ORDER BY CASE WHEN story.userID = 1 THEN 1 ELSE 0 END DESC;`;
-      const result = await select(query, [storyIDs]);
+      const query = `SELECT story.userID, (JSON_ARRAYAGG(JSON_OBJECT('id', storyID,'isVideo', isVideo,'url', storyLink,'uploadDate', uploadDate,'isCloseFriend', (storyVisibility = 2)))) AS stories, CASE WHEN MAX(storyVisibility) = 2 THEN 1 ELSE 0 END AS hasCloseFriend FROM instabun.story WHERE story.storyID IN (?) GROUP BY story.userID  ORDER BY CASE WHEN story.userID = ? THEN 1 ELSE 0 END DESC,MAX(uploadDate) DESC;`;
+      const result = await select(query, [storyIDs, userID]);
       return result;
     } catch (error) {
       return error;

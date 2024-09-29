@@ -299,16 +299,8 @@ app.get("/api/user/recommended", async (req, res) => {
   }
 });
 
-//Returns the user's profile
 app.get("/api/user/profile", async (req, res) => {
   const { requestingUserID, targetUserID } = req.query;
-
-  const userManager = new UserManager();
-  const followManager = new FollowManager();
-  const blockManager = new BlockManager();
-  const directMessageManager = new DirectMessageManager();
-  const collectionManager = new CollectionManager();
-  const postManager = new PostManager();
 
   // Validate user IDs
   if (!requestingUserID || !targetUserID) {
@@ -316,54 +308,55 @@ app.get("/api/user/profile", async (req, res) => {
   }
 
   try {
-    const data = {};
-    Object.assign(data, await userManager.getProfile(targetUserID));
+    const userManager = new UserManager();
+    const followManager = new FollowManager();
+    const blockManager = new BlockManager();
+    const directMessageManager = new DirectMessageManager();
+    const collectionManager = new CollectionManager();
+    const postManager = new PostManager();
 
-    if (requestingUserID !== targetUserID) {
-      Object.assign(data, {
-        isFollowing: await followManager.isFollowing(
-          requestingUserID,
-          targetUserID
-        ),
-      });
-      Object.assign(data, {
-        hasBlockedUser: await blockManager.isUserBlocked(
-          targetUserID,
-          requestingUserID
-        ),
-      });
-      Object.assign(data, {
-        canMessage: await directMessageManager.canUserMessage(
-          requestingUserID,
-          targetUserID
-        ),
-      });
-    }
+    const profileData = await userManager.getProfile(targetUserID);
 
-    Object.assign(data, {
-      collections: await collectionManager.getCollections(
-        requestingUserID,
-        targetUserID
-      ),
-    });
-    const post = await postManager.getProfilePost(
-      requestingUserID,
-      targetUserID
-    );
-    Object.assign(data, {
-      posts: post,
-    });
-    Object.assign(data, {
-      totalFollowings: await followManager.getTotalFollowing(targetUserID),
-    });
-    Object.assign(data, {
-      totalFollowers: await followManager.getTotalFollowers(targetUserID),
-    });
+    const additionalData = await Promise.all([
+      requestingUserID !== targetUserID
+        ? followManager.isFollowing(requestingUserID, targetUserID)
+        : null,
+      requestingUserID !== targetUserID
+        ? blockManager.isUserBlocked(targetUserID, requestingUserID)
+        : null,
+      requestingUserID !== targetUserID
+        ? directMessageManager.canUserMessage(requestingUserID, targetUserID)
+        : null,
+      collectionManager.getCollections(requestingUserID, targetUserID),
+      postManager.getProfilePost(requestingUserID, targetUserID),
+      followManager.getTotalFollowing(targetUserID),
+      followManager.getTotalFollowers(targetUserID),
+    ]);
 
-    // Send the response back to the client
-    return res.json(data);
+    const [
+      isFollowing,
+      hasBlockedUser,
+      canMessage,
+      collections,
+      posts,
+      totalFollowings,
+      totalFollowers,
+    ] = additionalData;
+
+    const responseData = {
+      ...profileData,
+      isFollowing,
+      hasBlockedUser,
+      canMessage,
+      collections,
+      posts,
+      totalFollowings,
+      totalFollowers,
+    };
+
+    return res.json(responseData);
   } catch (error) {
-    console.error("Error fetching user profile:", error); // Log the error for debugging
+    console.error("Error fetching user profile:", error);
     res.status(500).json({
       error: error.message || "Internal Server Error",
       message: "Error occurred while getting the user's profile",
@@ -779,7 +772,7 @@ app.get("/api/story", (req, res) => {
   const storyManager = new StoryManager();
 
   storyManager
-    .getStories(userID)
+    .getFollowingStory(userID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

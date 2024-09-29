@@ -6,9 +6,9 @@ const FirebaseStorageManager = require("./FirebaseStorageManager");
 //It is a class that manages the creation of bookmarks and adds post to specific bookmarks
 class BookmarkManager {
   //Returns a list of bookmarks
-  async getList(userID) {
+  async getBookmarks(userID) {
     try {
-      const query = `SELECT bookmarkID,bookmarkTitle FROM bookmark where userID = ?;`;
+      const query = `SELECT bookmarkID,bookmarkTitle,coverPhoto FROM bookmark where userID = ?;`;
       const result = await select(query, [userID]);
       return result;
     } catch (error) {

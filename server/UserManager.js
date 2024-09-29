@@ -91,7 +91,7 @@ class UserManager {
       username: username,
       displayName: displayName,
       profileIcon: profileIcon,
-      bio: bio ? bio : "",
+      bio: bio,
     };
   }
 

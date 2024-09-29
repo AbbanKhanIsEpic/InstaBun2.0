@@ -127,6 +127,10 @@ class PostManager {
         (element) => element?.["postID"]
       );
 
+      if (!posts.length) {
+        return new Error("Unable to retrieve post via the provided tags");
+      }
+
       const filteredPost = await this.#addUploaderDetails(posts);
 
       const completePosts = await this.#addPostDetails(userID, filteredPost);
@@ -190,7 +194,7 @@ class PostManager {
   //Post that is not liked based on the tagID
   async #getUnlikedPostsByTags(tagIDs) {
     try {
-      const query = `SELECT DISTINCT tagpost.postID FROM tagpost LEFT JOIN likepost on likepost.postID = tagpost.postID where tagID IN (?) AND likepost.postID IS NULL ;`;
+      const query = `SELECT DISTINCT tagpost.postID FROM tagpost LEFT JOIN likepost on likepost.postID = tagpost.postID INNER JOIN post on post.postID = tagpost.postID where tagID IN (?) AND likepost.postID IS NULL AND post.postVisibility = 0;`;
       const result = await select(query, [tagIDs]);
       return result;
     } catch (error) {
@@ -240,8 +244,15 @@ class PostManager {
 
   async #addUploaderDetails(postIDs) {
     try {
-      const query = `SELECT postID AS id, users.userID, users.profileIcon, users.username, postLink,isVideo, description, uploadDate,post.postVisibility FROM instabun.post INNER JOIN users on users.userID = post.userID where postID IN (?) ORDER BY uploadDate DESC`;
-      const result = await select(query, [postIDs]);
+      const query = `
+        SELECT postID AS id, users.userID, users.profileIcon, users.username, 
+               postLink, isVideo, description, uploadDate, post.postVisibility 
+        FROM instabun.post 
+        INNER JOIN users on users.userID = post.userID 
+        WHERE postID IN (?) 
+        ORDER BY FIELD(postID, ?)
+      `;
+      const result = await select(query, [postIDs, postIDs]);
       return result;
     } catch (error) {
       return error;
@@ -308,7 +319,7 @@ class PostManager {
       //So we have to take that into account
       const post = await this.#addUploaderDetails(postID);
 
-      const filteredPost = await this.#filterPost(userID, postID);
+      const filteredPost = await this.#filterPost(userID, post);
 
       const postDetailsArray = await this.#addPostDetails(userID, filteredPost);
 

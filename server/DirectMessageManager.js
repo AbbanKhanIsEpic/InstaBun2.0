@@ -49,14 +49,14 @@ class DirectMessageManager {
   }
 
   //Get a list of people who the user has communicated with
-  async getCommunicatedWithList(userID) {
+  async #getMessagePartnerIDs(userID) {
     try {
       const query =
         "SELECT distinct CASE WHEN senderID = ? THEN receiverID ELSE senderID END as id FROM directmessage WHERE senderID = ? OR receiverID = ? ORDER BY messageID DESC;";
 
       const result = await select(query, [userID, userID, userID]);
 
-      return result;
+      return result ? result.map((element) => element["id"]) : [];
     } catch (error) {
       return error;
     }
@@ -64,19 +64,19 @@ class DirectMessageManager {
 
   //Get list of people who has communicated with the user
   //This will only include messages between two users if either of them are blocked
-  async getBlockedMessageList(userID) {
+  async getBlockedList(userID) {
     try {
       //Managers :D
       const userManager = new UserManager();
       const blockManager = new BlockManager();
 
       //Get a list of people who the user has communicated with
-      const communicatedWithList = await this.getCommunicatedWithList(userID);
+      const communicatedWithList = await this.#getMessagePartnerIDs(userID);
 
       // Filter out blocked users
       const filteredList = [];
 
-      for (const { id: messagedUserID } of communicatedWithList) {
+      for (const messagedUserID of communicatedWithList) {
         const isCurrentUserBlocked = await blockManager.isUserBlocked(
           messagedUserID,
           userID
@@ -136,12 +136,12 @@ class DirectMessageManager {
       const blockManager = new BlockManager();
 
       //Get a list of people who the user has communicated with
-      const communicatedWithList = await this.getCommunicatedWithList(userID);
+      const communicatedWithList = await this.#getMessagePartnerIDs(userID);
 
       // Filter out blocked users
       const filteredList = [];
 
-      for (const { id: messagedUserID } of communicatedWithList) {
+      for (const messagedUserID of communicatedWithList) {
         console.log(messagedUserID);
         const isCurrentUserBlocked = await blockManager.isUserBlocked(
           messagedUserID,
@@ -212,18 +212,18 @@ class DirectMessageManager {
   }
   //Save when the user cleared the message
   //Does not actually clear the message (will just appear as if on the client side of who wanted to clear the message)
-  async clearMessage(senderID, recieverID) {
+  async clearMessage(senderID, receiverID) {
     try {
       const hasUserClearBefore = await this.#hasClearedMessageBefore(
         senderID,
-        recieverID
+        receiverID
       );
       if (hasUserClearBefore) {
         const updateQuery = `UPDATE ClearDirectMessage SET Time = now() WHERE (SenderID = ?) and (RecieverID = ?);`;
-        update(updateQuery, [senderID, recieverID]);
+        update(updateQuery, [senderID, receiverID]);
       } else {
         const createQuery = `INSERT INTO ClearDirectMessage (SenderID, RecieverID, Time) VALUES (?,?,now());`;
-        update(createQuery, [senderID, recieverID]);
+        update(createQuery, [senderID, receiverID]);
       }
     } catch (error) {
       return error;
@@ -231,10 +231,10 @@ class DirectMessageManager {
   }
 
   //Check if the user has cleared the message on their side before
-  async #hasClearedMessageBefore(senderID, recieverID) {
+  async #hasClearedMessageBefore(senderID, receiverID) {
     try {
       const query = `SELECT count(*) FROM instabun.ClearDirectMessage WHERE SenderID = ? AND RecieverID = ?;`;
-      const [result] = await select(query, [senderID, recieverID]);
+      const [result] = await select(query, [senderID, receiverID]);
       return result["count(*)"] == 1;
     } catch (error) {
       return error;

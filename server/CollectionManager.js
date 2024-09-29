@@ -26,7 +26,10 @@ class CollectionManager {
             return element["storyID"];
           });
 
-          const storiesWithDetails = await storyManager.getStories(storyIDs);
+          const storiesWithDetails = await storyManager.getStories(
+            targetUserID,
+            storyIDs
+          );
 
           collection["stories"] = storiesWithDetails[0]["stories"];
         });
@@ -50,7 +53,10 @@ class CollectionManager {
             return element["storyID"];
           });
 
-          const storiesWithDetails = await storyManager.getStories(storyIDs);
+          const storiesWithDetails = await storyManager.getStories(
+            targetUserID,
+            storyIDs
+          );
 
           collection["stories"] = storiesWithDetails[0]["stories"];
         });

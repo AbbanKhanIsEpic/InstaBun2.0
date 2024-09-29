@@ -40,7 +40,7 @@ class FollowManager {
     try {
       const query = `SELECT FollowingID FROM instabun.followers where FollowerID = ?;`;
       const result = await select(query, [followerID]);
-      return result;
+      return result ? result.map((element) => element["FollowingID"]) : [];
     } catch (error) {
       return error;
     }
@@ -51,7 +51,7 @@ class FollowManager {
     try {
       const query = `SELECT FollowerID FROM instabun.Follows where FollowingID = ?;`;
       const result = await select(query, [followingID]);
-      return result;
+      return result ? result.map((element) => element["FollowerID"]) : null;
     } catch (error) {
       return error;
     }
@@ -78,7 +78,7 @@ class FollowManager {
     try {
       const following = await this.getFollowings(userID);
       for (let i = 0; i < following.length; i++) {
-        const followingUserID = following[i]["FollowingID"];
+        const followingUserID = following[i];
         const isCloseFriend = await this.isCloseFriend(userID, followingUserID);
         if (!isCloseFriend) {
           following.splice(i, 1);
@@ -110,11 +110,12 @@ class FollowManager {
     }
   }
 
-  async isVisibleToUser(userID, uploaderUserID, visibility) {
-    if (visibility == 0) return true; // Public
-    if (visibility == 1) return await this.isFollowing(userID, uploaderUserID); // Followers
-    if (visibility == 2)
-      return await this.isCloseFriend(userID, uploaderUserID); // Close Friends
+  async isVisibleToUser(requestingUserID, targetUserID, targetVisibility) {
+    if (targetVisibility == 0) return true; // Public
+    if (targetVisibility == 1)
+      return await this.isFollowing(requestingUserID, targetUserID); // Followers
+    if (targetVisibility == 2)
+      return await this.isCloseFriend(requestingUserID, targetUserID); // Close Friends
     return false;
   }
 }

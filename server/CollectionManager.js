@@ -58,6 +58,8 @@ class CollectionManager {
             storyIDs
           );
 
+          console.log(storiesWithDetails);
+
           collection["stories"] = storiesWithDetails[0]["stories"];
         });
 

@@ -10,7 +10,7 @@ templates['comment'] = template({"1":function(container,depth0,helpers,partials,
 
   return "<div class=\"commenter ms-3 mb-1\" id=\""
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"commentID") : stack1), depth0))
-    + "\">\r\n  <div class=\"d-flex flex-row gap-2\"></div>\r\n  <img src=\""
+    + "\">\r\n  <div class=\"d-flex flex-row gap-2\">\r\n  <img src=\""
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"profileIcon") : stack1), depth0))
     + "\" alt=\""
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"username") : stack1), depth0))
@@ -20,20 +20,20 @@ templates['comment'] = template({"1":function(container,depth0,helpers,partials,
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"username") : stack1), depth0))
     + "</strong></span>\r\n    <div class=\"comment\">"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"comment") : stack1), depth0))
-    + "</div>\r\n  </div>\r\n  <div class=\"d-flex justify-content-between\">\r\n    <div>\r\n      <span class=\"commentLike"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasLiked") : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":13,"column":30},"end":{"line":13,"column":60}}})) != null ? stack1 : "")
+    + "</div>\r\n  </div>\r\n  </div>\r\n  <div class=\"d-flex justify-content-between\">\r\n    <div>\r\n      <span class=\"commentLike"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasLiked") : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":14,"column":30},"end":{"line":14,"column":60}}})) != null ? stack1 : "")
     + "\">\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasLiked") : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0, blockParams),"inverse":container.program(6, data, 0, blockParams),"data":data,"blockParams":blockParams,"loc":{"start":{"line":14,"column":8},"end":{"line":26,"column":15}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasLiked") : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0, blockParams),"inverse":container.program(6, data, 0, blockParams),"data":data,"blockParams":blockParams,"loc":{"start":{"line":15,"column":8},"end":{"line":27,"column":15}}})) != null ? stack1 : "")
     + "      </span>\r\n      <span class=\"me-3\">\r\n        <span class=\"totalCommentLike\">"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"totalLike") : stack1), depth0))
     + "</span> like</span>\r\n      <span class=\"commentDislike"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasDisliked") : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":30,"column":33},"end":{"line":30,"column":66}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasDisliked") : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":31,"column":33},"end":{"line":31,"column":66}}})) != null ? stack1 : "")
     + "\">\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasDisliked") : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0, blockParams),"inverse":container.program(10, data, 0, blockParams),"data":data,"blockParams":blockParams,"loc":{"start":{"line":31,"column":8},"end":{"line":43,"column":15}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(depth0 != null ? lookupProperty(depth0,"hasDisliked") : depth0),{"name":"if","hash":{},"fn":container.program(8, data, 0, blockParams),"inverse":container.program(10, data, 0, blockParams),"data":data,"blockParams":blockParams,"loc":{"start":{"line":32,"column":8},"end":{"line":44,"column":15}}})) != null ? stack1 : "")
     + "      </span>\r\n      <span><span class=\"totalCommentDislike\">"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"totalDislike") : stack1), depth0))
     + "</span>\r\n        dislike</span>\r\n    </div>\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(lookupProperty(helpers,"isCurrentUserComment")||(depth0 && lookupProperty(depth0,"isCurrentUserComment"))||alias4).call(alias3,((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"userID") : stack1),{"name":"isCurrentUserComment","hash":{},"data":data,"blockParams":blockParams,"loc":{"start":{"line":48,"column":10},"end":{"line":48,"column":47}}}),{"name":"if","hash":{},"fn":container.program(12, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":48,"column":4},"end":{"line":56,"column":11}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias3,(lookupProperty(helpers,"isCurrentUserComment")||(depth0 && lookupProperty(depth0,"isCurrentUserComment"))||alias4).call(alias3,((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"userID") : stack1),{"name":"isCurrentUserComment","hash":{},"data":data,"blockParams":blockParams,"loc":{"start":{"line":49,"column":10},"end":{"line":49,"column":47}}}),{"name":"if","hash":{},"fn":container.program(12, data, 0, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":49,"column":4},"end":{"line":57,"column":11}}})) != null ? stack1 : "")
     + "  </div>\r\n</div>\r\n";
 },"2":function(container,depth0,helpers,partials,data) {
     return " active";
@@ -55,6 +55,6 @@ templates['comment'] = template({"1":function(container,depth0,helpers,partials,
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"comments") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 1, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":1,"column":0},"end":{"line":59,"column":9}}})) != null ? stack1 : "");
+  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"comments") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 1, blockParams),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":1,"column":0},"end":{"line":60,"column":9}}})) != null ? stack1 : "");
 },"useData":true,"useBlockParams":true});
 })();

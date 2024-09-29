@@ -39,11 +39,7 @@ class StoryManager {
       const followManager = new FollowManager();
       const userManager = new UserManager();
 
-      const followingList = (await followManager.getFollowings(userID)).map(
-        (element) => {
-          return element?.["FollowingID"];
-        }
-      );
+      const followingList = await followManager.getFollowings(userID);
 
       if (!followingList.length) {
         return new Error(

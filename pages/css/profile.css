@@ -1,4 +1,4 @@
-.collections:not(:empty) {
+#collections:not(:empty) {
   height: 200px;
 }
 
@@ -25,4 +25,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+#postContainer {
+  position: sticky !important;
+  top: 0px;
+  height: 90vh;
+}
+
+#postContainer img,
+#postContainer video {
+  width: 470px;
+  height: 500px;
 }

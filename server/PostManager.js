@@ -445,9 +445,7 @@ class PostManager {
       //Manager
       const followManager = new FollowManager();
 
-      const followingList = (await followManager.getFollowings(userID)).map(
-        (element) => element["FollowingID"]
-      );
+      const followingList = await followManager.getFollowings(userID);
 
       if (!followingList.length) {
         return new Error(

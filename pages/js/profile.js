@@ -33,7 +33,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       return storyAge(uploadDate);
     });
 
-    const template = Handlebars.templates["profile"];
+    const profileTemplate = Handlebars.templates["profile"];
+
+    const collectionTemplate = Handlebars.templates["collection"];
+
+    const postsTemplate = Handlebars.templates["post-profile"];
 
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),
@@ -45,13 +49,32 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const data = await getProfile(userID, profileUserID);
 
-    const htmlOutput = template(data);
+    const collections = { collections: data["collections"] };
 
-    document.getElementById("contentPage").innerHTML = htmlOutput;
+    collections["username"] = data["username"];
+
+    collections["profileIcon"] = data["profileIcon"];
+
+    const posts = { posts: data["posts"] };
+
+    console.log(posts);
+
+    const [profileOutput, collectionOutput, postOutput] = await Promise.all([
+      profileTemplate(data),
+      collectionTemplate(collections),
+      postsTemplate(posts),
+    ]);
+
+    document.getElementById("contentPage").innerHTML = profileOutput;
+
+    document.getElementById("collections").innerHTML = collectionOutput;
+
+    document.getElementById("posts").innerHTML = postOutput;
 
     const storiesModal = document.getElementsByClassName("modal");
 
-    const collections = data["collections"];
+    const postModal = new bootstrap.Modal(document.getElementById("post"));
+    postModal.show(); // To show the modal manually
 
     Array.from(storiesModal).forEach((modal) => {
       const carouselInner = modal.querySelector(".carousel-inner");

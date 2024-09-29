@@ -19,13 +19,13 @@
             <div class="btn btn-primary ms-3" id="followButton">Follow</div>
           {{/if}}
           {{#if canMessage}}
-            <div class="btn btn-primary ms-3">Message</div>
+            <div class="btn btn-primary ms-3" id="messageButton">Message</div>
           {{else}}
           {{/if}}
           {{#if hasBlockedUser}}
-            <div class="btn btn-secondary ms-3" id="followButton">Unblock</div>
+            <div class="btn btn-secondary ms-3" id="blockButton">Unblock</div>
           {{else}}
-            <div class="btn btn-primary ms-3" id="followButton">Block</div>
+            <div class="btn btn-primary ms-3" id="blockButton">Block</div>
           {{/if}}
         {{/if}}
       </div>

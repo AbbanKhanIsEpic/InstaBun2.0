@@ -134,6 +134,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const posts = document.querySelectorAll(".post");
 
+    const followButton = document.querySelector("#followButton");
+
+    const blockButton = document.querySelector("#blockButton");
+
     Array.from(storiesModal).forEach((modal) => {
       const carouselInner = modal.querySelector(".carousel-inner");
       const storyAgeElement = modal.querySelector(".storyAge");
@@ -294,6 +298,52 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
       });
     });
+
+    followButton.addEventListener("click", async function () {
+      const isFollowing = followButton.innerHTML == "Unfollow";
+      if (isFollowing) {
+        const status = await unfollow(userID, profileUserID);
+        if (status == "200") {
+          followButton.classList.add("btn-primary");
+          followButton.classList.remove("btn-secondary");
+          followButton.innerHTML = "Follow";
+        } else {
+          alert("Unable to unfollow, try again");
+        }
+      } else {
+        const status = await follow(userID, profileUserID);
+        if (status == "200") {
+          followButton.classList.remove("btn-primary");
+          followButton.classList.add("btn-secondary");
+          followButton.innerHTML = "Unfollow";
+        } else {
+          alert("Unable to unfollow, try again");
+        }
+      }
+    });
+
+    // blockButton.addEventListener("click", async function () {
+    //   const hasBlocked = blockButton.innerHTML == "Unblock";
+    //   if (hasBlocked) {
+    //     const status = await unfollow(userID, profileUserID);
+    //     if (status == "200") {
+    //       followButton.classList.add("btn-primary");
+    //       followButton.classList.remove("btn-secondary");
+    //       followButton.innerHTML = "Follow";
+    //     } else {
+    //       alert("Unable to unfollow, try again");
+    //     }
+    //   } else {
+    //     const status = await follow(userID, profileUserID);
+    //     if (status == "200") {
+    //       followButton.classList.remove("btn-primary");
+    //       followButton.classList.add("btn-secondary");
+    //       followButton.innerHTML = "Unfollow";
+    //     } else {
+    //       alert("Unable to unfollow, try again");
+    //     }
+    //   }
+    // });
   } catch (error) {
     console.error("Error fetching posts or rendering template:", error);
   }

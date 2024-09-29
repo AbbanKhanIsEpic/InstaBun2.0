@@ -2,6 +2,14 @@
   height: 200px;
 }
 
+#postInteractionContainer {
+  min-height: 100px;
+}
+
+#comments {
+  min-height: 100%;
+}
+
 #posts,
 #stories,
 #collections {

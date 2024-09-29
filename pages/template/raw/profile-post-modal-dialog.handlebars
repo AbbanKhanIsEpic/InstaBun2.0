@@ -1,42 +1,173 @@
-<div class="modal-dialog modal-dialog-centered modal-fullscreen"></div>
-<div class="modal-content bg-black text-white glassmorph">
-    <div class="modal-header d-flex flex-column p-0  position-relative pb-4">
-        <h5 class="modal-title pt-3">{{username}}'s post</h5>
-        <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3" data-bs-dismiss="modal"
-            aria-label="Close">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
-                viewBox="0 0 16 16">
-                <path
-                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
-                    stroke="white" stroke-width="1.5" />
-            </svg>
-        </button>
+<div
+  class="modal-dialog modal-dialog-centered modal-fullscreen modal-dialog-scrollable"
+>
+  <div class="modal-content bg-black text-white glassmorph">
+    <div class="modal-header d-flex flex-column p-0 position-relative pb-4">
+      <h5 id="modalTitle" class="modal-title pt-3">{{username}}'s Post</h5>
+      <button
+        type="button"
+        class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
+        data-bs-dismiss="modal"
+        aria-label="Close modal"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          class="bi bi-x-lg"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+            stroke="white"
+            stroke-width="1.5"
+          />
+        </svg>
+      </button>
     </div>
     <div class="modal-body d-flex w-100 flex-row m-0 p-0">
-        <div class="ms-3 d-flex justify-content-center border-end" id="postContainer">
-            <div class="d-flex align-items-center justify-content-center pe-3 position-relative">
-                {{#if isVideo}}
-                <video controls class="border-1 border user-select-none content">
-                    <source src="{{postLink}}" />
-                </video>
+      <div
+        class="ms-3 d-flex justify-content-center border-end"
+        id="postContainer"
+      >
+        <div
+          class="d-flex align-items-center justify-content-center pe-3 position-relative"
+        >
+          {{#if isVideo}}
+            <video
+              controls
+              preload="auto"
+              class="rounded"
+              width="100%"
+              height="auto"
+            >
+              <source src="{{postLink}}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          {{else}}
+            <img
+              src="{{postLink}}"
+              class="border-1 border user-select-none content"
+            />
+          {{/if}}
+        </div>
+      </div>
+      <div
+        id="postInformationContainer"
+        class="d-flex flex-column w-100 mt-3 ms-3 me-3 position-relative"
+      >
+        <div class="d-flex flex-row gap-2 ms-3 align-items-center">
+          <img
+            src="{{profileIcon}}"
+            alt="{{username}}'s Profile Icon"
+            width="50"
+            height="50"
+            class="rounded-5"
+          />
+          <div class="mb-1">
+            <span><strong class="username">{{username}}</strong></span>
+            <div class="description">{{description}}</div>
+          </div>
+        </div>
+        <hr class="w-100 border-white border-2" />
+        <div class="d-flex flex-column gap-4" id="comments">
+
+        </div>
+        <div
+          class="position-sticky bottom-0 bg-black position-relative"
+          id="postInteractionContainer"
+        >
+          <div class="d-flex flex-row justify-content-between pt-2">
+            <div class="d-flex flex-row gap-4">
+              <div id="likeButton">
+                {{#if hasLiked}}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="red"
+                    class="bi bi-heart-fill like"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"
+                    />
+                  </svg>
                 {{else}}
-                <img src="{{postLink}}" class="border-1 border user-select-none content" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="white"
+                    class="bi bi-heart postInteraction"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"
+                    />
+                  </svg>
                 {{/if}}
+              </div>
+              <div role="button" id="shareButton">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="white"
+                  class="bi bi-share postInteraction"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"
+                  />
+                </svg>
+              </div>
             </div>
+            <div role="button" id="bookmarkButton">
+              {{#if hasBookmarked}}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="white"
+                  class="bi bi-bookmark-fill bookmark"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"
+                  />
+                </svg>
+              {{else}}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="white"
+                  class="bi bi-bookmark postInteraction"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"
+                  />
+                </svg>
+              {{/if}}
+            </div>
+          </div>
+          <div
+            class="position-absolute bottom-0 w-100 d-flex flex-row mb-2 gap-2 border-top border-2 pt-2"
+          >
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              class="form-control"
+              id="commentInput"
+            />
+            <button class="btn btn-primary" id="commentButton">Comment</button>
+          </div>
         </div>
-        <div id="postInformationContainer" class="d-flex flex-column w-100 mt-3 ms-3 me-3">
-            <div class="d-flex flex-row gap-2 ms-3">
-                <img src="https://i.pinimg.com/originals/98/1d/6b/981d6b2e0ccb5e968a0618c8d47671da.jpg"
-                    alt="e's Profile Icon" width="50" height="50" class="rounded-5" />
-                <div class="mb-1">
-                    <span><strong class="username">{{username}}</strong></span>
-                    <div class="comment">{{description}}</div>
-                </div>
-            </div>
-            <hr class="w-100 border-white border-2" />
-            <div class="d-flex flex-column gap-4" id="comments">
-            </div>
-        </div>
+      </div>
     </div>
-</div>
+  </div>
 </div>

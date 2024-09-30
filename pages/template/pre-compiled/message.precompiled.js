@@ -58,8 +58,8 @@ templates['message'] = template({"1":function(container,depth0,helpers,partials,
         return undefined
     };
 
-  return "      <div\r\n        onclick=\"window.open('http://127.0.0.1:5500/pages/profile.html?username="
-    + alias1(((helper = (helper = lookupProperty(helpers,"username") || (depth0 != null ? lookupProperty(depth0,"username") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"username","hash":{},"data":data,"loc":{"start":{"line":37,"column":80},"end":{"line":37,"column":92}}}) : helper)))
+  return "      <div\r\n        onclick=\"window.open('http://127.0.0.1:5500/pages/profile.html?userID="
+    + alias1(((helper = (helper = lookupProperty(helpers,"senderID") || (depth0 != null ? lookupProperty(depth0,"senderID") : depth0)) != null ? helper : container.hooks.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"senderID","hash":{},"data":data,"loc":{"start":{"line":37,"column":78},"end":{"line":37,"column":90}}}) : helper)))
     + "', '_self');\"\r\n        role=\"button\"\r\n      >\r\n        <img\r\n          src=\""
     + alias1(alias2(((stack1 = blockParams[2][0]) != null ? lookupProperty(stack1,"icon") : stack1), depth0))
     + "\"\r\n          alt=\"\"\r\n          width=\"40\"\r\n          height=\"40\"\r\n          class=\"rounded rounded-circle ms-3 mb-1\"\r\n        />\r\n        <span>"

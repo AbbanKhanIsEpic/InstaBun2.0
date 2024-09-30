@@ -1,6 +1,6 @@
 import { likePost, unlikePost } from "./API/post.js";
 import { userID } from "./userSession.js";
-import { getUserID, getProfile, block, unblock } from "./API/user.js";
+import { getProfile, block, unblock } from "./API/user.js";
 import {
   follow,
   unfollow,
@@ -108,10 +108,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),
     });
-    const profileUsername = params.username;
-    const profileUserID = profileUsername
-      ? await getUserID(profileUsername)
-      : userID;
+    const profileUserID = params.userID ? params.userID : userID;
 
     const data = await getProfile(userID, profileUserID);
 

@@ -247,4 +247,10 @@ async function showCollectionData() {
   const output = template({ collections: data });
 
   document.querySelector("#contentPage").innerHTML = output;
+
+  const collections = document.querySelectorAll(".collection");
+
+  Array.from(collections).forEach((collection) => {
+    collection.addEventListener("click", function () {});
+  });
 }

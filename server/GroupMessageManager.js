@@ -19,14 +19,12 @@ class GroupMessageManager {
 
       //Add display name and profile icon to each of the sender
       for (const [index, { senderID: senderID }] of result.entries()) {
-        const [username, displayName, profileIcon] = await Promise.all([
-          userManager.getUsername(senderID),
+        const [displayName, profileIcon] = await Promise.all([
           userManager.getDisplayName(senderID),
           userManager.getProfileIcon(senderID),
         ]);
 
         result[index]["displayName"] = displayName;
-        result[index]["username"] = username;
         result[index]["icon"] = profileIcon;
       }
       return result;

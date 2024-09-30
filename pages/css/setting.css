@@ -1,0 +1,44 @@
+.nav li.active {
+  background: #111010;
+}
+#posts,
+#stories,
+#collections {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding-top: 10px;
+  padding-left: 40px;
+  padding-right: 10px;
+}
+#posts > .post,
+#stories > .story {
+  max-width: 100%;
+  height: 350px;
+}
+#posts > .post video,
+#posts > .post img,
+#stories > .story video,
+#stories > .story img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#postContainer {
+  position: sticky !important;
+  top: 0px;
+  height: 90vh;
+}
+
+#postContainer img,
+#postContainer video {
+  width: 470px;
+  height: 500px;
+}
+
+input[type="checkbox"] {
+  width: 32px;
+  height: 32px;
+}

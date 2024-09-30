@@ -82,6 +82,18 @@ export async function getProfile(requestingUserID, targetUserID) {
   }
 }
 
+export async function getUserInfo(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/userInfo`, {
+      params: { userID },
+    });
+    console.log(response);
+    return response["data"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function block(requestingUserID, targetUserID) {
   try {
     const response = await axios.post(`${API_BASE_URL}/block`, {

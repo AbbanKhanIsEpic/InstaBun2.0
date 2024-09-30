@@ -152,6 +152,16 @@ class StoryManager {
       return error;
     }
   }
+
+  async getUserStories(userID) {
+    try {
+      const query = `Select * from story where userID = ?`;
+      const result = await select(query, [userID]);
+      return result;
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
 module.exports = StoryManager;

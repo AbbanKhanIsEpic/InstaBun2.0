@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         postModal.innerHTML = modalOutput;
 
-        new bootstrap.Modal(postModal).show(); // To show the modal manually
+        new bootstrap.Modal(postModal).show();
 
         const likeButton = postModal.querySelector("#likeButton");
 

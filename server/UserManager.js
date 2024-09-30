@@ -230,7 +230,6 @@ ORDER BY (COUNT(*)) DESC;`;
       try {
         const query = `SELECT 2SVE FROM instabun.Users where Email = ?;`;
         const [result] = await select(query, [userIdentifier]);
-        console.log(result["2SVE"] == 1);
         return result["2SVE"] == 1;
       } catch (error) {
         return error;
@@ -239,6 +238,7 @@ ORDER BY (COUNT(*)) DESC;`;
       try {
         const query = `SELECT 2SVE FROM instabun.Users where Username = ?;`;
         const [result] = await select(query, [userIdentifier]);
+        console.log(result);
         return result["2SVE"] == 1;
       } catch (error) {
         return error;

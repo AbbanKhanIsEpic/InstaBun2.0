@@ -255,6 +255,31 @@ app.get("/api/user/userID", (req, res) => {
     });
 });
 
+app.get("/api/user/userInfo", async (req, res) => {
+  const { userID } = req.query;
+
+  const userManager = new UserManager();
+
+  try {
+    const profile = await userManager.getProfile(userID);
+    const is2StepEnabled = await userManager.checkTwoStepVerificationEnabled(
+      profile["username"]
+    );
+    const emailAddress = await userManager.getEmail(profile["username"]);
+
+    console.log(is2StepEnabled);
+
+    profile["is2StepEnabled"] = is2StepEnabled;
+    profile["emailAddress"] = emailAddress;
+
+    res.status(200).send(profile);
+  } catch (error) {
+    res
+      .status(500)
+      .send({ error: "An error occurred while retrieving user information" });
+  }
+});
+
 //Returns a list of user filtered by page number, skip and key word (what username or display name  contain)
 app.get("/api/user/search", (req, res) => {
   const { searchQuery, userID } = req.query;
@@ -792,7 +817,6 @@ app.post("/api/post/share", (req, res) => {
 });
 
 //Story
-
 app.post("/api/story", upload.single("file"), async (req, res) => {
   try {
     console.log(req.file);
@@ -820,13 +844,29 @@ app.post("/api/story", upload.single("file"), async (req, res) => {
   }
 });
 
-app.get("/api/story", (req, res) => {
+app.get("/api/story/following", (req, res) => {
   const { userID } = req.query;
 
   const storyManager = new StoryManager();
 
   storyManager
     .getFollowingStory(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/story/user", (req, res) => {
+  const { userID } = req.query;
+
+  const storyManager = new StoryManager();
+
+  storyManager
+    .getUserStories(userID)
     .then((jsonifiedResult) => {
       res.status(200).send(jsonifiedResult);
     })

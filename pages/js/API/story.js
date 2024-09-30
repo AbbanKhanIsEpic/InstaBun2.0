@@ -14,9 +14,20 @@ export async function createStory(formData) {
   }
 }
 
-export async function getStories(userID) {
+export async function getFollowingStories(userID) {
   try {
-    const response = await axios.get(`${API_BASE_URL}`, {
+    const response = await axios.get(`${API_BASE_URL}/following`, {
+      params: { userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getUserStories(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user`, {
       params: { userID },
     });
     return response.data;

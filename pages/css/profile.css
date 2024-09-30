@@ -7,7 +7,7 @@
 }
 
 #comments {
-  min-height: 100%;
+  min-height: 80%;
 }
 
 #posts,
@@ -21,6 +21,13 @@
   padding-left: 40px;
   padding-right: 10px;
 }
+
+#posts {
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 #posts > .post,
 #stories > .story {
   max-width: 100%;

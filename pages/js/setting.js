@@ -1,9 +1,9 @@
 import { getUserInfo } from "./API/user.js";
 import { getUserStories } from "./API/story.js";
+import { getUserPosts } from "./API/post.js";
 import { userID } from "./userSession.js";
 
 const storyModal = document.querySelector("#storyModal");
-let visibility = 0;
 
 document.addEventListener("DOMContentLoaded", async function () {
   showUserData();
@@ -29,6 +29,7 @@ document.querySelector("#postSection").addEventListener("click", function () {
   document.querySelector("#contentPage").innerHTML = "";
   document.querySelector("li.active").classList.remove("active");
   document.querySelector("#postSection").classList.add("active");
+  showPostData();
 });
 
 document
@@ -78,6 +79,10 @@ async function showUserData() {
 }
 
 async function showStoryData() {
+  Handlebars.registerHelper("isSameVisibility", function (arg1, arg2, options) {
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+  });
+
   const template = Handlebars.templates["setting-story"];
 
   const data = await getUserStories(userID);
@@ -95,6 +100,10 @@ async function showStoryData() {
       const modalOutput = modalTemplate(data[index]);
       storyModal.innerHTML = modalOutput;
       new bootstrap.Modal(storyModal).show();
+
+      let visibility = data[index]["storyVisibility"];
+
+      console.log(visibility);
 
       const visibilityCheckBoxes = document
         .querySelector("#postInformationContainer")
@@ -116,4 +125,18 @@ async function showStoryData() {
       });
     });
   });
+}
+
+async function showPostData() {
+  Handlebars.registerHelper("isSameVisibility", function (arg1, arg2, options) {
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+  });
+
+  const template = Handlebars.templates["setting-post"];
+
+  const data = await getUserPosts(userID);
+
+  const output = template({ posts: data });
+
+  document.querySelector("#contentPage").innerHTML = output;
 }

@@ -64,7 +64,7 @@
             type="checkbox"
             value="0"
             id="uploadVisibilityAll"
-            checked
+           {{#isSameVisibility storyVisibility 0}}checked{{/isSameVisibility}}
           />
           <label
             class="form-check-label ms-2 mb-0 display-7"
@@ -79,6 +79,7 @@
             type="checkbox"
             value="1"
             id="uploadVisibilityFollowers"
+            {{#isSameVisibility storyVisibility 1}}checked{{/isSameVisibility}}
           />
           <label
             class="form-check-label ms-2 display-7"
@@ -93,6 +94,7 @@
             type="checkbox"
             value="2"
             id="uploadVisbilityFriends"
+            {{#isSameVisibility storyVisibility 2}}checked{{/isSameVisibility}}
           />
           <label
             class="form-check-label ms-2 display-7"
@@ -107,6 +109,7 @@
             type="checkbox"
             value="3"
             id="uploadVisibilityNoOne"
+            {{#isSameVisibility storyVisibility 3}}checked{{/isSameVisibility}}
           />
           <label
             class="form-check-label ms-2 display-7"

@@ -749,6 +749,22 @@ app.get("/api/post/select", (req, res) => {
     });
 });
 
+app.get("/api/post/user", (req, res) => {
+  const { userID } = req.query;
+
+  const post = new PostManager();
+
+  post
+    .getUserPosts(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
 app.post("/api/post/like", (req, res) => {
   const postID = req.body.postID;
   const userID = req.body.userID;

@@ -79,3 +79,14 @@ export async function getSearchedPost(userID, tags) {
     console.error(error);
   }
 }
+
+export async function getUserPosts(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/user`, {
+      params: { userID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

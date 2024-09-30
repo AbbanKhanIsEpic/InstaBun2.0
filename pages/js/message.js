@@ -165,9 +165,9 @@ viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
 
   let selectedMessage;
 
-  Array.from(messageSelections).forEach((messageSelection, index) => {
-    const id = data["messageList"][index]["id"];
-    const isDirect = !data["messageList"][index]["isGroup"];
+  Array.from(messageSelections).forEach((messageSelection) => {
+    const id = messageSelection.id;
+    const isDirect = messageSelection.classList.contains("direct");
     if (id == communicatingToID) {
       if (isDirect != isGroup) {
         messageSelection.classList.add("selected");
@@ -175,15 +175,16 @@ viewHiddenMessages.addEventListener("shown.bs.modal", async function () {
       }
     }
     messageSelection.addEventListener("click", function () {
-      const id = data["messageList"][index]["id"];
-      const isDirect = !data["messageList"][index]["isGroup"];
-      const icon = data["messageList"][index]["icon"];
-      const name = data["messageList"][index]["name"];
-      const username = data["messageList"][index]["username"];
+      const id = messageSelection.id;
+      const isDirect = messageSelection.classList.contains("direct");
+      const icon = messageSelection.querySelector("img").src;
+      const name = messageSelection.querySelector(
+        '[aria-label="name"]'
+      ).innerHTML;
       if (selectedMessage != undefined) {
         selectedMessage.classList.remove("selected");
       }
-      setMessageContainer(userID, isDirect, id, name, icon);
+      setMessageContainer(userID, isDirect, id, name, icon, true);
       messageSelection.classList.add("selected");
       selectedMessage = messageSelection;
     });
@@ -427,8 +428,8 @@ async function displayMessageLists(userID) {
   let selectedMessage;
 
   Array.from(messageSelections).forEach((messageSelection, index) => {
-    const id = data["messageList"][index]["id"];
-    const isDirect = !data["messageList"][index]["isGroup"];
+    const id = messageSelection.id;
+    const isDirect = messageSelection.classList.contains("direct");
     if (id == communicatingToID) {
       if (isDirect != isGroup) {
         messageSelection.classList.add("selected");
@@ -436,11 +437,12 @@ async function displayMessageLists(userID) {
       }
     }
     messageSelection.addEventListener("click", function () {
-      const id = data["messageList"][index]["id"];
-      const isDirect = !data["messageList"][index]["isGroup"];
-      const icon = data["messageList"][index]["icon"];
-      const name = data["messageList"][index]["name"];
-      const username = data["messageList"][index]["username"];
+      const id = messageSelection.id;
+      const isDirect = messageSelection.classList.contains("direct");
+      const icon = messageSelection.querySelector("img").src;
+      const name = messageSelection.querySelector(
+        '[aria-label="name"]'
+      ).innerHTML;
       if (selectedMessage != undefined) {
         selectedMessage.classList.remove("selected");
       }

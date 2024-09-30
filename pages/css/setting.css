@@ -63,11 +63,3 @@ input[type="checkbox"] {
   width: 32px;
   height: 32px;
 }
-
-/* Ensure the main container takes up 100% of the available space */
-#contentPage {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-}

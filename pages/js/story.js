@@ -1,4 +1,4 @@
-import { getStories } from "./API/story.js";
+import { getFollowingStories } from "./API/story.js";
 import { userID } from "./userSession.js";
 
 console.log(userID);
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const template = Handlebars.templates["story"];
 
-  const stories = await getStories(userID);
+  const stories = await getFollowingStories(userID);
 
   console.log(stories);
 

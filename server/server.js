@@ -1286,5 +1286,21 @@ app.get("/api/comment", (req, res) => {
     });
 });
 
+app.get("/api/collection/user", (req, res) => {
+  const { userID } = req.query;
+
+  const collectionManager = new CollectionManager();
+
+  collectionManager
+    .getUserCollections(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).json(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
 //Create server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -503,7 +503,7 @@ class PostManager {
 
   async getUserPosts(userID) {
     try {
-      const query = `SELECT post.*, JSON_ARRAYAGG(JSON_OBJECT('tagName', tagName,"tagID",tag.tagID)) AS tags FROM post INNER JOIN tagpost ON tagpost.postID = post.postID INNER JOIN tag ON tag.tagID = tagpost.tagID WHERE userID = ? GROUP BY post.postID`;
+      const query = `SELECT post.*, JSON_ARRAYAGG(tagName) AS tags FROM post INNER JOIN tagpost ON tagpost.postID = post.postID INNER JOIN tag ON tag.tagID = tagpost.tagID WHERE userID = ? GROUP BY post.postID`;
       const result = await select(query, [userID]);
       return result;
     } catch (error) {

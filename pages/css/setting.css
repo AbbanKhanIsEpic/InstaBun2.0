@@ -6,17 +6,23 @@
 #collections {
   display: grid;
   align-content: start;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
   gap: 10px;
   padding-top: 10px;
   padding-left: 40px;
   padding-right: 10px;
 }
 
-#posts {
+#posts,
+#stories,
+#collections {
   max-height: 360px;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+#tagList {
+  height: 150px;
 }
 
 #posts > .post,
@@ -25,10 +31,17 @@
   height: 350px;
 }
 
+#collections > .collection {
+  max-width: 90%;
+  height: 350px;
+}
+
 #posts > .post video,
 #posts > .post img,
 #stories > .story video,
-#stories > .story img {
+#stories > .story img,
+#collections > .collection video,
+#collections > .collection img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -49,4 +62,12 @@
 input[type="checkbox"] {
   width: 32px;
   height: 32px;
+}
+
+/* Ensure the main container takes up 100% of the available space */
+#contentPage {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }

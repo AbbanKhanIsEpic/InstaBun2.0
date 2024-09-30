@@ -1,0 +1,39 @@
+<div
+  class="d-flex flex-column align-items-start justify-content-center w-100 mt-2 ms-2 mb-5"
+>
+  <div class="d-flex flex-row w-100">
+    <div
+      class="d-flex align-items-center position-relative searchBar ps-4 pe-4 pt-4 w-100"
+    >
+      <input class="form-control" type="text" id="searchPostInput" />
+      <button type=" button" class="btn btn-primary ms-3" id="searchPostButton">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          class="bi bi-search"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  id="collections"
+  class="col w-100 overflow-x-hidden mb-5 overflow-y-auto h-auto"
+>
+  {{#each collections}}
+    <div
+      class="collection d-flex position-relative flex-column border-1 border"
+      id="{{collectionID}}"
+    >
+      <h5>{{collectionTitle}}</h5>
+      <img src="{{coverPhoto}}" alt="" />
+    </div>
+  {{/each}}
+</div>

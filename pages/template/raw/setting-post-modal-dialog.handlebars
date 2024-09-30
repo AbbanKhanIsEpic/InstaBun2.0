@@ -1,0 +1,85 @@
+<div class="modal-dialog modal-dialog-centered modal-fullscreen modal-dialog-scrollable">
+  <div class="modal-content bg-black text-white glassmorph">
+    <div class="modal-header d-flex flex-column p-0 position-relative pb-4">
+      <h5 id="modalTitle" class="modal-title pt-3">Post</h5>
+      <button type="button" class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3" data-bs-dismiss="modal"
+        aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" class="bi bi-x-lg"
+          viewBox="0 0 16 16">
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+            stroke="white" stroke-width="1.5" />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body d-flex w-100 flex-row m-0 p-0">
+      <div class="ms-3 d-flex justify-content-center border-end" id="postContainer">
+        <div class="d-flex align-items-center justify-content-center pe-3 position-relative">
+          {{#if isVideo}}
+          <video controls preload="auto" class="rounded" width="100%" height="auto">
+            <source src="{{postLink}}" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          {{else}}
+          <img src="{{postLink}}" class="border-1 border user-select-none content" />
+          {{/if}}
+        </div>
+      </div>
+      <div id="postInformationContainer" class="d-flex flex-column w-100 mt-3 ms-3 me-3 position-relative">
+        <div>
+          <h3 class="mb-4 mt-4">Description:</h3>
+          <textarea name="description" id="descriptionInput" class="form-control noBoxShadow w-100 rounded-3"
+            rows="3"></textarea>
+        </div>
+        <div>
+          <h3 class="mb-4 mt-4">Tags:</h3>
+          <div class="form-group d-flex">
+            <input type="text" placeholder="Enter a tag..."
+              class="form-control text-white bg-black border-3 noBoxShadow rounded-3 border-white border-end-0 rounded-end-0"
+              id="tagInput" />
+            <button class="btn btn-primary rounded-start-0 border-start-0" id="addTagButton">
+              Add
+            </button>
+          </div>
+          <div id="tagList" class="mt-2 border border-3 border-white w-100 rounded-3 gap-2 overflow-y-auto"></div>
+        </div>
+        <div>
+          <h3 class="mb-4 mt-4">Visibility:</h3>
+          <div class="form-check d-flex align-items-center mb-2">
+            <input class="form-check-input visibilityCheckBox" type="checkbox" value="0" id="uploadVisibilityAll"
+              {{#isSameVisibility postVisibility 0}}checked{{/isSameVisibility}} />
+            <label class="form-check-label ms-2 mb-0 display-7" for="uploadVisibilityAll">
+              Everyone
+            </label>
+          </div>
+          <div class="form-check d-flex align-items-center mb-2">
+            <input class="form-check-input visibilityCheckBox" type="checkbox" value="1" id="uploadVisibilityFollowers"
+              {{#isSameVisibility postVisibility 1}}checked{{/isSameVisibility}} />
+            <label class="form-check-label ms-2 display-7" for="uploadVisibilityFollowers">
+              Followers
+            </label>
+          </div>
+          <div class="form-check d-flex align-items-center mb-2">
+            <input class="form-check-input visibilityCheckBox" type="checkbox" value="2" id="uploadVisbilityFriends"
+              {{#isSameVisibility postVisibility 2}}checked{{/isSameVisibility}} />
+            <label class="form-check-label ms-2 display-7" for="uploadVisbilityFriends">
+              Friends
+            </label>
+          </div>
+          <div class="form-check d-flex align-items-center">
+            <input class="form-check-input visibilityCheckBox" type="checkbox" value="3" id="uploadVisibilityNoOne"
+              {{#isSameVisibility postVisibility 3}}checked{{/isSameVisibility}} />
+            <label class="form-check-label ms-2 display-7" for="uploadVisibilityNoOne">
+              No-one
+            </label>
+          </div>
+        </div>
+        <hr class="invisible" />
+      </div>
+    </div>
+    <div class="modal-footer d-flex w-100 flex-row">
+      <button id="savePostButton" class="btn btn-primary">Save</button>
+      <button id="deletePostButton" class="btn btn-danger">Delete</button>
+    </div>
+  </div>
+</div>

@@ -120,7 +120,7 @@ class CommentManager {
     } else if (dislikes === 0) {
       return Infinity; // No dislikes, treat as highest possible ratio
     } else if (likes === 0 && dislikes !== 0) {
-      return -Infinity; // No likes, treat as lowest possible ratio
+      return -dislikes; // No likes, treat as lowest possible ratio
     } else {
       return likes / dislikes; // Regular ratio calculation
     }

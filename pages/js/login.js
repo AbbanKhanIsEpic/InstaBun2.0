@@ -94,6 +94,8 @@ loginButton.addEventListener("click", async function () {
   //Checks if login is correct
   const status = await login(userIdentifier, password);
 
+  console.log(status);
+
   //401 -> User did not enter correct details
   if (status == 401) {
     //This checks if user wants to login via email or username
@@ -145,7 +147,6 @@ loginButton.addEventListener("click", async function () {
       .addEventListener("click", async function () {
         if (authCodeInput.value == code) {
           await createUserSession(userIdentifier, 30);
-          window.open("http://127.0.0.1:5500/pages/home.html", "_self");
         } else {
           verifyAuthError.textContent = "Make sure to enter the code correctly";
           authCodeInput.style.borderColor = "red";
@@ -155,7 +156,6 @@ loginButton.addEventListener("click", async function () {
   //If creditial is correct and 2STEP not required
   else if (status == 200) {
     await createUserSession(userIdentifier, 30);
-    window.open("http://127.0.0.1:5500/pages/home.html", "_self");
   }
 });
 

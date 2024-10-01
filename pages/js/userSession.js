@@ -6,12 +6,12 @@ export async function createUserSession(userIdentifier, expirationDays) {
   try {
     const response = await getUserID(userIdentifier);
 
-    console.log(response.data.userID);
-
     if (response.status != "200") {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
     const userID = response.data.userID;
+
     const date = new Date();
     date.setTime(date.getTime() + expirationDays * 24 * 60 * 60 * 1000);
 
@@ -19,10 +19,21 @@ export async function createUserSession(userIdentifier, expirationDays) {
     const domain = "domain=127.0.0.1";
     const path = "path=/"; // Cookie accessible from all paths
 
+    //Delete cookie
     document.cookie =
-      "userID" + "=" + userID + ";" + expires + ";" + domain + ";" + path;
-    console.log("Cookie has been made");
-    alert("Hello");
+      "userID=" +
+      userID +
+      ";" +
+      "expires=Thu, 01 Jan 1970 00:00:00 UTC;" +
+      "path=/;" +
+      "domain=" +
+      domain +
+      ";";
+
+    //Create cookie
+    document.cookie =
+      "userID" + "=" + userID + ";" + expires + ";" + path + ";" + domain;
+    window.open("http://127.0.0.1:5500/pages/home.html", "_self");
   } catch (error) {
     console.log(error);
   }

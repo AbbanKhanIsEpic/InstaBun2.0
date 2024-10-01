@@ -63,8 +63,7 @@ export async function getUserID(userIdentifier) {
     const response = await axios.get(`${API_BASE_URL}/userID`, {
       params: { userIdentifier },
     });
-    console.log(response);
-    return response["data"]["userID"];
+    return response;
   } catch (error) {
     console.error(error);
   }

@@ -1,5 +1,5 @@
 //Imports
-import { login, getEmailAddress } from "./API/user.js";
+import { login, getEmailAddress, isEmailTaken } from "./API/user.js";
 import { getLocation } from "./API/location.js";
 import { sendAuth, sendChangePasswordCode } from "./API/email.js";
 import { createUserSession } from "./userSession.js";
@@ -231,7 +231,7 @@ forgotPassword.addEventListener("click", async function () {
     const password = newPasswordInput.value.replaceAll(/\s/g, ""); //Remove all white spaces
     const confirmPassword = newConfirmPasswordInput.value.replaceAll(/\s/g, ""); //Remove all white spaces
 
-    isValid = true;
+    let isValid = true;
 
     //Reset errors
     newPasswordError.textContent = "";
@@ -324,5 +324,4 @@ function resetTimer() {
 function setPasswordErrorMessage(message) {
   newPasswordError.textContent = message;
   newPasswordInput.style.borderColor = "red";
-  isValid = false;
 }

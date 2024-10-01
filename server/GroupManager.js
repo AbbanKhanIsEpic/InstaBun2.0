@@ -46,7 +46,7 @@ class GroupManager {
   }
 
   //Remove member to the group
-  async removeMemeber(groupID, groupMemberID) {
+  async removeMember(groupID, groupMemberID) {
     try {
       const query = `DELETE FROM GroupMembers WHERE (GroupID = ?) AND (UserID = ?);`;
       await update(query, [groupID, groupMemberID]);
@@ -168,11 +168,41 @@ class GroupManager {
       await groupMessage.deleteGroupMessages(groupID);
       await groupMessage.deleteClearMessages(groupID);
       for (const groupMember of groupMembers) {
-        await this.removeMemeber(groupID, groupMember);
+        await this.removeMember(groupID, groupMember);
       }
       const query = `DELETE FROM community WHERE (GroupID = ?);`;
       await update(query, [groupID]);
       return "Delete group operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateGroupIcon(file, groupID) {
+    try {
+      const buffer = file.buffer;
+      const fileName = sha1(buffer);
+      const url = "groupIcon/" + fileName;
+      const mimetype = file.mimetype;
+
+      const firebaseStorageManager = new FirebaseStorageManager();
+      const firebaseURL = await firebaseStorageManager.uploadFile(
+        buffer,
+        url,
+        mimetype
+      );
+
+      const query = `UPDATE groupdb SET groupIcon = ? WHERE (groupID = ?)`;
+      update(query, [firebaseURL, groupID]);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateGroupName(groupName, groupID) {
+    try {
+      const query = `UPDATE groupdb SET groupName = ? WHERE (groupID = ?)`;
+      update(query, [groupName, groupID]);
     } catch (error) {
       return error;
     }

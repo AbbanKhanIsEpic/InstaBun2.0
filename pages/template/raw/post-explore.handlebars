@@ -82,7 +82,7 @@
       >{{totalLike}}</div>
       <div
         role="button"
-        class="mb-3 commentButton"
+        class="commentButton"
         data-bs-toggle="modal"
         data-bs-target="#viewComments"
       >
@@ -99,7 +99,10 @@
           />
         </svg>
       </div>
-      <div role="button" class="mb-3 shareButton" role="button">
+      <div
+        class="text-white d-flex justify-content-center mb-3"
+      >{{totalComment}}</div>
+      <div role="button" class="shareButton" role="button">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -113,6 +116,9 @@
           />
         </svg>
       </div>
+      <div
+        class="text-white d-flex justify-content-center mb-3"
+      >{{totalShare}}</div>
       <div role="button" class="bookmarkButton" role="button">
         {{#if hasBookmarked}}
           <svg

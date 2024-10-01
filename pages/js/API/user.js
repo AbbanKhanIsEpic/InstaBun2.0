@@ -110,6 +110,18 @@ export async function block(requestingUserID, targetUserID) {
   }
 }
 
+export async function isEmailTaken(email) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/IsEmailTaken`, {
+      params: { email },
+    });
+    console.log(response);
+    return response["data"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function unblock(requestingUserID, targetUserID) {
   try {
     const response = await axios.delete(

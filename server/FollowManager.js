@@ -29,6 +29,7 @@ class FollowManager {
     try {
       const query = `SELECT count(*) FROM instabun.followers where FollowerID = ? AND FollowingID = ?;`;
       const [result] = await select(query, [requestingUserID, targetUserID]);
+      console.log(result);
       return result["count(*)"] == 1;
     } catch (error) {
       return error;

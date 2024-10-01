@@ -496,13 +496,13 @@ app.post("/api/email/auth", async (req, res) => {
 
 //Send email to finalise account creation
 app.post("/api/email/creation", async (req, res) => {
-  const { toEmail, code, location } = req.body;
+  const { email, code, location } = req.body;
 
-  console.log(toEmail, code, location);
+  console.log(email, code, location);
 
   try {
     const emailManager = new EmailManager();
-    await emailManager.createAccount(toEmail, code, location);
+    await emailManager.createAccount(email, code, location);
     res.status(200).json({ message: "Complete" });
   } catch (error) {
     res.status(500).send({
@@ -514,11 +514,11 @@ app.post("/api/email/creation", async (req, res) => {
 
 //Send email to change user's password
 app.post("/api/email/changePassword", async (req, res) => {
-  const { toEmail, code, location } = req.body;
+  const { email, code, location } = req.body;
 
   try {
     const emailManager = new EmailManager();
-    await emailManager.passwordChange(toEmail, code, location);
+    await emailManager.passwordChange(email, code, location);
     res.status(200).json({ message: "Complete" });
   } catch (error) {
     res.status(500).send({
@@ -717,20 +717,23 @@ app.get("/api/post/search", (req, res) => {
     });
 });
 
-app.get("/api/post/recommend", (req, res) => {
+app.get("/api/post/recommend", async (req, res) => {
   const { userID } = req.query;
 
   const post = new PostManager();
 
-  post
-    .getPostBasedLike(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).send(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
+  try {
+    const result = await post.getPostBasedLike(userID);
+
+    if (!result || !result.length) {
+      const mostPopular = await post.getPopularPost(userID);
+      return res.status(200).send(mostPopular);
+    }
+
+    return res.status(200).send(result);
+  } catch (error) {
+    return res.status(500).send("Error occurred");
+  }
 });
 
 app.get("/api/post/select", (req, res) => {
@@ -1116,7 +1119,7 @@ app.delete("/api/group/member", async (req, res) => {
   const groupManager = new GroupManager();
 
   try {
-    await groupManager.removeMemeber(groupID, userID);
+    await groupManager.removeMember(groupID, userID);
     res
       .status(200)
       .json({ message: "Data received and processed successfully" });

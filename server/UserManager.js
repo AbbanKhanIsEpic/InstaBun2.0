@@ -1,5 +1,6 @@
 const { select, update } = require("./DB.js");
 const FollowManager = require("./FollowManager.js");
+const BlockManager = require("./BlockManager.js");
 
 //Imports
 class UserManager {
@@ -129,14 +130,22 @@ class UserManager {
     //Username or display name starting with the search query
     searchQuery += "%";
     try {
+      //Manager
+      const blockManager = new BlockManager();
+
+      const followManager = new FollowManager();
       //When searching for users, you are able to search yourself
       const query = `SELECT userID, username, displayName, profileIcon FROM users WHERE (username LIKE ? OR displayName LIKE ?);`;
       const listOfUsers = await select(query, [searchQuery, searchQuery]);
       //Iterating through the listOfUsers
+
+      //Remove any users who blocked the current user
+      listOfUsers.filter(async (user) => {
+        isBlocked = await blockManager.isUserBlocked(userID, user["userID"]);
+      });
+
       for (let i = 0; i < listOfUsers.length; i++) {
         const searchedUserID = listOfUsers[i]["userID"];
-
-        const followManager = new FollowManager();
 
         listOfUsers[i]["isFollowing"] = await followManager.isFollowing(
           userID,
@@ -157,30 +166,49 @@ class UserManager {
   //Thirdly, filter them by checking if the friends' friends are not friends with the current user
   async getMutualAcquaintance(userID) {
     try {
-      const query = `With friend as (SELECT 
-    FollowingID AS userID
-FROM
-    followers
-WHERE
-    FollowerID = ?
-HAVING (SELECT 
-        COUNT(*)
-    FROM
-        followers
-    WHERE
-        (FollowingID = ? AND FollowerID = userID)
-            OR (FollowingID = userID AND FollowerID = ?)) = 2), 
+      const followManager = new FollowManager();
+      const blockManager = new BlockManager();
 
-MutualAcquaintance as (SELECT FollowerID as friendID, FollowingID as userID FROM followers WHERE  FollowerID IN (select * from friend) AND FollowingID NOT IN (select * from friend UNION select ? as userID) AND FollowingID NOT IN (Select followingID from followers where FollowerID = ?))
-            
-Select username, displayName, profileIcon, MutualAcquaintance.userID, 0 as isFollowing from MutualAcquaintance INNER JOIN users on users.userID = MutualAcquaintance.userID group by MutualAcquaintance.userID;`;
-      const result = await select(query, [
-        userID,
-        userID,
-        userID,
-        userID,
-        userID,
-      ]);
+      const closeFriends = await followManager.getCloseFriend(userID);
+
+      const mutualAcquaintances = [];
+
+      for (const friendID of closeFriends) {
+        const friendCloseFriends = await followManager.getCloseFriend(friendID);
+        for (const mutualID of friendCloseFriends) {
+          if (mutualID == userID) {
+            continue;
+          }
+          const isBlocked = await blockManager.isUserBlocked(userID, mutualID);
+          if (isBlocked) {
+            continue;
+          }
+          const isFollowing = await followManager.isFollowing(userID, mutualID);
+          if (isFollowing) {
+            continue;
+          }
+          mutualAcquaintances.push(mutualID);
+        }
+      }
+
+      const promises = mutualAcquaintances.map(async (mutualID) => {
+        const [username, displayName, profileIcon] = await Promise.all([
+          this.getUsername(mutualID),
+          this.getDisplayName(mutualID),
+          this.getProfileIcon(mutualID),
+        ]);
+
+        return {
+          userID: mutualID,
+          username: username,
+          displayName: displayName,
+          profileIcon: profileIcon,
+          isFollowing: 0,
+        };
+      });
+
+      const result = await Promise.all(promises);
+      console.log(result);
       return result;
     } catch (error) {
       return error;
@@ -189,27 +217,44 @@ Select username, displayName, profileIcon, MutualAcquaintance.userID, 0 as isFol
 
   async getPopularUsers(userID) {
     try {
-      const query = `SELECT 
-    username,
-    displayName,
-    profileIcon,
-    userID,
-    (SELECT 
-            COUNT(*)
-        FROM
-            followers
-        WHERE
-            FollowerID = ? AND FollowingID = userID) isFollowing
-FROM
-    followers
-        INNER JOIN
-    users ON users.userID = followers.followingID
-WHERE
-    userID != ?
-GROUP BY FollowingID
-ORDER BY (COUNT(*)) DESC;`;
-      const result = await select(query, [userID, userID]);
-      return result;
+      const followManager = new FollowManager();
+      const blockManager = new BlockManager();
+
+      const query = `SELECT distinct FollowingID FROM instabun.followers WHERE followingID != ? group by FollowingID ORDER BY count(*) DESC;`;
+
+      const result = await select(query, [userID]);
+
+      console.log(result);
+
+      const completeResult = [];
+
+      for (const { FollowingID: famousUserID } of result) {
+        const isBlocked = await blockManager.isUserBlocked(
+          userID,
+          famousUserID
+        );
+
+        if (isBlocked) {
+          continue;
+        }
+
+        const [username, displayName, profileIcon, isFollowing] =
+          await Promise.all([
+            this.getUsername(famousUserID),
+            this.getDisplayName(famousUserID),
+            this.getProfileIcon(famousUserID),
+            followManager.isFollowing(userID, famousUserID),
+          ]);
+
+        completeResult.push({
+          userID: famousUserID,
+          username: username,
+          displayName: displayName,
+          profileIcon: profileIcon,
+          isFollowing: isFollowing,
+        });
+      }
+      return completeResult;
     } catch (error) {
       return error;
     }

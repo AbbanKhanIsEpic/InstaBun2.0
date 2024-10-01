@@ -4,6 +4,7 @@ const sha1 = require("sha1");
 const FirebaseStorageManager = require("./FirebaseStorageManager");
 const FollowManager = require("./FollowManager.js");
 const CommentManager = require("./CommentManager.js");
+const BlockManager = require("./BlockManager.js");
 const BookmarkManager = require("./BookmarkManager.js");
 
 class PostManager {
@@ -123,11 +124,9 @@ class PostManager {
 
       const tagIDsArray = await this.#getTagIDs(tags);
 
-      const posts = (await this.#getPostForAll(tagIDsArray)).map(
-        (element) => element?.["postID"]
-      );
+      const posts = await this.#getPostForAll(userID, tagIDsArray);
 
-      if (!posts.length) {
+      if (!posts.length || !posts) {
         return new Error("Unable to retrieve post via the provided tags");
       }
 
@@ -147,15 +146,19 @@ class PostManager {
   //3 -> get post that user has not liked
   async getPostBasedLike(userID) {
     try {
-      const top10TagIDs = (await this.#getPersonalTop10TagIDs(userID)).map(
-        (element) => element?.["tagID"]
-      );
-      if (!top10TagIDs.length) {
+      const top10TagIDs = await this.#getPersonalTop10TagIDs(userID);
+
+      if (!top10TagIDs.length || !top10TagIDs) {
         return new Error("User has not liked any post");
       }
-      const unLikedPostIDs = (
-        await this.#getUnlikedPostsByTags(top10TagIDs)
-      ).map((element) => element?.["postID"]);
+
+      const unLikedPostIDs = await this.#getUnlikedPostsByTags(top10TagIDs);
+
+      if (!unLikedPostIDs.length || !unLikedPostIDs) {
+        return new Error(
+          "Unable to give recommendation as user has liked all post"
+        );
+      }
 
       const posts = await this.#addUploaderDetails(unLikedPostIDs);
 
@@ -171,13 +174,15 @@ class PostManager {
 
   async getPopularPost(userID) {
     try {
-      const top10TagIDs = (await this.#getTop10TagIDs(userID)).map(
-        (element) => element?.["tagID"]
-      );
+      const top10TagIDs = await this.#getTop10TagIDs(userID);
 
-      const unLikedPostIDs = (
-        await this.#getUnlikedPostsByTags(top10TagIDs)
-      ).map((element) => element?.["postID"]);
+      const unLikedPostIDs = await this.#getUnlikedPostsByTags(top10TagIDs);
+
+      if (!unLikedPostIDs.length || !unLikedPostIDs) {
+        return new Error(
+          "Unable to give recommendation as user has liked all post"
+        );
+      }
 
       const posts = await this.#addUploaderDetails(unLikedPostIDs);
 
@@ -196,7 +201,7 @@ class PostManager {
     try {
       const query = `SELECT DISTINCT tagpost.postID FROM tagpost LEFT JOIN likepost on likepost.postID = tagpost.postID INNER JOIN post on post.postID = tagpost.postID where tagID IN (?) AND likepost.postID IS NULL AND post.postVisibility = 0;`;
       const result = await select(query, [tagIDs]);
-      return result;
+      return result ? result.map((element) => element?.["postID"]) : null;
     } catch (error) {
       return error;
     }
@@ -207,13 +212,35 @@ class PostManager {
   //If the uploader(the user who created the post) does not allow everyone to see
   //The post will not be included
   //This method is used for the explore screen
-  async #getPostForAll(tagsArray) {
+  async #getPostForAll(userID, tagsArray) {
     try {
-      const query = `SELECT tagpost.postID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY postID ORDER BY COUNT(DISTINCT tagID) DESC`;
+      const blockManager = new BlockManager();
+
+      //Get post that is public to all
+      const query = `SELECT tagpost.postID,post.userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID INNER JOIN block on block.blockerUserID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY post.postID ORDER BY COUNT(DISTINCT tagID) DESC`;
 
       const result = await select(query, [tagsArray]);
 
-      return result;
+      //If there is no post with that tags
+      //Return empty
+      if (!result || !result.length) {
+        return [];
+      }
+
+      const filteredPostIDs = [];
+
+      //User should not be able to view content from people who blocked them
+      for (const { userID: uploaderUserID, postID: postID } of result) {
+        const isBlocked = await blockManager.isUserBlocked(
+          userID,
+          uploaderUserID
+        );
+        if (!isBlocked) {
+          filteredPostIDs.push(postID);
+        }
+      }
+
+      return filteredPostIDs;
     } catch (error) {
       return error;
     }
@@ -224,7 +251,7 @@ class PostManager {
     try {
       const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID where userID = ? group by tagID order by count(*) DESC LIMIT 10`;
       const result = await select(query, [userID]);
-      return result;
+      return result ? result.map((element) => element?.["tagID"]) : [];
     } catch (error) {
       return error;
     }
@@ -234,7 +261,7 @@ class PostManager {
   //This will be used to help when the user is new and/or has no like
   async #getTop10TagIDs() {
     try {
-      const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID where group by tagID order by count(*) DESC LIMIT 10`;
+      const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID  group by tagID order by count(*) DESC LIMIT 10`;
       const result = await select(query);
       return result;
     } catch (error) {
@@ -338,17 +365,19 @@ class PostManager {
 
       const promises = filteredPost.map(async (post) => {
         const postID = post["id"];
-        const [totalLike, hasLiked, totalComment, hasBookmarked] =
+        const [totalLike, hasLiked, totalComment, totalShare, hasBookmarked] =
           await Promise.all([
             this.getTotalLike(postID),
             this.hasLiked(postID, userID),
             commentManager.getTotalComment(postID),
+            this.getTotalShare(postID),
             bookmarkManager.hasBookmarked(userID, postID),
           ]);
 
         post["totalLike"] = totalLike;
         post["hasLiked"] = hasLiked;
         post["totalComment"] = totalComment;
+        post["totalShare"] = totalShare;
         post["hasBookmarked"] = hasBookmarked;
       });
       await Promise.all(promises);
@@ -447,7 +476,7 @@ class PostManager {
 
       const followingList = await followManager.getFollowings(userID);
 
-      if (!followingList.length) {
+      if (!followingList.length || !followingList) {
         return new Error(
           "Unable to get following post because user is not following anyone"
         );
@@ -477,7 +506,7 @@ class PostManager {
         ])
       ).map((element) => element?.["postID"]);
 
-      if (!postIDs.length) {
+      if (!postIDs.length || !postIDs) {
         return new Error("The user does not have any posts");
       }
 
@@ -531,6 +560,16 @@ class PostManager {
         await update(query, [postID, userID]);
         return "Record share action operation successful";
       }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getTotalShare(postID) {
+    try {
+      const query = `Select count(*) from sharepost where postID = ?`;
+      const [result] = await select(query, [postID]);
+      return result["count(*)"];
     } catch (error) {
       return error;
     }

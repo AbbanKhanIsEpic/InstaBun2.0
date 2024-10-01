@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const followingsOutput = followingsTemplate({ users: followingsData });
 
-      viewFollowingList.querySelector("#followerList").innerHTML =
+      viewFollowingList.querySelector("#followingList").innerHTML =
         followingsOutput;
 
       new bootstrap.Modal(viewFollowingList).show();

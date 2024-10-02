@@ -282,6 +282,7 @@ async function displayUserList() {
     }
 
     checkbox.addEventListener("change", function () {
+      console.log(showCaseMemberNewGroup);
       const isSelected = user.classList.contains("selected");
       if (isSelected) {
         user.classList.remove("selected");
@@ -290,7 +291,7 @@ async function displayUserList() {
         });
         selectedArray.splice(index, 1);
         const copy = user.childNodes[1].cloneNode(true);
-        for (i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
+        for (let i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
           const childNode = showCaseMemberNewGroup.childNodes[i];
           if (childNode.isEqualNode(copy)) {
             showCaseMemberNewGroup.removeChild(childNode);
@@ -346,7 +347,7 @@ function displaySelectedUsers(selectedArray) {
         checkmark.classList.toggle("d-none");
         checkbox.value = "off";
         const copy = deSelectedUser.childNodes[1].cloneNode(true);
-        for (i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
+        for (let i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
           const childNode = showCaseMemberNewGroup.childNodes[i];
           if (childNode.isEqualNode(copy)) {
             showCaseMemberNewGroup.removeChild(childNode);
@@ -441,14 +442,18 @@ async function setMessageContainer(
   const moreInfo = document.querySelector("#moreInfo");
 
   moreInfo.addEventListener("click", function () {
-    if (isDirect) {
-      window.open(
-        `http://127.0.0.1:5500/pages/profile.html?userID=${userID}`,
-        "_self"
-      );
-    } else {
-      infoModal.style.display = "block";
-    }
+    const modalTemplate = Handlebars.templates["conversation-info"];
+    const data = {
+      isDirect: isDirect,
+      name: toName.trim(),
+      profileIcon: toProfileIcon,
+    };
+    const modalOutput = modalTemplate(data);
+    const conversationInfoModal = document.querySelector(
+      "#conversationInfoModal"
+    );
+    conversationInfoModal.innerHTML = modalOutput;
+    new bootstrap.Modal(conversationInfoModal).show();
   });
 
   displayMessages(userID, toID, isDirect, hidden);

@@ -8,6 +8,10 @@ class DirectMessageManager {
   //Save the message to database
   async sendMessage(senderID, receiverID, message) {
     try {
+      const canMessage = await this.canUserMessage(senderID, receiverID);
+      if (!canMessage) {
+        return new Error("Can not send message beacause dm limit");
+      }
       const query = `INSERT INTO directmessage (senderID,receiverID,message) VALUES (?, ?, ?);`;
       await update(query, [senderID, receiverID, message]);
       return "Send message operation successful";

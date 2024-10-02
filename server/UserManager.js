@@ -140,19 +140,28 @@ class UserManager {
       //Iterating through the listOfUsers
 
       //Remove any users who blocked the current user
-      listOfUsers.filter(async (user) => {
-        isBlocked = await blockManager.isUserBlocked(userID, user["userID"]);
-      });
+      const filteredUsers = await Promise.all(
+        listOfUsers.map(async (user) => {
+          const isBlocked = await blockManager.isUserBlocked(
+            userID,
+            user["userID"]
+          );
+          return { ...user, isBlocked };
+        })
+      );
 
-      for (let i = 0; i < listOfUsers.length; i++) {
-        const searchedUserID = listOfUsers[i]["userID"];
+      // Filter out the users who are blocked
+      const result = filteredUsers.filter((user) => !user.isBlocked);
 
-        listOfUsers[i]["isFollowing"] = await followManager.isFollowing(
+      for (let i = 0; i < result.length; i++) {
+        const searchedUserID = result[i]["userID"];
+
+        result[i]["isFollowing"] = await followManager.isFollowing(
           userID,
           searchedUserID
         );
       }
-      return listOfUsers;
+      return result;
     } catch (error) {
       return error;
     }

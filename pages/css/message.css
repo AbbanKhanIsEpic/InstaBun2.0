@@ -46,7 +46,8 @@
 
 #userList,
 #hiddenMessageList,
-#showCaseMemberNewGroup {
+#showCaseMemberNewGroup,
+#newMemberList {
   height: 240px;
 }
 

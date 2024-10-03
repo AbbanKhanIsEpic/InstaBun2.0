@@ -1,5 +1,14 @@
 //Imports
-import { createGroup, getOwnerID, getMembers } from "./API/group.js";
+import {
+  createGroup,
+  getOwnerID,
+  getMembers,
+  addMember,
+  removeMember,
+  changeOwner,
+  updateTitle,
+  changeGroupIcon,
+} from "./API/group.js";
 import { getUserList } from "./API/user.js";
 import {
   sendGroupMessage,
@@ -10,6 +19,8 @@ import {
   deleteDirectMessage,
   deleteGroupMessage,
   getHiddenMessageList,
+  clearDirectMessage,
+  clearGroupMessage,
 } from "./API/message.js";
 import { userID } from "./userSession.js";
 import { getProfileIcon, getUsername, getDisplayName } from "./API/user.js";
@@ -49,6 +60,7 @@ let isGroup;
 let deleteMessageID;
 let communicatingToID;
 let selectedFile;
+let confirmAction = null;
 
 const selectedArray = [];
 
@@ -211,11 +223,13 @@ cancelDeleteMessage.addEventListener("click", function () {
 });
 
 confirmDeleteMessage.addEventListener("click", async function () {
+  console.log("Hello");
   const resultStatus = (
     isGroup
       ? await deleteGroupMessage(deleteMessageID)
       : await deleteDirectMessage(deleteMessageID)
   )["status"];
+  console.log(resultStatus);
   if (resultStatus == 200) {
     await displayMessages(userID, communicatingToID, !isGroup);
     await displayMessageLists(userID);
@@ -455,9 +469,6 @@ async function setMessageContainer(
     const groupMembers = await getMembers(communicatingToID);
 
     Handlebars.registerHelper("isGroupOwner", function (memberID, ownerID) {
-      console.log("Hello");
-      console.log(memberID);
-      console.log(ownerID);
       return memberID == ownerID;
     });
 
@@ -470,8 +481,6 @@ async function setMessageContainer(
       isGroupOwner: selectedGroupOwner == userID,
     };
 
-    console.log(groupMembers);
-
     const modalOutput = modalTemplate(data);
     const conversationInfoModal = document.querySelector(
       "#conversationInfoModal"
@@ -480,6 +489,401 @@ async function setMessageContainer(
     conversationInfoModal.innerHTML = modalOutput;
 
     new bootstrap.Modal(conversationInfoModal).show();
+
+    const clearMessage = conversationInfoModal.querySelector("#clearMessage");
+
+    const transferOwnershipButtons =
+      document.querySelectorAll(".transferOwnership");
+
+    const removeMemberButtons = document.querySelectorAll(".removeMember");
+
+    const addNewMemberButton = conversationInfoModal.querySelector(
+      "#addNewMemberButton"
+    );
+
+    const leaveGroupButton =
+      conversationInfoModal.querySelector("#leaveGroupButton");
+
+    const changeGroupNameInput = conversationInfoModal.querySelector(
+      "#changeGroupNameInput"
+    );
+
+    const updateGroupButton =
+      conversationInfoModal.querySelector("#updateGroupButton");
+
+    let selectedFile = null;
+    let hasSelectedFile = false;
+
+    document
+      .querySelector("#changeGroupProfileIcon")
+      .addEventListener("change", function (event) {
+        selectedFile = event.target.files[0];
+        if (selectedFile.type.match("image.*")) {
+          const reader = new FileReader();
+          reader.addEventListener("load", async (event) => {
+            const imageSource = event.target.result;
+            document.querySelector("#showNewIcon").src = imageSource;
+          });
+          reader.readAsDataURL(selectedFile);
+          hasSelectedFile = true;
+        } else {
+          alert("Only images allowed, sorry");
+        }
+      });
+
+    if (updateGroupButton) {
+      updateGroupButton.addEventListener("click", async function () {
+        const inputValue = changeGroupNameInput.value;
+        if (hasSelectedFile) {
+          const formData = new FormData();
+
+          const mime = selectedFile.type;
+
+          const name = selectedFile.name;
+
+          console.log(selectedFile);
+
+          const newFile = new File([selectedFile], name, { type: mime });
+
+          formData.append("file", newFile);
+
+          formData.append(
+            "jsonData",
+            JSON.stringify({
+              groupID: communicatingToID,
+            })
+          );
+          updateGroupButton.classList.add("disabled");
+          const status = await changeGroupIcon(formData);
+          if (status == "200") {
+            updateGroupButton.classList.remove("disabled");
+            alert("Icon has been updated");
+          } else {
+            alert("Something went wrong, try again");
+          }
+        }
+        if (inputValue.trim() != toName.trim()) {
+          await updateTitle(communicatingToID, inputValue.trim());
+          alert("Title has been updated");
+        }
+      });
+      location.reload();
+    }
+
+    if (leaveGroupButton) {
+      leaveGroupButton.addEventListener("click", function () {
+        if (confirmAction == null) {
+          alert("Click the button again to confirm your departure");
+          confirmAction = { type: "leaveGroup", groupID: communicatingToID };
+          return;
+        }
+        if (
+          confirmAction.type == "leaveGroup" &&
+          confirmAction.groupID == communicatingToID
+        ) {
+          alert("Confirmed");
+          removeMember(communicatingToID, userID);
+          location.reload();
+          return;
+        } else {
+          alert("Click the button again to confirm your departure");
+          confirmAction = {
+            type: "leaveGroup",
+            groupID: communicatingToID,
+          };
+          return;
+        }
+      });
+    }
+
+    Array.from(transferOwnershipButtons).forEach((transferOwnership) => {
+      transferOwnership.addEventListener("click", async function () {
+        if (confirmAction == null) {
+          alert("Click the button again to confirm your transfer of ownership");
+          confirmAction = {
+            type: "leaveGroup",
+            groupID: communicatingToID,
+            id: transferOwnership.id,
+          };
+          return;
+        }
+        if (
+          confirmAction.type == "leaveGroup" &&
+          confirmAction.groupID == communicatingToID &&
+          confirmAction.id == transferOwnership.id
+        ) {
+          await changeOwner(communicatingToID, transferOwnership.id);
+          alert("Transfer is done");
+          location.reload();
+          return;
+        } else {
+          alert("Click the button again to confirm your transfer of ownership");
+          confirmAction = {
+            type: "leaveGroup",
+            groupID: communicatingToID,
+            id: transferOwnership.id,
+          };
+          return;
+        }
+      });
+    });
+
+    Array.from(removeMemberButtons).forEach((removeMemberButton) => {
+      removeMemberButton.addEventListener("click", async function () {
+        if (confirmAction == null) {
+          alert("Click the button again to confirm removing the member");
+          confirmAction = {
+            type: "removeMember",
+            groupID: communicatingToID,
+            id: removeMemberButton.id,
+          };
+          return;
+        }
+        if (
+          confirmAction.type == "removeMember" &&
+          confirmAction.groupID == communicatingToID &&
+          confirmAction.id == removeMemberButton.id
+        ) {
+          await removeMember(communicatingToID, removeMemberButton.id);
+          alert("Removing the member is done");
+          location.reload();
+          return;
+        } else {
+          alert("Click the button again to confirm removing the member");
+          confirmAction = {
+            type: "removeMember",
+            groupID: communicatingToID,
+            id: removeMemberButton.id,
+          };
+          return;
+        }
+      });
+    });
+
+    clearMessage.addEventListener("click", async function () {
+      if (isDirect) {
+        if (confirmAction == null) {
+          alert("Click the button again to confirm clearing messages");
+          confirmAction = {
+            type: "clearDirect",
+            groupID: null,
+            id: communicatingToID,
+          };
+          return;
+        }
+        if (
+          confirmAction.type == "clearDirect" &&
+          confirmAction.groupID == null &&
+          confirmAction.id == communicatingToID
+        ) {
+          await clearDirectMessage(userID, communicatingToID);
+          alert("Clearing messages is done");
+          location.reload();
+          return;
+        } else {
+          alert("Click the button again to confirm clearing messages");
+          confirmAction = {
+            type: "clearDirect",
+            groupID: null,
+            id: communicatingToID,
+          };
+          return;
+        }
+      } else {
+        if (confirmAction == null) {
+          alert("Click the button again to confirm clearing messages");
+          confirmAction = {
+            type: "clearGroup",
+            groupID: communicatingToID,
+            id: null,
+          };
+          return;
+        }
+        if (
+          confirmAction.type == "clearGroup" &&
+          confirmAction.groupID == communicatingToID &&
+          confirmAction.id == null
+        ) {
+          await clearGroupMessage(userID, communicatingToID);
+          alert("Clearing messages is done");
+          location.reload();
+          return;
+        } else {
+          alert("Click the button again to confirm clearing messages");
+          confirmAction = {
+            type: "clearGroup",
+            groupID: communicatingToID,
+            id: null,
+          };
+          return;
+        }
+      }
+    });
+
+    if (addNewMemberButton) {
+      addNewMemberButton.addEventListener("click", async function () {
+        const addMemberModal = document.querySelector("#addMemberModal");
+
+        new bootstrap.Modal(addMemberModal).show();
+
+        const newMemberArray = [];
+
+        const newMemberList = addMemberModal.querySelector("#newMemberList");
+        const showcaseSelectedMembers = addMemberModal.querySelector(
+          "#showcaseSelectedMembers"
+        );
+        const searchNewMemberInput = addMemberModal.querySelector(
+          "#searchNewMemberInput"
+        );
+
+        const addMemberButton = document.querySelector("#addMember");
+
+        addMemberButton.addEventListener("click", async function () {
+          const existingGroupMemberIDs = groupMembers.map(
+            (groupMember) => groupMember?.["userID"]
+          );
+          const selectedUserIDs = newMemberArray.map((member) =>
+            Number(member?.["id"])
+          );
+          const isContainingExsitingMembers = selectedUserIDs.filter(
+            (memberID) => existingGroupMemberIDs.includes(memberID)
+          );
+          if (isContainingExsitingMembers.includes(userID)) {
+            alert("You can not add yourself");
+            return;
+          }
+          if (isContainingExsitingMembers.length > 0) {
+            alert("You can not add an existing member");
+            return;
+          }
+          const newMembers = selectedUserIDs.filter(
+            (memberID) => !existingGroupMemberIDs.includes(memberID)
+          );
+          addMemberButton.classList.add("disabled");
+          for (const memberID of newMembers) {
+            await addMember(communicatingToID, memberID);
+          }
+          alert("Member/s are added");
+          location.reload();
+        });
+
+        searchNewMemberInput.addEventListener("input", function () {
+          const keywords = searchNewMemberInput.value.trim();
+          //Only display the list after 500ms -> user stop typing
+          setTimeout(function () {
+            if (
+              keywords !== searchNewMemberInput.value ||
+              keywords.length == 0
+            ) {
+              userList.innerHTML = "";
+            } else if (keywords == searchNewMemberInput.value) {
+              displayUserList();
+            }
+          }, 500);
+        });
+
+        async function displayUserList() {
+          const template = Handlebars.templates["search-user-message"];
+          const data = await getUserList(searchNewMemberInput.value, userID);
+
+          // Render the template with data
+          const htmlOutput = template(data);
+
+          // Insert the HTML into the DOM
+          newMemberList.innerHTML = htmlOutput;
+
+          const users = addMemberModal.getElementsByClassName("user");
+
+          Array.from(users).forEach((user) => {
+            console.log(user);
+            const id = user.id.split("-")[1];
+            const displayName = user
+              .querySelector('[aria-label="display name"]')
+              .textContent.trim();
+            const username = user
+              .querySelector('[aria-label="username"]')
+              .textContent.trim();
+            const profileIcon = user.querySelector("img").src;
+            const checkbox = user.querySelector("input[type=checkbox]");
+            const checkmark = user.querySelector(".checkmark > svg");
+
+            const isAlreadySelected =
+              newMemberArray.findIndex(function (selected) {
+                return selected.id == id;
+              }) != -1;
+
+            if (isAlreadySelected) {
+              user.classList.add("selected");
+              checkmark.classList.toggle("d-none");
+              checkbox.value = "on";
+            }
+
+            checkbox.addEventListener("change", function () {
+              const isSelected = user.classList.contains("selected");
+              if (isSelected) {
+                user.classList.remove("selected");
+                const index = newMemberArray.findIndex(function (selected) {
+                  return selected.id == id;
+                });
+                newMemberArray.splice(index, 1);
+              } else {
+                user.classList.add("selected");
+                newMemberArray.push({
+                  id: id,
+                  displayName: displayName,
+                  profileIcon: profileIcon,
+                  username: username,
+                });
+              }
+              displaySelectedUsers(newMemberArray);
+              checkmark.classList.toggle("d-none");
+            });
+          });
+        }
+
+        function displaySelectedUsers(newMemberArray) {
+          const template = Handlebars.templates["selected-user"];
+          const data = { users: newMemberArray };
+
+          console.log(data);
+
+          // Render the template with data
+          const htmlOutput = template(data);
+
+          // Insert the HTML into the DOM
+          showcaseSelectedMembers.innerHTML = htmlOutput;
+
+          const selectedUsers =
+            showcaseSelectedMembers.getElementsByClassName("selectedUser");
+
+          Array.from(selectedUsers).forEach((selectedUser) => {
+            const closeButton = selectedUser.querySelector(".btn-close");
+            const id = selectedUser.id.split("-")[1];
+
+            closeButton.addEventListener("click", function () {
+              const index = newMemberArray.findIndex(function (selected) {
+                return selected.id == id;
+              });
+              newMemberArray.splice(index, 1);
+
+              const deSelectedUser = document.querySelector(`#user-${id}`);
+              if (deSelectedUser !== null) {
+                const checkbox = deSelectedUser.querySelector(
+                  "input[type=checkbox]"
+                );
+                const checkmark =
+                  deSelectedUser.querySelector(".checkmark > svg");
+                deSelectedUser.classList.remove("selected");
+                checkmark.classList.toggle("d-none");
+                checkbox.value = "off";
+              }
+
+              displaySelectedUsers(newMemberArray);
+            });
+          });
+        }
+      });
+    }
   });
 
   displayMessages(userID, toID, isDirect, hidden);

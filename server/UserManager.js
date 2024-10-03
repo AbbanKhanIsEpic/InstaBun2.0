@@ -139,14 +139,21 @@ class UserManager {
       const listOfUsers = await select(query, [searchQuery, searchQuery]);
       //Iterating through the listOfUsers
 
-      //Remove any users who blocked the current user
+      //Remove any users who blocked the current user or blocked by the current user
       const filteredUsers = await Promise.all(
         listOfUsers.map(async (user) => {
           const isBlocked = await blockManager.isUserBlocked(
             userID,
             user["userID"]
           );
-          return { ...user, isBlocked };
+
+          const hasBlocked = await blockManager.isUserBlocked(
+            user["userID"],
+            userID
+          );
+
+          const finalBlockValue = hasBlocked || isBlocked;
+          return { ...user, finalBlockValue };
         })
       );
 
@@ -190,6 +197,10 @@ class UserManager {
           }
           const isBlocked = await blockManager.isUserBlocked(userID, mutualID);
           if (isBlocked) {
+            continue;
+          }
+          const hasBlocked = await blockManager.isUserBlocked(mutualID, userID);
+          if (hasBlocked) {
             continue;
           }
           const isFollowing = await followManager.isFollowing(userID, mutualID);
@@ -244,6 +255,14 @@ class UserManager {
         );
 
         if (isBlocked) {
+          continue;
+        }
+
+        const hasBlocked = await blockManager.isUserBlocked(
+          famousUserID,
+          userID
+        );
+        if (hasBlocked) {
           continue;
         }
 

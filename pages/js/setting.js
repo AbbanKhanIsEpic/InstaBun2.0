@@ -360,7 +360,7 @@ async function showBookmarkData() {
             reader.readAsDataURL(selectedFile);
             hasSelectedFile = true;
           } else {
-            alert("Only video or images allowed, sorry");
+            alert("Only images allowed, sorry");
           }
         });
 

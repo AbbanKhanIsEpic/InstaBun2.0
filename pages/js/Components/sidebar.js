@@ -1,7 +1,16 @@
-document.addEventListener("DOMContentLoaded", function () {
+import { getUsername, getProfileIcon } from "../API/user.js";
+import { userID } from "../userSession.js";
+
+document.addEventListener("DOMContentLoaded", async function () {
   const template = Handlebars.templates["sidebar"];
 
-  const htmlOutput = template();
+  const username = await getUsername(userID);
+  const profileIcon = await getProfileIcon(userID);
+
+  const htmlOutput = template({
+    username: username,
+    profileIcon: profileIcon,
+  });
 
   document
     .querySelector("#contentPage")
@@ -30,4 +39,10 @@ function toSearch() {
 }
 function toMessage() {
   window.open("http://127.0.0.1:5500/pages/message.html", "_self");
+}
+function toSetting() {
+  window.open("http://127.0.0.1:5500/pages/setting.html", "_self");
+}
+function toProfile() {
+  window.open("http://127.0.0.1:5500/pages/profile.html", "_self");
 }

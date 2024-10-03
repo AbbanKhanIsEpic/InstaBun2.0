@@ -855,9 +855,6 @@ app.post("/api/post/share", (req, res) => {
 //Story
 app.post("/api/story", upload.single("file"), async (req, res) => {
   try {
-    console.log(req.file);
-    console.log(req.body);
-
     const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
 
     if (!jsonData || Object.keys(jsonData).length === 0) {
@@ -939,6 +936,8 @@ app.get("/api/message/list", async (req, res) => {
 
   try {
     const directList = await directMessageManager.getDirectList(userID);
+
+    console.log(directList);
 
     const directPromises = directList.map(async (element) => {
       element["isGroup"] = false;
@@ -1029,17 +1028,16 @@ app.delete("/api/message/direct/:messageID", (req, res) => {
 
   const directMessageManager = new DirectMessageManager();
 
-  try {
-    directMessageManager.deleteMessage(messageID);
-    res
-      .status(200)
-      .json({ message: "Data received and processed successfully" });
-  } catch (error) {
-    res.status(500).json({
-      error: error.message || error,
-      message: "Error occurred while deleting a direct message",
+  directMessageManager
+    .deleteMessage(messageID)
+    .then((jsonifiedResult) => {
+      console.log(jsonifiedResult);
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
     });
-  }
 });
 
 app.post("/api/message/direct", (req, res) => {
@@ -1078,13 +1076,13 @@ app.post("/api/message/group", (req, res) => {
   }
 });
 
-app.delete("/api/message/group/:messageID", (req, res) => {
-  const { messageID } = req.params;
+app.post("/api/message/group/clear", (req, res) => {
+  const { userID, groupID } = req.body;
 
   const groupMessageManager = new GroupMessageManager();
 
   try {
-    groupMessageManager.deleteGroupMessages(messageID);
+    groupMessageManager.clearMessage(userID, groupID);
     res
       .status(200)
       .json({ message: "Data received and processed successfully" });
@@ -1094,6 +1092,41 @@ app.delete("/api/message/group/:messageID", (req, res) => {
       message: "Error occurred while sending a group message",
     });
   }
+});
+
+app.post("/api/message/direct/clear", (req, res) => {
+  const { senderID, receiverID } = req.body;
+
+  const directMessageManager = new DirectMessageManager();
+
+  try {
+    directMessageManager.clearMessage(senderID, receiverID);
+    res
+      .status(200)
+      .json({ message: "Data received and processed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message || error,
+      message: "Error occurred while sending a group message",
+    });
+  }
+});
+
+app.delete("/api/message/group/:messageID", (req, res) => {
+  const { messageID } = req.params;
+
+  const groupMessageManager = new GroupMessageManager();
+
+  groupMessageManager
+    .deleteMessage(messageID)
+    .then((jsonifiedResult) => {
+      console.log(jsonifiedResult);
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
 });
 
 //Group
@@ -1145,6 +1178,46 @@ app.patch("/api/group/transferOwnership", async (req, res) => {
   }
 });
 
+app.patch("/api/group/groupTitle", async (req, res) => {
+  const { groupID, groupName } = req.body;
+
+  const groupManager = new GroupManager();
+
+  try {
+    await groupManager.updateGroupName(groupName, groupID);
+    res.status(200).json({ message: "Group title successfully updated" });
+  } catch (error) {
+    console.error("Error updating group title:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request" });
+  }
+});
+
+app.patch("/api/group/icon", upload.single("file"), async (req, res) => {
+  const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
+
+  if (!jsonData || Object.keys(jsonData).length === 0) {
+    return res.status(400).json({
+      message: "Error occurred, did not receive jsonData",
+    });
+  }
+
+  const { groupID } = jsonData;
+
+  const groupManager = new GroupManager();
+
+  try {
+    await groupManager.updateGroupIcon(req.file, groupID);
+    res.status(200).json({ message: "Group icon successfully updated" });
+  } catch (error) {
+    console.error("Error transferring ownership:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request" });
+  }
+});
+
 app.post("/api/group/member", async (req, res) => {
   const { groupID, userID } = req.body;
 
@@ -1182,12 +1255,12 @@ app.delete("/api/group/member/:groupID/:userID", async (req, res) => {
 });
 
 app.delete("/api/group", async (req, res) => {
-  const { groupID, groupMembers } = req.query;
+  const { groupID } = req.query;
 
   const groupManager = new GroupManager();
 
   try {
-    await groupManager.deleteGroup(groupID, groupMembers);
+    await groupManager.deleteGroup(groupID);
     res
       .status(200)
       .json({ message: "Data received and processed successfully" });

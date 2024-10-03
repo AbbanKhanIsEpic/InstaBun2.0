@@ -48,7 +48,7 @@ class GroupManager {
   //Remove member to the group
   async removeMember(groupID, groupMemberID) {
     try {
-      const query = `DELETE FROM GroupMembers WHERE (GroupID = ?) AND (UserID = ?);`;
+      const query = `DELETE FROM GroupMembers WHERE (GroupID = ?) AND (memberID = ?);`;
       await update(query, [groupID, groupMemberID]);
       return "Remove member operation successful";
     } catch (error) {
@@ -76,7 +76,7 @@ class GroupManager {
       //Get when message was cleared
       const groupIDList = await this.getGroupIDList(userID);
       //Since null returns nothing -> user not being in a group will return NULL -> return nothing
-      if (!groupIDList.length) {
+      if (!groupIDList || !groupIDList.length) {
         return [];
       }
 
@@ -94,20 +94,20 @@ class GroupManager {
 
         const hasLastMessage = latestMessage?.["messageID"] ? true : false;
 
-        const senderID = hasLastMessage ? latestMessage["senderID"] : null;
+        const senderID = hasLastMessage ? latestMessage?.["senderID"] : null;
 
         const senderName = hasLastMessage
           ? await userManager.getDisplayName(senderID)
           : null;
 
-        const message = hasLastMessage ? latestMessage["message"] : null;
+        const message = hasLastMessage ? latestMessage?.["message"] : null;
 
         const clearMessageTime =
           await groupMessageManager.getWhenMessageCleared(groupID, userID);
 
         const time = hasLastMessage
-          ? new Date(Math.max(latestMessage["time"], clearMessageTime))
-          : result[index]["time"];
+          ? new Date(latestMessage?.["time"])
+          : new Date(Math.max(result[index]["time"], clearMessageTime));
 
         result[index]["senderID"] = senderID;
         result[index]["senderName"] = senderName;
@@ -151,7 +151,7 @@ class GroupManager {
   //Transfer the ownership of the group(groupID) to the user(newOwnerID)
   async transferOwnership(groupID, newOwnerID) {
     try {
-      const query = `UPDATE community SET OwnerID = ? WHERE (GroupID = ?);`;
+      const query = `UPDATE groupDB SET OwnerID = ? WHERE (GroupID = ?);`;
       await update(query, [newOwnerID, groupID]);
       return "Transfer ownership operation successful";
     } catch (error) {

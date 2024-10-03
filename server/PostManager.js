@@ -322,7 +322,11 @@ class PostManager {
           userID,
           uploaderUserID
         );
-        if (!isBlocked) {
+        const hasBlocked = await blockManager.isUserBlocked(
+          uploaderUserID,
+          userID
+        );
+        if (!isBlocked && !hasBlocked) {
           filteredPostIDs.push(postID);
         }
       }

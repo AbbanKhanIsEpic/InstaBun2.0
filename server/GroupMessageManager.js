@@ -11,7 +11,7 @@ class GroupMessageManager {
 
       //Get when message was cleared
       const clearMessageTime =
-        (await this.getWhenMessageCleared(groupID, userID)) || 0;
+        (await this.getWhenMessageCleared(groupID, userID)) ?? 0;
 
       //Get the messages
       const query = `SELECT * FROM groupMessages WHERE groupID = ? AND messageID > ? AND time > ?;`;
@@ -59,6 +59,7 @@ class GroupMessageManager {
   //Does not actually clear the message (will just appear as if on the client side of who wanted to clear the message)
   async clearMessage(userID, groupID) {
     try {
+      console.log("Hello");
       const hasUserClearBefore = await this.#hasClearedMessageBefore(
         userID,
         groupID
@@ -115,7 +116,7 @@ class GroupMessageManager {
   //Returns when user cleared the group messages
   async getWhenMessageCleared(groupID, userID) {
     try {
-      const query = `SELECT time FROM cleargroupmessage where userID = ? AND groupID = ?;`;
+      const query = `SELECT time FROM cleargroupmessage where groupID = ? AND userID = ?;`;
       const [result] = await select(query, [groupID, userID]);
       return result ? result["time"] : null;
     } catch (error) {
@@ -126,18 +127,14 @@ class GroupMessageManager {
   //Returns the latest message
   async getLatestMessage(groupID, userID) {
     try {
-      try {
-        const clearMessageTime =
-          (await this.getWhenMessageCleared(groupID, userID)) || 0;
+      const clearMessageTime =
+        (await this.getWhenMessageCleared(groupID, userID)) ?? 0;
 
-        const query = `SELECT *  FROM groupmessages  WHERE time > ?  AND groupID = ? ORDER BY messageID DESC LIMIT 1;`;
+      const query = `SELECT *  FROM groupmessages  WHERE time > ?  AND groupID = ? ORDER BY messageID DESC LIMIT 1;`;
 
-        const [result] = await select(query, [clearMessageTime, groupID]);
+      const [result] = await select(query, [clearMessageTime, groupID]);
 
-        return result;
-      } catch (error) {
-        return error;
-      }
+      return result;
     } catch (error) {
       return error;
     }

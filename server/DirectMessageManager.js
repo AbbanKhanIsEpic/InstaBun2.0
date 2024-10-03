@@ -200,6 +200,10 @@ class DirectMessageManager {
       //Get a list of people who the user has communicated with
       const communicatedWithList = await this.#getMessagePartnerIDs(userID);
 
+      if (!communicatedWithList || !communicatedWithList.length) {
+        return new Error("User has talked to no one");
+      }
+
       const canCommunicatedWithList = await this.#filterByDMLimit(
         userID,
         communicatedWithList
@@ -232,9 +236,9 @@ class DirectMessageManager {
             this.getLatestMessage(userID, messagedUserID),
           ]);
 
-        const senderName = await userManager.getDisplayName(
-          latestMessage.senderID
-        );
+        const senderName = latestMessage
+          ? await userManager.getDisplayName(latestMessage?.["senderID"])
+          : "";
 
         const clearMessageTime =
           (await this.getWhenMessageCleared(userID, messagedUserID)) || 0;
@@ -244,17 +248,18 @@ class DirectMessageManager {
           username: username,
           icon: profileIcon,
           name: displayName,
-          senderID: latestMessage["senderID"],
+          senderID: latestMessage ? latestMessage?.["senderID"] : "",
           senderName: senderName,
-          message: latestMessage["message"],
+          message: latestMessage ? latestMessage?.["message"] : "",
           time: new Date(
             Math.max(
-              new Date(latestMessage["time"]),
+              new Date(latestMessage ? latestMessage?.["time"] : 0),
               new Date(clearMessageTime)
             )
           ),
         });
       }
+      console.log(filteredList);
       return filteredList;
     } catch (error) {
       return error;
@@ -288,11 +293,12 @@ class DirectMessageManager {
         senderID,
         receiverID
       );
+      console.log(hasUserClearBefore);
       if (hasUserClearBefore) {
-        const updateQuery = `UPDATE ClearDirectMessage SET Time = now() WHERE (SenderID = ?) and (RecieverID = ?);`;
+        const updateQuery = `UPDATE ClearDirectMessage SET Time = now() WHERE (SenderID = ?) and (receiverID = ?);`;
         update(updateQuery, [senderID, receiverID]);
       } else {
-        const createQuery = `INSERT INTO ClearDirectMessage (SenderID, RecieverID, Time) VALUES (?,?,now());`;
+        const createQuery = `INSERT INTO ClearDirectMessage (SenderID, receiverID, Time) VALUES (?,?,now());`;
         update(createQuery, [senderID, receiverID]);
       }
     } catch (error) {
@@ -303,7 +309,7 @@ class DirectMessageManager {
   //Check if the user has cleared the message on their side before
   async #hasClearedMessageBefore(senderID, receiverID) {
     try {
-      const query = `SELECT count(*) FROM instabun.ClearDirectMessage WHERE SenderID = ? AND RecieverID = ?;`;
+      const query = `SELECT count(*) FROM instabun.ClearDirectMessage WHERE SenderID = ? AND receiverID = ?;`;
       const [result] = await select(query, [senderID, receiverID]);
       return result["count(*)"] == 1;
     } catch (error) {

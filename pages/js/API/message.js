@@ -37,6 +37,40 @@ export async function sendDirectMessage(senderID, receiverID, message) {
   }
 }
 
+export async function clearDirectMessage(senderID, receiverID) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/direct/clear`, {
+      senderID,
+      receiverID,
+    });
+    return { status: 200, response: response };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      internalMessage: "Failed to send direct message",
+      error: error.message,
+    };
+  }
+}
+
+export async function clearGroupMessage(userID, groupID) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/group/clear`, {
+      userID,
+      groupID,
+    });
+    return response["status"];
+  } catch (error) {
+    console.error(error);
+    return {
+      status: 500,
+      internalMessage: "Failed to send direct message",
+      error: error.message,
+    };
+  }
+}
+
 //Get messages
 export async function getMessageLists(userID) {
   try {
@@ -94,6 +128,8 @@ export async function deleteDirectMessage(messageID) {
 export async function deleteGroupMessage(messageID) {
   try {
     const response = await axios.delete(`${API_BASE_URL}/group/${messageID}`);
+    console.log(response);
+    console.log("Hello");
     return response;
   } catch (error) {
     console.error(error);

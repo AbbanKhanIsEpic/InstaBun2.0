@@ -1,6 +1,7 @@
 import { getLocation } from "./API/location.js";
 import { sendCreationCode } from "./API/email.js";
 import { createUserSession } from "./userSession.js";
+import { isUsernameTaken, createAccount, isEmailTaken } from "./API/user.js";
 
 //Declaring elements
 const registerButton = document.querySelector("#registerButton");
@@ -155,7 +156,7 @@ registerButton.addEventListener("click", async function () {
   finaliseCreation.style.display = "block";
   let code = Math.floor(100000 + Math.random() * 900000);
   const location = await getLocation();
-  sendCode(emailAddress, code, location);
+  sendCreationCode(emailAddress, code, location);
   startTimer();
   document
     .querySelector("#sendEmailAgain")
@@ -164,7 +165,7 @@ registerButton.addEventListener("click", async function () {
         alert("You can only request when the code expires");
       } else {
         code = Math.floor(100000 + Math.random() * 900000);
-        sendCode(emailAddress, code, location);
+        sendCreationCode(emailAddress, code, location);
         resetTimer();
       }
     });
@@ -216,4 +217,17 @@ function setPasswordErrorMessage(message) {
 function setEmailErrorMessage(message) {
   emailAddressError.textContent = message;
   emailInput.style.borderColor = "red";
+}
+
+function startTimer() {
+  timer = window.setTimeout(function () {
+    console.log("Time is up");
+    timeOver = true;
+  }, duration);
+}
+
+function resetTimer() {
+  timeOver = false;
+  clearTimeout(timer);
+  startTimer(duration);
 }

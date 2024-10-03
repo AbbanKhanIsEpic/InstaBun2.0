@@ -98,7 +98,7 @@ app.get("/api/user/displayName", (req, res) => {
   user
     .getDisplayName(userID)
     .then((displayName) => {
-      res.status(200).send({ DisplayName: displayName });
+      res.status(200).send({ displayName: displayName });
     })
     .catch((error) => {
       console.error(error);
@@ -230,7 +230,7 @@ app.get("/api/user/username", (req, res) => {
   user
     .getUsername(userID)
     .then((username) => {
-      res.status(200).send({ Username: username });
+      res.status(200).send({ username: username });
     })
     .catch((error) => {
       console.error(error);
@@ -410,9 +410,9 @@ app.get("/api/user/profileIcon", (req, res) => {
   const user = new UserManager();
 
   user
-    .getUserProfileIconLink(userID)
+    .getProfileIcon(userID)
     .then((profileIconLink) => {
-      res.status(200).send({ ProfileIconLink: profileIconLink });
+      res.status(200).send({ profileIcon: profileIconLink });
     })
     .catch((error) => {
       console.error(error);
@@ -699,6 +699,21 @@ app.post("/api/post", upload.single("file"), async (req, res) => {
   }
 });
 
+app.patch("/api/post", async (req, res) => {
+  const { postID, tags, description, visibility } = req.body;
+
+  const postManager = new PostManager();
+
+  try {
+    await postManager.updatePost(postID, tags, description, visibility);
+
+    res.status(200).json({ message: "Complete post upload" });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return res.status(500).send("An error occurred while updating the post.");
+  }
+});
+
 app.get("/api/post/search", (req, res) => {
   const { userID, tags } = req.query;
 
@@ -723,13 +738,15 @@ app.get("/api/post/recommend", async (req, res) => {
   const post = new PostManager();
 
   try {
-    const result = await post.getPostBasedLike(userID);
+    const result = await post.getUserRecommendation(userID);
+
+    console.log(!result || !result.length);
 
     if (!result || !result.length) {
-      const mostPopular = await post.getPopularPost(userID);
+      const mostPopular = await post.getGeneralReccomendation(userID);
+      console.log(mostPopular);
       return res.status(200).send(mostPopular);
     }
-
     return res.status(200).send(result);
   } catch (error) {
     return res.status(500).send("Error occurred");
@@ -893,6 +910,24 @@ app.get("/api/story/user", (req, res) => {
       console.error(error);
       res.status(500).send("Error occurred");
     });
+});
+
+app.patch("/api/story/visibility", async (req, res) => {
+  const { storyID, visibility } = req.body;
+
+  const storyManager = new StoryManager();
+
+  try {
+    await storyManager.setVisibility(storyID, visibility);
+    res
+      .status(200)
+      .json({ message: "Story's visibility successfully updated" });
+  } catch (error) {
+    console.error("Error transferring ownership:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request" });
+  }
 });
 
 //Message
@@ -1303,6 +1338,62 @@ app.get("/api/collection/user", (req, res) => {
       console.error(error);
       res.status(500).send("Error occurred");
     });
+});
+
+app.get("/api/bookmark/user", (req, res) => {
+  const { userID } = req.query;
+
+  const bookmarkManager = new BookmarkManager();
+
+  bookmarkManager
+    .getUserBookmarks(userID)
+    .then((jsonifiedResult) => {
+      res.status(200).json(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.get("/api/bookmark/post", (req, res) => {
+  const { bookmarkID } = req.query;
+
+  const bookmarkManager = new BookmarkManager();
+
+  bookmarkManager
+    .getBookmarkedPost(bookmarkID)
+    .then((jsonifiedResult) => {
+      res.status(200).json(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
+});
+
+app.post("/api/bookmark", upload.single("file"), async (req, res) => {
+  try {
+    const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
+
+    if (!jsonData || Object.keys(jsonData).length === 0) {
+      return res.status(400).json({
+        message: "Error occurred, did not receive jsonData",
+      });
+    }
+
+    const { bookmarkTitle, userID } = jsonData;
+    const bookmarkManager = new BookmarkManager();
+
+    await bookmarkManager.create(bookmarkTitle, userID, req.file);
+    res.status(200).json({ message: "Complete bookmark created" });
+  } catch (error) {
+    console.error("Error creating bookmark:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred while creating bookmark",
+    });
+  }
 });
 
 //Create server

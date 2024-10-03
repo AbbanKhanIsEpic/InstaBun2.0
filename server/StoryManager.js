@@ -162,6 +162,15 @@ class StoryManager {
       return error;
     }
   }
+
+  async setVisibility(storyID, storyVisibility) {
+    try {
+      const query = `UPDATE story SET storyVisibility = ? WHERE (storyID = ?);`;
+      await update(query, [storyVisibility, storyID]);
+    } catch (error) {
+      return error;
+    }
+  }
 }
 
 module.exports = StoryManager;

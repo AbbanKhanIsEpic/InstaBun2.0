@@ -1,12 +1,15 @@
 import { getUserInfo } from "./API/user.js";
-import { getUserStories } from "./API/story.js";
-import { getUserPosts } from "./API/post.js";
+import { getUserStories, updateStory } from "./API/story.js";
+import { getUserPosts, updatePost } from "./API/post.js";
 import { getUserCollection } from "./API/collection.js";
+import {
+  getUserBookmark,
+  createBookmark,
+  getBookmarkedPost,
+} from "./API/bookmark.js";
 import { userID } from "./userSession.js";
 
-const storyModal = document.querySelector("#storyModal");
-
-const postModal = document.querySelector("#postModal");
+const standardModal = document.querySelector("#standardModal");
 
 document.addEventListener("DOMContentLoaded", async function () {
   showUserData();
@@ -50,6 +53,7 @@ document
     document.querySelector("#contentPage").innerHTML = "";
     document.querySelector("li.active").classList.remove("active");
     document.querySelector("#bookmarkSection").classList.add("active");
+    showBookmarkData();
   });
 
 async function showUserData() {
@@ -102,12 +106,12 @@ async function showStoryData() {
       const modalTemplate =
         Handlebars.templates["setting-stories-modal-dialog"];
       const modalOutput = modalTemplate(data[index]);
-      storyModal.innerHTML = modalOutput;
-      new bootstrap.Modal(storyModal).show();
+      standardModal.innerHTML = modalOutput;
+      new bootstrap.Modal(standardModal).show();
 
       let visibility = data[index]["storyVisibility"];
 
-      console.log(visibility);
+      const saveStoryButton = document.querySelector("#saveStoryButton");
 
       const visibilityCheckBoxes = document
         .querySelector("#storyInformationContainer")
@@ -126,6 +130,18 @@ async function showStoryData() {
             }
           });
         });
+      });
+
+      saveStoryButton.addEventListener("click", async function () {
+        const storyID = data[index]["storyID"];
+        console.log(visibility);
+        const status = await updateStory(storyID, visibility);
+        if (status == "200") {
+          alert("Story's visibilty successfully updated");
+          showStoryData();
+        } else {
+          alert("Something went wrong, try again");
+        }
       });
     });
   });
@@ -152,17 +168,19 @@ async function showPostData() {
 
       const modalOutput = modalTemplate(data[index]);
 
-      postModal.innerHTML = modalOutput;
+      standardModal.innerHTML = modalOutput;
 
-      new bootstrap.Modal(postModal).show();
+      new bootstrap.Modal(standardModal).show();
 
-      const descriptionInput = postModal.querySelector("#descriptionInput");
+      const descriptionInput = standardModal.querySelector("#descriptionInput");
+
+      const updatePostButton = document.querySelector("#savePostButton");
 
       let visibility = data[index]["postVisibility"];
 
       const tags = [];
 
-      const tagList = postModal.querySelector("#tagList");
+      const tagList = standardModal.querySelector("#tagList");
 
       data[index]["tags"].map((tag) => {
         tags.push(tag);
@@ -175,7 +193,7 @@ async function showPostData() {
         .querySelector("#postInformationContainer")
         .querySelectorAll(".visibilityCheckBox");
 
-      const addTagButton = postModal.querySelector("#addTagButton");
+      const addTagButton = standardModal.querySelector("#addTagButton");
 
       visibilityCheckBoxes.forEach((visibilityCheckBox) => {
         visibilityCheckBox.addEventListener("change", function (event) {
@@ -235,6 +253,25 @@ async function showPostData() {
           });
         });
       }
+
+      updatePostButton.addEventListener("click", async function () {
+        updatePostButton.classList.add("disabled");
+        const postID = data[index]["postID"];
+        const status = await updatePost(
+          postID,
+          tags,
+          descriptionInput.value,
+          visibility
+        );
+        if (status == 200) {
+          updatePostButton.classList.remove("disabled");
+          alert("Updated post");
+          showPostData();
+        } else {
+          updatePostButton.classList.remove("disabled");
+          alert("Something went wrong, try again");
+        }
+      });
     });
   });
 }
@@ -253,4 +290,124 @@ async function showCollectionData() {
   Array.from(collections).forEach((collection) => {
     collection.addEventListener("click", function () {});
   });
+}
+
+async function showBookmarkData() {
+  const template = Handlebars.templates["setting-bookmark"];
+
+  const data = await getUserBookmark(userID);
+
+  const output = template({ bookmarks: data });
+
+  document.querySelector("#contentPage").innerHTML = output;
+
+  const bookmarks = document.querySelectorAll(".bookmark");
+
+  Array.from(bookmarks).forEach((bookmark, index) => {
+    console.log("Hello");
+    console.log(bookmark);
+    bookmark.addEventListener("click", async function () {
+      const bookmarkID = data[index]["bookmarkID"];
+      const bookmarkTitle = data[index]["bookmarkTitle"];
+
+      const modalTemplate = Handlebars.templates["bookmark-post"];
+
+      const posts = await getBookmarkedPost(bookmarkID);
+
+      const combinedData = { posts: posts, Title: bookmarkTitle };
+
+      const modalOutput = modalTemplate(combinedData);
+
+      standardModal.innerHTML = modalOutput;
+
+      new bootstrap.Modal(standardModal).show();
+    });
+  });
+
+  document
+    .querySelector("#createBookmarkButton")
+    .addEventListener("click", function () {
+      const template = Handlebars.templates["create-bookmark"];
+
+      const modalOutput = template();
+
+      standardModal.innerHTML = modalOutput;
+
+      new bootstrap.Modal(standardModal).show();
+
+      let hasSelectedFile = false;
+
+      let selectedFile = null;
+
+      const newBookmarkCoverImage = document.querySelector("#newBookmarkCover");
+
+      const newBookmarkTitleInput = document.querySelector(
+        "#newBookmarkTitleInput"
+      );
+
+      const bookmarkCreateButton = document.querySelector(
+        "#bookmarkCreateButton"
+      );
+
+      document
+        .querySelector("#newBookmarkCoverInput")
+        .addEventListener("change", function (event) {
+          selectedFile = event.target.files[0];
+          if (selectedFile.type.match("image.*")) {
+            const reader = new FileReader();
+            reader.addEventListener("load", async (event) => {
+              const imageSource = event.target.result;
+              newBookmarkCoverImage.src = imageSource;
+            });
+            reader.readAsDataURL(selectedFile);
+            hasSelectedFile = true;
+          } else {
+            alert("Only video or images allowed, sorry");
+          }
+        });
+
+      bookmarkCreateButton.addEventListener("click", async function () {
+        const bookmarkTitle = newBookmarkTitleInput.value;
+        if (!hasSelectedFile) {
+          alert("You need to set a cover");
+          return;
+        }
+        if (bookmarkTitle.trim().length == 0) {
+          alert("You need to set a bookmarkTitle");
+          return;
+        }
+        if (bookmarkTitle.trim().length != bookmarkTitle.length) {
+          alert("The bookmarkTitle can not have spaces at the start or end");
+          return;
+        }
+        const formData = new FormData();
+
+        const mime = selectedFile.type;
+
+        const name = selectedFile.name;
+
+        console.log(selectedFile);
+
+        const newFile = new File([selectedFile], name, { type: mime });
+
+        formData.append("file", newFile);
+
+        formData.append(
+          "jsonData",
+          JSON.stringify({
+            bookmarkTitle: bookmarkTitle,
+            userID: userID,
+          })
+        );
+
+        bookmarkCreateButton.classList.add("disabled");
+        const response = await createBookmark(formData);
+        if (response.status == "200") {
+          alert("The bookmark has been created");
+        } else {
+          alert("Error has occured, try again");
+        }
+        window.open("http://127.0.0.1:5500/pages/setting.html", "_self");
+      });
+    });
 }

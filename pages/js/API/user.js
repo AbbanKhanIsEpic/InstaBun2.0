@@ -132,3 +132,51 @@ export async function unblock(requestingUserID, targetUserID) {
     console.error(error);
   }
 }
+
+export async function getProfileIcon(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/profileIcon`, {
+      params: { userID },
+    });
+    console.log(response);
+    return response["data"]["profileIcon"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getUsername(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/username`, {
+      params: { userID },
+    });
+    console.log(response);
+    return response["data"]["username"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getDisplayName(userID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/displayName`, {
+      params: { userID },
+    });
+    console.log(response);
+    return response["data"]["displayName"];
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function isUsernameTaken(username) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/isUsernameTaken`, {
+      params: { username },
+    });
+    console.log(response);
+    return response["data"];
+  } catch (error) {
+    console.error(error);
+  }
+}

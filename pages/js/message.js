@@ -12,6 +12,7 @@ import {
   getHiddenMessageList,
 } from "./API/message.js";
 import { userID } from "./userSession.js";
+import { getProfileIcon, getUsername, getDisplayName } from "./API/user.js";
 //Declarations
 const searchUsersInput = document.querySelector("#searchUsersInput");
 const userList = document.getElementById("userList");
@@ -68,6 +69,8 @@ searchUsersInput.addEventListener("input", function () {
 });
 
 createGroupModalClose.addEventListener("click", function () {
+  selectedArray.length = 0;
+  showCaseMemberNewGroup.innerHTML = "";
   createGroupModal.style.display = "none";
   document.querySelector(".modal-backdrop").classList.add("d-none");
 });
@@ -239,11 +242,16 @@ startConversationButton.addEventListener("click", function () {
     setMessageContainer(userID, true, id, displayName, profileIcon);
     newMessageModal.style.display = "none";
     document.querySelector(".modal-backdrop").classList.add("d-none");
+    selectedArray.length = 0;
+    userList.innerHTML = "";
+    searchUsersInput.value = "";
+    showcaseSelectedUsers.innerHTML = "";
   } else if (hasSelectedSelf) {
     alert("You can not select yourself as another member in a group");
   } else {
     newMessageModal.style.display = "none";
     createGroupModal.style.display = "block";
+    displayMemberNewGroup();
   }
 });
 
@@ -282,7 +290,6 @@ async function displayUserList() {
     }
 
     checkbox.addEventListener("change", function () {
-      console.log(showCaseMemberNewGroup);
       const isSelected = user.classList.contains("selected");
       if (isSelected) {
         user.classList.remove("selected");
@@ -290,18 +297,8 @@ async function displayUserList() {
           return selected.id == id;
         });
         selectedArray.splice(index, 1);
-        const copy = user.childNodes[1].cloneNode(true);
-        for (let i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
-          const childNode = showCaseMemberNewGroup.childNodes[i];
-          if (childNode.isEqualNode(copy)) {
-            showCaseMemberNewGroup.removeChild(childNode);
-            break;
-          }
-        }
       } else {
         user.classList.add("selected");
-        const copy = user.childNodes[1].cloneNode(true);
-        showCaseMemberNewGroup.appendChild(copy);
         selectedArray.push({
           id: id,
           displayName: displayName,
@@ -312,6 +309,17 @@ async function displayUserList() {
       checkmark.classList.toggle("d-none");
     });
   });
+}
+
+async function displayMemberNewGroup() {
+  const template = Handlebars.templates["member"];
+  const owner = {
+    profileIcon: await getProfileIcon(userID),
+    displayName: await getDisplayName(userID),
+    username: await getUsername(userID),
+  };
+  const output = template({ users: [owner, ...selectedArray] });
+  showCaseMemberNewGroup.innerHTML = output;
 }
 
 function displaySelectedUsers(selectedArray) {
@@ -346,14 +354,6 @@ function displaySelectedUsers(selectedArray) {
         deSelectedUser.classList.remove("selected");
         checkmark.classList.toggle("d-none");
         checkbox.value = "off";
-        const copy = deSelectedUser.childNodes[1].cloneNode(true);
-        for (let i = 0; i < showCaseMemberNewGroup.childNodes.length; i++) {
-          const childNode = showCaseMemberNewGroup.childNodes[i];
-          if (childNode.isEqualNode(copy)) {
-            showCaseMemberNewGroup.removeChild(childNode);
-            break;
-          }
-        }
       }
 
       displaySelectedUsers(selectedArray);

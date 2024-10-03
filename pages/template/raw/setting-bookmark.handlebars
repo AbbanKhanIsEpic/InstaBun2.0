@@ -5,11 +5,11 @@
     <div
       class="d-flex align-items-center position-relative searchBar ps-4 pe-4 pt-4 w-100"
     >
-      <input class="form-control" type="text" id="searchCollectionInput" />
+      <input class="form-control" type="text" id="searchBookmarkInput" />
       <button
         type=" button"
         class="btn btn-primary ms-3"
-        id="searchCollectionButton"
+        id="searchBookmarkButton"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +27,7 @@
       <button
         type="button"
         class="btn btn-primary ms-3"
-        id="createCollectionButton"
+        id="createBookmarkButton"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -48,15 +48,15 @@
   </div>
 </div>
 <div
-  id="collections"
+  id="bookmarks"
   class="col w-100 overflow-x-hidden mb-5 overflow-y-auto h-auto"
 >
-  {{#each collections}}
+  {{#each bookmarks}}
     <div
-      class="collection d-flex position-relative flex-column border-1 border"
-      id="{{collectionID}}"
+      class="bookmark d-flex position-relative flex-column border-1 border"
+      id="{{bookmarkID}}"
     >
-      <h5>{{collectionTitle}}</h5>
+      <h5>{{bookmarkTitle}}</h5>
       <img src="{{coverPhoto}}" alt="" />
     </div>
   {{/each}}

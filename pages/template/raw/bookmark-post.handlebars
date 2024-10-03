@@ -1,0 +1,73 @@
+<div
+  class="modal-dialog modal-dialog-centered modal-fullscreen modal-dialog-scrollable"
+>
+  <div class="modal-content bg-black text-white glassmorph">
+    <div class="modal-header d-flex flex-column p-0 position-relative pb-4">
+      <h5 id="modalTitle" class="modal-title pt-3">{{Title}}</h5>
+      <button
+        type="button"
+        class="bg-transparent border-0 position-absolute end-0 pt-3 pe-3"
+        data-bs-dismiss="modal"
+        aria-label="Close modal"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          class="bi bi-x-lg"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+            stroke="white"
+            stroke-width="1.5"
+          />
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body d-flex w-100 flex-row m-0 p-0">
+      <div
+        id="newBookmarkInformationContainer"
+        class="d-flex flex-column w-100 mt-3 ms-3 me-3 position-relative"
+      >
+        <div
+          id="posts"
+          class="col w-100 overflow-x-hidden mb-5 overflow-y-auto h-auto"
+        >
+          {{#each posts}}
+            <div
+              class="post d-flex position-relative"
+              id="{{postID}}"
+              onclick="window.location.href='http://127.0.0.1:5500/pages/discover.html?postID={{postID}}'"
+            >
+              {{#if isVideo}}
+                <div class="position-absolute top-0 d-flex end-0 me-3 mt-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="25"
+                    height="25"
+                    fill="currentColor"
+                    class="bi bi-camera-video"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2zm11.5 5.175 3.5 1.556V4.269l-3.5 1.556zM2 4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h7.5a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"
+                    />
+                  </svg>
+                </div>
+                <video class="border-1 border user-select-none content">
+                  <source src="{{postLink}}" />
+                </video>
+              {{else}}
+                <img src="{{postLink}}" alt="" />
+              {{/if}}
+            </div>
+          {{/each}}
+        </div>
+        <hr class="invisible" />
+      </div>
+    </div>
+  </div>
+</div>

@@ -35,3 +35,17 @@ export async function getUserStories(userID) {
     console.error(error);
   }
 }
+
+export async function updateStory(storyID, visibility) {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/visibility`, {
+      storyID,
+      visibility,
+    });
+    console.log(response);
+    return response["status"];
+  } catch (error) {
+    console.error("Error updating post:", error);
+    throw error; // Rethrow the error for further handling if needed
+  }
+}

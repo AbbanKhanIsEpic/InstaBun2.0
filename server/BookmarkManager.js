@@ -6,7 +6,7 @@ const FirebaseStorageManager = require("./FirebaseStorageManager");
 //It is a class that manages the creation of bookmarks and adds post to specific bookmarks
 class BookmarkManager {
   //Returns a list of bookmarks
-  async getBookmarks(userID) {
+  async getUserBookmarks(userID) {
     try {
       const query = `SELECT bookmarkID,bookmarkTitle,coverPhoto FROM bookmark where userID = ?;`;
       const result = await select(query, [userID]);
@@ -34,17 +34,6 @@ class BookmarkManager {
       const query = `INSERT INTO bookmark(bookmarkTitle,coverPhoto, userID) VALUE(?,?,?);`;
       await update(query, [bookmarkTitle, coverLink, userID]);
       return "Bookmark creation operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Delete a bookmark
-  async delete(bookmarkID) {
-    try {
-      const query = `DELETE FROM bookmark WHERE bookmarkID = ?;`;
-      await update(query, [bookmarkID]);
-      return "Bookmark deletion operation successful";
     } catch (error) {
       return error;
     }
@@ -78,6 +67,16 @@ class BookmarkManager {
       const query = `SELECT COUNT(*) FROM bookmark INNER JOIN bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID where userID = ? AND postID = ?;`;
       const [result] = await select(query, [userID, postID]);
       return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getBookmarkedPost(bookmarkID) {
+    try {
+      const query = `SELECT bookmarkpost.postID, post.isVideo,post.postLink FROM instabun.bookmarkpost INNER JOIN post on post.postID = bookmarkpost.postID where bookmarkID = ?;`;
+      const result = await select(query, [bookmarkID]);
+      return result;
     } catch (error) {
       return error;
     }

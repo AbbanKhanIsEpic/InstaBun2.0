@@ -134,7 +134,7 @@ uploadButton.addEventListener("click", async function () {
       uploadButton.classList.add("disabled");
       const response = await createPost(formData);
       if (response.status == "200") {
-        alert("The story has been uploaded");
+        alert("The post has been uploaded");
         window.open("http://127.0.0.1:5500/pages/create.html", "_self");
       } else {
         alert("Error has occured, try again");

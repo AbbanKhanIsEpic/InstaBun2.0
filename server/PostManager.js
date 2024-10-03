@@ -29,7 +29,7 @@ class PostManager {
         //Check if that tag exits
         //If not: create it
         if (!doesTagExist) {
-          this.#createTag(tag);
+          await this.#createTag(tag);
         }
       });
       await Promise.all(tagPromises);
@@ -44,6 +44,33 @@ class PostManager {
       const postID = await this.#getLatestPostID(userID);
       //Now we have the postID, we can attach the tags to the post
       await this.#attachTagsToPost(tags, postID);
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updatePost(postID, tags, description, visibility) {
+    try {
+      console.log(tags);
+      //It is a promise because this needs to run first
+      //So we can create the tags first then upload the post then attach the tags to the post
+      const tagPromises = tags.map(async (tag) => {
+        //Look through each of the tags
+        const doesTagExist = await this.#doesTagExist(tag);
+        //Check if that tag exits
+        //If not: create it
+        if (!doesTagExist) {
+          await this.#createTag(tag);
+        }
+      });
+      await Promise.all(tagPromises);
+
+      //Create the post
+      const query = `UPDATE post SET description = ?,postVisibility = ? WHERE (postID = ?);`;
+
+      await update(query, [description, visibility, postID]);
+
+      await this.updateTags(postID, tags);
     } catch (error) {
       return error;
     }
@@ -68,6 +95,62 @@ class PostManager {
       const query = `INSERT INTO instabun.Tag (TagName) VALUES (?);`;
       await update(query, [tag]);
       return "Create tag operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateTags(postID, tags) {
+    try {
+      const oldTags = await this.getAllPostTagName(postID);
+      console.log(oldTags);
+
+      const lowerOldTags = oldTags.map((tagName) => tagName.toLowerCase());
+      const lowerNewTagIDs = tags.map((tagName) => tagName.toLowerCase());
+
+      const addTags = lowerNewTagIDs.filter(
+        (tagName) => !lowerOldTags.includes(tagName)
+      );
+
+      console.log(addTags);
+
+      const removeTags = lowerOldTags.filter(
+        (tagName) => !lowerNewTagIDs.includes(tagName)
+      );
+
+      console.log(removeTags);
+
+      if (removeTags.length > 0) {
+        await this.#removeTagsFromPost(removeTags, postID);
+      }
+
+      if (addTags.length > 0) {
+        await this.#attachTagsToPost(addTags, postID);
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getAllPostTagName(postID) {
+    try {
+      const query = `Select tagName from tagpost INNER JOIN tag on tag.tagID = tagpost.tagID where postID = ?`;
+      const result = await select(query, [postID]);
+      return result ? result.map((tag) => tag?.["tagName"]) : [];
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async #removeTagsFromPost(tags, postID) {
+    try {
+      const tagIDsArray = await this.#getTagIDs(tags);
+      const attachTagIDToPostPromise = tagIDsArray.map(async (tagID) => {
+        const query = `DELETE FROM tagpost WHERE (postID = ?) and (tagID = ?);`;
+        await update(query, [postID, tagID]);
+      });
+      await Promise.all(attachTagIDToPostPromise);
+      return "Attach tags to post operation successful";
     } catch (error) {
       return error;
     }
@@ -144,27 +227,25 @@ class PostManager {
   //1 -> get top 10 tags
   //2 -> get post that contains that tags
   //3 -> get post that user has not liked
-  async getPostBasedLike(userID) {
+  async getUserRecommendation(userID) {
     try {
       const top10TagIDs = await this.#getPersonalTop10TagIDs(userID);
 
       if (!top10TagIDs.length || !top10TagIDs) {
-        return new Error("User has not liked any post");
+        return [];
       }
 
-      const unLikedPostIDs = await this.#getUnlikedPostsByTags(top10TagIDs);
+      const unlikedPostIDs = await this.#getUnlikedPostIDs(userID, top10TagIDs);
 
-      if (!unLikedPostIDs.length || !unLikedPostIDs) {
+      if (!unlikedPostIDs.length || !unlikedPostIDs) {
         return new Error(
           "Unable to give recommendation as user has liked all post"
         );
       }
 
-      const posts = await this.#addUploaderDetails(unLikedPostIDs);
+      const posts = await this.#addUploaderDetails(unlikedPostIDs);
 
-      const filteredPost = await this.#filterPost(userID, posts);
-
-      const completePost = await this.#addPostDetails(userID, filteredPost);
+      const completePost = await this.#addPostDetails(userID, posts);
 
       return completePost;
     } catch (error) {
@@ -172,36 +253,40 @@ class PostManager {
     }
   }
 
-  async getPopularPost(userID) {
+  async #getUnlikedPostIDs(userID, tagIDs) {
+    const publicPostIDs = await this.#getPostForAll(userID, tagIDs);
+
+    const unlikedPostIDs = [];
+
+    for (const postID of publicPostIDs) {
+      const hasUserNotLikedPost = !(await this.hasLiked(postID, userID));
+      if (hasUserNotLikedPost) {
+        unlikedPostIDs.push(postID);
+      }
+    }
+
+    console.log(unlikedPostIDs);
+
+    return unlikedPostIDs;
+  }
+
+  async getGeneralReccomendation(userID) {
     try {
       const top10TagIDs = await this.#getTop10TagIDs(userID);
 
-      const unLikedPostIDs = await this.#getUnlikedPostsByTags(top10TagIDs);
+      const publicPostIDs = await this.#getPostForAll(userID, top10TagIDs);
 
-      if (!unLikedPostIDs.length || !unLikedPostIDs) {
+      if (!publicPostIDs.length || !publicPostIDs) {
         return new Error(
           "Unable to give recommendation as user has liked all post"
         );
       }
 
-      const posts = await this.#addUploaderDetails(unLikedPostIDs);
+      const posts = await this.#addUploaderDetails(publicPostIDs);
 
-      const filteredPosts = await this.#filterPost(userID, posts);
-
-      const completePosts = await this.#addPostDetails(userID, filteredPosts);
+      const completePosts = await this.#addPostDetails(userID, posts);
 
       return completePosts;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Post that is not liked based on the tagID
-  async #getUnlikedPostsByTags(tagIDs) {
-    try {
-      const query = `SELECT DISTINCT tagpost.postID FROM tagpost LEFT JOIN likepost on likepost.postID = tagpost.postID INNER JOIN post on post.postID = tagpost.postID where tagID IN (?) AND likepost.postID IS NULL AND post.postVisibility = 0;`;
-      const result = await select(query, [tagIDs]);
-      return result ? result.map((element) => element?.["postID"]) : null;
     } catch (error) {
       return error;
     }
@@ -220,6 +305,8 @@ class PostManager {
       const query = `SELECT tagpost.postID,post.userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID INNER JOIN block on block.blockerUserID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY post.postID ORDER BY COUNT(DISTINCT tagID) DESC`;
 
       const result = await select(query, [tagsArray]);
+
+      console.log(result);
 
       //If there is no post with that tags
       //Return empty
@@ -263,7 +350,7 @@ class PostManager {
     try {
       const query = `SELECT tagID FROM likepost INNER JOIN tagpost on tagpost.postID = likepost.postID  group by tagID order by count(*) DESC LIMIT 10`;
       const result = await select(query);
-      return result;
+      return result ? result.map((tagID) => tagID?.["tagID"]) : [];
     } catch (error) {
       return error;
     }

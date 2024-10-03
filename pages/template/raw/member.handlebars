@@ -1,0 +1,25 @@
+{{#each users as |user|}}
+  <div
+    class="d-flex justify-content-between w-100 user"
+    id="user-{{user.userID}}"
+  >
+    <div class="w-100 ps-4 d-flex flex-row align-items-center">
+      <img
+        src={{user.profileIcon}}
+        alt=""
+        width="44"
+        height="44"
+        class="rounded-circle me-2"
+      />
+      <div class="d-flex flex-column">
+        <span aria-label="display name">
+          {{user.displayName}}
+        </span>
+        <span
+          class="text-white-50"
+          aria-label="username"
+        >{{user.username}}</span>
+      </div>
+    </div>
+  </div>
+{{/each}}

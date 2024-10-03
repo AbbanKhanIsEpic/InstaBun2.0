@@ -80,6 +80,17 @@ export async function getSearchedPost(userID, tags) {
   }
 }
 
+export async function getSelectedPost(userID, postID) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/select`, {
+      params: { userID, postID },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function getUserPosts(userID) {
   try {
     const response = await axios.get(`${API_BASE_URL}/user`, {
@@ -88,5 +99,21 @@ export async function getUserPosts(userID) {
     return response.data;
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function updatePost(postID, tags, description, visibility) {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}`, {
+      postID,
+      tags,
+      description,
+      visibility,
+    });
+    console.log(response);
+    return response["status"];
+  } catch (error) {
+    console.error("Error updating post:", error);
+    throw error; // Rethrow the error for further handling if needed
   }
 }

@@ -21,12 +21,7 @@ export async function createUserSession(userIdentifier, expirationDays) {
 
     //Delete cookie
     document.cookie =
-      "userID=" +
-      userID +
-      ";" +
-      "expires=Thu, 01 Jan 1970 00:00:00 UTC;" +
-      "path=/;" +
-      "domain=" +
+      "userID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" +
       domain +
       ";";
 

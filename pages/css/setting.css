@@ -3,7 +3,8 @@
 }
 #posts,
 #stories,
-#collections {
+#collections,
+#bookmarks {
   display: grid;
   align-content: start;
   grid-template-columns: repeat(3, minmax(250px, 1fr));
@@ -15,7 +16,8 @@
 
 #posts,
 #stories,
-#collections {
+#collections,
+#bookmarks {
   max-height: 360px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -31,7 +33,8 @@
   height: 350px;
 }
 
-#collections > .collection {
+#collections > .collection,
+#bookmarks > .bookmark {
   max-width: 90%;
   height: 350px;
 }
@@ -41,20 +44,22 @@
 #stories > .story video,
 #stories > .story img,
 #collections > .collection video,
-#collections > .collection img {
+#collections > .collection img,
+#bookmarks > .bookmark video,
+#bookmarks > .bookmark img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-#postContainer {
+#mediaContainer {
   position: sticky !important;
   top: 0px;
   height: 90vh;
 }
 
-#postContainer img,
-#postContainer video {
+#mediaContainer img,
+#mediaContainer video {
   width: 470px;
   height: 500px;
 }

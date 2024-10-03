@@ -24,11 +24,11 @@ class EmailManager {
           `<div>Hello <br> <br> <strong>` +
           code +
           `,
-        </strong> is your 2-Step verification code. Enter the above code into the verification screen to login. This code will expire in 15 minutes <br> <br> This request was received from <strong>
+        </strong> is your 2-Step verification code. Enter the above code into the verification screen to login. This code will expire in 15 minutes.<br> <br> This request was received from <strong>
           ` +
           location +
           `,
-        </strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
+        </strong>. <br> <br>IMPORTANT: Do not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
       };
 
       // Send the email
@@ -61,11 +61,11 @@ class EmailManager {
           `<div>Hello <br> <br> <strong>` +
           code +
           `,
-        </strong> is your password change verification code. Enter the above code into the verification screen to change your password. This code will expire in 15 minutes <br> <br> This request was received from <strong>
+        </strong> is your password change verification code. Enter the above code into the verification screen to change your password. This code will expire in 15 minutes.<br> <br> This request was received from <strong>
           ` +
           location +
           `,
-        </strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
+        </strong>. <br> <br>IMPORTANT: Do not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
       };
 
       // Send the email
@@ -98,11 +98,11 @@ class EmailManager {
           `<div>Hello <br> <br> <strong>` +
           code +
           `,
-        </strong> is your account creation verification code. Enter the above code into the verification screen to create your account. This code will expire in 15 minutes <br> <br> This request was received from <strong>
+        </strong> is your account creation verification code. Enter the above code into the verification screen to create your account. This code will expire in 15 minutes.<br> <br> This request was received from <strong>
           ` +
           location +
           `,
-        </strong>. <br> <br>IMPORTANT: Don not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
+        </strong>. <br> <br>IMPORTANT: Do not share your security codes with anyone. InstaBun will never ask you for your codes. This can include things like texting your code, screensharing, etc. By sharing your security codes with someone else, you are putting your account and its content at high risk. <br><br> Thank You,<br><br>  <strong>The InstaBun Team</strong> </div>`,
       };
 
       // Send the email

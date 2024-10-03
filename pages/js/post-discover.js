@@ -5,6 +5,7 @@ import {
   unlikePost,
   getLikeList,
   getSearchedPost,
+  getSelectedPost,
 } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
@@ -98,7 +99,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const templatePost = Handlebars.templates["post-explore"];
 
-  const data = await getRecommend(userID);
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
+  const postID = params.postID;
+
+  const data = postID
+    ? await getSelectedPost(userID, postID)
+    : await getRecommend(userID);
 
   const htmlOutput = templatePost({ post: data });
 

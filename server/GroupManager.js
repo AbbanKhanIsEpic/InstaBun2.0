@@ -27,6 +27,7 @@ class GroupManager {
       //The latest groupID will be the group that just been created
       const groupID = await this.#getLatestGroupID(createrUserID);
       for (const groupMember of groupMembers) {
+        console.log(groupMember);
         await this.addMember(groupID, groupMember);
       }
     } catch (error) {

@@ -24,10 +24,10 @@ templates['post-explore'] = template({"1":function(container,depth0,helpers,part
     + alias4(((helper = (helper = lookupProperty(helpers,"totalComment") || (depth0 != null ? lookupProperty(depth0,"totalComment") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"totalComment","hash":{},"data":data,"loc":{"start":{"line":104,"column":7},"end":{"line":104,"column":23}}}) : helper)))
     + "</div>\r\n      <div role=\"button\" class=\"shareButton\" role=\"button\">\r\n        <svg\r\n          xmlns=\"http://www.w3.org/2000/svg\"\r\n          width=\"24\"\r\n          height=\"24\"\r\n          fill=\"white\"\r\n          class=\"bi bi-share postInteraction\"\r\n          viewBox=\"0 0 16 16\"\r\n        >\r\n          <path\r\n            d=\"M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3\"\r\n          />\r\n        </svg>\r\n      </div>\r\n      <div\r\n        class=\"text-white d-flex justify-content-center mb-3\"\r\n      >"
     + alias4(((helper = (helper = lookupProperty(helpers,"totalShare") || (depth0 != null ? lookupProperty(depth0,"totalShare") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"totalShare","hash":{},"data":data,"loc":{"start":{"line":121,"column":7},"end":{"line":121,"column":21}}}) : helper)))
-    + "</div>\r\n      <div role=\"button\" class=\"bookmarkButton\" role=\"button\" id="
-    + alias4(((helper = (helper = lookupProperty(helpers,"bookmarkID") || (depth0 != null ? lookupProperty(depth0,"bookmarkID") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"bookmarkID","hash":{},"data":data,"loc":{"start":{"line":122,"column":65},"end":{"line":122,"column":79}}}) : helper)))
-    + ">\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasBookmarked") : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":123,"column":8},"end":{"line":149,"column":15}}})) != null ? stack1 : "")
+    + "</div>\r\n      <div\r\n        role=\"button\"\r\n        class=\"bookmarkButton\"\r\n        role=\"button\"\r\n        id="
+    + alias4(((helper = (helper = lookupProperty(helpers,"bookmarkIDs") || (depth0 != null ? lookupProperty(depth0,"bookmarkIDs") : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"bookmarkIDs","hash":{},"data":data,"loc":{"start":{"line":126,"column":11},"end":{"line":126,"column":26}}}) : helper)))
+    + "\r\n      >\r\n"
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"hasBookmarked") : depth0),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data,"loc":{"start":{"line":128,"column":8},"end":{"line":154,"column":15}}})) != null ? stack1 : "")
     + "      </div>\r\n    </div>\r\n    <hr />\r\n  </div>\r\n";
 },"2":function(container,depth0,helpers,partials,data) {
     var helper, lookupProperty = container.lookupProperty || function(parent, propertyName) {
@@ -67,6 +67,6 @@ templates['post-explore'] = template({"1":function(container,depth0,helpers,part
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"post") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":154,"column":9}}})) != null ? stack1 : "");
+  return ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"post") : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":1,"column":0},"end":{"line":159,"column":9}}})) != null ? stack1 : "");
 },"useData":true});
 })();

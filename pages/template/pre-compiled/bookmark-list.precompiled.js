@@ -23,7 +23,7 @@ templates['bookmark-list'] = template({"1":function(container,depth0,helpers,par
         return undefined
     };
 
-  return "      <button\r\n        class=\"btn bg-dark-subtle h-75 w-25 me-4\"\r\n        id=\""
+  return "      <button\r\n        class=\"btn bg-dark-subtle h-75 w-25 me-4 bookmark\"\r\n        id=\""
     + container.escapeExpression(container.lambda(((stack1 = blockParams[1][0]) != null ? lookupProperty(stack1,"bookmarkID") : stack1), depth0))
     + "\"\r\n      >Remove</button>\r\n";
 },"4":function(container,depth0,helpers,partials,data,blockParams) {
@@ -34,7 +34,7 @@ templates['bookmark-list'] = template({"1":function(container,depth0,helpers,par
         return undefined
     };
 
-  return "      <button\r\n        class=\"btn bg-primary h-75 w-25 me-4\"\r\n        id=\""
+  return "      <button\r\n        class=\"btn bg-primary h-75 w-25 me-4 bookmark\"\r\n        id=\""
     + container.escapeExpression(container.lambda(((stack1 = blockParams[1][0]) != null ? lookupProperty(stack1,"bookmarkID") : stack1), depth0))
     + "\"\r\n      >Add</button>\r\n";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data,blockParams) {

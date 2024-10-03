@@ -66,17 +66,17 @@ class BookmarkManager {
     try {
       const query = `SELECT count(*) FROM bookmark INNER JOIN bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID where userID = ? AND postID = ?;`;
       const [result] = await select(query, [userID, postID]);
-      return result["count(*)"] == 1;
+      return result["count(*)"] >= 1;
     } catch (error) {
       return error;
     }
   }
 
-  async getBookmarkIDbyPostID(postID) {
+  async getBookmarkIDsbyPostID(postID) {
     try {
       const query = `SELECT bookmarkID from bookmarkpost where postID = ?`;
-      const [result] = await select(query, [postID]);
-      return result ? result?.["bookmarkID"] : null;
+      const result = await select(query, [postID]);
+      return result ? result.map((bookmark) => bookmark?.["bookmarkID"]) : null;
     } catch (error) {
       return error;
     }

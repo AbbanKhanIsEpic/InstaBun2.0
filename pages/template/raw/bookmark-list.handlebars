@@ -18,12 +18,12 @@
     </div>
     {{#if (hasBookmarked bookmark.bookmarkID)}}
       <button
-        class="btn bg-dark-subtle h-75 w-25 me-4"
+        class="btn bg-dark-subtle h-75 w-25 me-4 bookmark"
         id="{{bookmark.bookmarkID}}"
       >Remove</button>
     {{else}}
       <button
-        class="btn bg-primary h-75 w-25 me-4"
+        class="btn bg-primary h-75 w-25 me-4 bookmark"
         id="{{bookmark.bookmarkID}}"
       >Add</button>
     {{/if}}

@@ -462,14 +462,14 @@ class PostManager {
           totalComment,
           totalShare,
           hasBookmarked,
-          bookmarkID,
+          bookmarkIDs,
         ] = await Promise.all([
           this.getTotalLike(postID),
           this.hasLiked(postID, userID),
           commentManager.getTotalComment(postID),
           this.getTotalShare(postID),
           bookmarkManager.hasBookmarked(userID, postID),
-          bookmarkManager.getBookmarkIDbyPostID(postID),
+          bookmarkManager.getBookmarkIDsbyPostID(postID),
         ]);
 
         post["totalLike"] = totalLike;
@@ -477,7 +477,7 @@ class PostManager {
         post["totalComment"] = totalComment;
         post["totalShare"] = totalShare;
         post["hasBookmarked"] = hasBookmarked;
-        post["bookmarkID"] = bookmarkID;
+        post["bookmarkIDs"] = bookmarkIDs;
       });
       await Promise.all(promises);
       return filteredPost;

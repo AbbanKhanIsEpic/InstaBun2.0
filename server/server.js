@@ -1484,5 +1484,39 @@ app.post("/api/bookmark", upload.single("file"), async (req, res) => {
   }
 });
 
+app.post("/api/bookmark/post", async (req, res) => {
+  try {
+    const { bookmarkID, postID } = req.body;
+
+    const bookmarkManager = new BookmarkManager();
+
+    await bookmarkManager.addPost(bookmarkID, postID);
+    res.status(200).json({ message: "Add post to bookmark completed" });
+  } catch (error) {
+    console.error("Error add posting to bookmark:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred while add posting to bookmark",
+    });
+  }
+});
+
+app.delete("/api/bookmark/post/:bookmarkID/:postID", async (req, res) => {
+  try {
+    const { bookmarkID, postID } = req.params;
+
+    const bookmarkManager = new BookmarkManager();
+
+    await bookmarkManager.removePost(bookmarkID, postID);
+    res.status(200).json({ message: "Remove post to bookmark completed" });
+  } catch (error) {
+    console.error("Error removing posting to bookmark:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred while add removing to bookmark",
+    });
+  }
+});
+
 //Create server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

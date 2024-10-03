@@ -60,6 +60,7 @@ let isGroup;
 let deleteMessageID;
 let communicatingToID;
 let selectedFile;
+let hasSelectedGroupIcon = false;
 let confirmAction = null;
 
 const selectedArray = [];
@@ -89,10 +90,16 @@ createGroupModalClose.addEventListener("click", function () {
 
 createGroupBtn.addEventListener("click", function () {
   const groupName = groupNameInput.value;
+  if (!hasSelectedGroupIcon) {
+    alert("You must have a group icon");
+    return;
+  }
   if (groupName.length == 0) {
     alert("You must enter a name for the group");
+    return;
   } else if (groupName.length > 100) {
     alert("The group name is too long");
+    return;
   } else {
     const formData = new FormData();
 
@@ -105,7 +112,6 @@ createGroupBtn.addEventListener("click", function () {
     formData.append("file", newFile);
 
     const selectedUserID = selectedArray.map((user) => user.id);
-    selectedUserID.push(userID);
 
     formData.append(
       "jsonData",
@@ -215,6 +221,7 @@ groupIconInput.addEventListener("change", async function (event) {
       showNewGroupIcon.src = event.target.result;
     });
     reader.readAsDataURL(selectedFile);
+    hasSelectedGroupIcon = true;
   }
 });
 
@@ -332,6 +339,7 @@ async function displayUserList() {
 async function displayMemberNewGroup() {
   const template = Handlebars.templates["member"];
   const owner = {
+    id: userID,
     profileIcon: await getProfileIcon(userID),
     displayName: await getDisplayName(userID),
     username: await getUsername(userID),

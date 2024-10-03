@@ -452,20 +452,28 @@ class PostManager {
 
       const promises = filteredPost.map(async (post) => {
         const postID = post["id"];
-        const [totalLike, hasLiked, totalComment, totalShare, hasBookmarked] =
-          await Promise.all([
-            this.getTotalLike(postID),
-            this.hasLiked(postID, userID),
-            commentManager.getTotalComment(postID),
-            this.getTotalShare(postID),
-            bookmarkManager.hasBookmarked(userID, postID),
-          ]);
+        const [
+          totalLike,
+          hasLiked,
+          totalComment,
+          totalShare,
+          hasBookmarked,
+          bookmarkID,
+        ] = await Promise.all([
+          this.getTotalLike(postID),
+          this.hasLiked(postID, userID),
+          commentManager.getTotalComment(postID),
+          this.getTotalShare(postID),
+          bookmarkManager.hasBookmarked(userID, postID),
+          bookmarkManager.getBookmarkIDbyPostID(postID),
+        ]);
 
         post["totalLike"] = totalLike;
         post["hasLiked"] = hasLiked;
         post["totalComment"] = totalComment;
         post["totalShare"] = totalShare;
         post["hasBookmarked"] = hasBookmarked;
+        post["bookmarkID"] = bookmarkID;
       });
       await Promise.all(promises);
       return filteredPost;

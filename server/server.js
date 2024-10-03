@@ -1102,16 +1102,31 @@ app.get("/api/group/groupMembers", async (req, res) => {
 
   const groupManager = new GroupManager();
 
-  try {
-    const jsonifiedResult = await groupManager.getGroupMembers(groupID);
-    res.status(200).send(jsonifiedResult);
-  } catch (error) {
-    console.error("Error retrieving group members:", error);
-    res.status(500).json({
-      error: error.message || "Internal server error",
-      message: "Error occurred while retrieving group members",
+  groupManager
+    .getGroupMembers(groupID)
+    .then((jsonifiedResult) => {
+      res.status(200).send(jsonifiedResult);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
     });
-  }
+});
+
+app.get("/api/group/owner", async (req, res) => {
+  const { groupID } = req.query;
+
+  const groupManager = new GroupManager();
+
+  groupManager
+    .getOwnerID(groupID)
+    .then((jsonifiedResult) => {
+      res.status(200).send({ ownerID: jsonifiedResult });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).send("Error occurred");
+    });
 });
 
 app.patch("/api/group/transferOwnership", async (req, res) => {
@@ -1148,8 +1163,8 @@ app.post("/api/group/member", async (req, res) => {
   }
 });
 
-app.delete("/api/group/member", async (req, res) => {
-  const { groupID, userID } = req.query;
+app.delete("/api/group/member/:groupID/:userID", async (req, res) => {
+  const { groupID, userID } = req.params;
 
   const groupManager = new GroupManager();
 

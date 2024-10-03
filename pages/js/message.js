@@ -1,5 +1,5 @@
 //Imports
-import { createGroup } from "./API/group.js";
+import { createGroup, getOwnerID, getMembers } from "./API/group.js";
 import { getUserList } from "./API/user.js";
 import {
   sendGroupMessage,
@@ -237,8 +237,8 @@ startConversationButton.addEventListener("click", function () {
     const selectedUser = selectedArray[0];
     console.log(selectedUser);
     const id = selectedUser.id;
-    const profileIcon = selectedUser.profileIcon;
-    const displayName = selectedUser.DisplayName;
+    const profileIcon = selectedUser["profileIcon"];
+    const displayName = selectedUser["displayName"];
     setMessageContainer(userID, true, id, displayName, profileIcon);
     newMessageModal.style.display = "none";
     document.querySelector(".modal-backdrop").classList.add("d-none");
@@ -274,6 +274,9 @@ async function displayUserList() {
     const displayName = user
       .querySelector('[aria-label="display name"]')
       .textContent.trim();
+    const username = user
+      .querySelector('[aria-label="username"]')
+      .textContent.trim();
     const profileIcon = user.querySelector("img").src;
     const checkbox = user.querySelector("input[type=checkbox]");
     const checkmark = user.querySelector(".checkmark > svg");
@@ -303,6 +306,7 @@ async function displayUserList() {
           id: id,
           displayName: displayName,
           profileIcon: profileIcon,
+          username: username,
         });
       }
       displaySelectedUsers(selectedArray);
@@ -318,7 +322,9 @@ async function displayMemberNewGroup() {
     displayName: await getDisplayName(userID),
     username: await getUsername(userID),
   };
-  const output = template({ users: [owner, ...selectedArray] });
+  selectedArray.push(owner);
+
+  const output = template({ users: selectedArray });
   showCaseMemberNewGroup.innerHTML = output;
 }
 
@@ -383,7 +389,7 @@ async function displayMessageLists(userID) {
 
   let selectedMessage;
 
-  Array.from(messageSelections).forEach((messageSelection, index) => {
+  Array.from(messageSelections).forEach((messageSelection) => {
     const id = messageSelection.id;
     const isDirect = messageSelection.classList.contains("direct");
     if (id == communicatingToID) {
@@ -441,18 +447,38 @@ async function setMessageContainer(
 
   const moreInfo = document.querySelector("#moreInfo");
 
-  moreInfo.addEventListener("click", function () {
+  moreInfo.addEventListener("click", async function () {
     const modalTemplate = Handlebars.templates["conversation-info"];
+
+    const selectedGroupOwner = (await getOwnerID(communicatingToID))["ownerID"];
+
+    const groupMembers = await getMembers(communicatingToID);
+
+    Handlebars.registerHelper("isGroupOwner", function (memberID, ownerID) {
+      console.log("Hello");
+      console.log(memberID);
+      console.log(ownerID);
+      return memberID == ownerID;
+    });
+
     const data = {
       isDirect: isDirect,
       name: toName.trim(),
       profileIcon: toProfileIcon,
+      ownerID: selectedGroupOwner,
+      members: groupMembers,
+      isGroupOwner: selectedGroupOwner == userID,
     };
+
+    console.log(groupMembers);
+
     const modalOutput = modalTemplate(data);
     const conversationInfoModal = document.querySelector(
       "#conversationInfoModal"
     );
+
     conversationInfoModal.innerHTML = modalOutput;
+
     new bootstrap.Modal(conversationInfoModal).show();
   });
 

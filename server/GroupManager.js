@@ -21,7 +21,7 @@ class GroupManager {
         mimetype
       );
 
-      const query = `INSERT INTO instabun.groupdb (ownerID, groupName,groupProfileIcon) VALUES (?,?,?);`;
+      const query = `INSERT INTO instabun.groupdb (ownerID, groupName,groupIcon) VALUES (?,?,?);`;
       await update(query, [createrUserID, groupName, firebaseURL]);
       //Since user just created the group
       //The latest groupID will be the group that just been created
@@ -74,9 +74,7 @@ class GroupManager {
       const userManager = new UserManager();
       const groupMessageManager = new GroupMessageManager();
       //Get when message was cleared
-      const groupIDList = (await this.getGroupIDList(userID)).map(
-        (g) => g.groupID
-      );
+      const groupIDList = await this.getGroupIDList(userID);
       //Since null returns nothing -> user not being in a group will return NULL -> return nothing
       if (!groupIDList.length) {
         return [];
@@ -127,7 +125,7 @@ class GroupManager {
     try {
       const query = "Select groupID from groupMembers where memberID = ?";
       const result = await select(query, [userID]);
-      return result;
+      return result ? result.map((groupID) => groupID?.["groupID"]) : [];
     } catch (error) {
       return error;
     }
@@ -138,7 +136,7 @@ class GroupManager {
     try {
       const query = `SELECT users.userID, users.username, users.displayName, users.profileIcon FROM instabun.GroupMembers
     INNER JOIN
-     users ON users.userID = groupMembers.userID
+     users ON users.userID = groupMembers.memberID
     INNER JOIN
      groupdb ON groupdb.groupID = GroupMembers.groupID
     WHERE
@@ -173,6 +171,16 @@ class GroupManager {
       const query = `DELETE FROM community WHERE (GroupID = ?);`;
       await update(query, [groupID]);
       return "Delete group operation successful";
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getOwnerID(groupID) {
+    try {
+      const query = "Select ownerID from groupDB where groupID = ?";
+      const [result] = await select(query, [groupID]);
+      return result ? result?.["ownerID"] : null;
     } catch (error) {
       return error;
     }

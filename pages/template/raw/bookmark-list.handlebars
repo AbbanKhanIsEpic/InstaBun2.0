@@ -4,28 +4,28 @@
   >
     <div class="d-flex flex-row ms-4">
       <img
-        src="{{user.profileIcon}}"
+        src="{{bookmark.coverPhoto}}"
         height="50"
         width="50"
         alt=""
-        class="rounded-circle profileIcon"
+        class="rounded-circle"
       />
-      <div class="d-flex flex-column ms-3">
+      <div class="d-flex flex-column ms-3 justify-content-center">
         <div class="displayName">
-          <strong>{{bookmarks.Title}}</strong>
+          <strong>{{bookmark.bookmarkTitle}}</strong>
         </div>
       </div>
     </div>
-      {{#ifBookMarked user.bookmarkID}}
-        <button
-          class="btn bg-dark-subtle h-75 w-25 me-4"
-          id="{{user.userID}}"
-        >Remove</button>
-      {{else}}
-        <button
-          class="btn bg-primary h-75 w-25 me-4"
-          id="{{user.userID}}"
-        >Add</button>
-      {{/if}}
+    {{#if (hasBookmarked bookmark.bookmarkID)}}
+      <button
+        class="btn bg-dark-subtle h-75 w-25 me-4"
+        id="{{bookmark.bookmarkID}}"
+      >Remove</button>
+    {{else}}
+      <button
+        class="btn bg-primary h-75 w-25 me-4"
+        id="{{bookmark.bookmarkID}}"
+      >Add</button>
+    {{/if}}
   </div>
 {{/each}}

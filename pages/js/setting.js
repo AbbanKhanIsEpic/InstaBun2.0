@@ -304,8 +304,6 @@ async function showBookmarkData() {
   const bookmarks = document.querySelectorAll(".bookmark");
 
   Array.from(bookmarks).forEach((bookmark, index) => {
-    console.log("Hello");
-    console.log(bookmark);
     bookmark.addEventListener("click", async function () {
       const bookmarkID = data[index]["bookmarkID"];
       const bookmarkTitle = data[index]["bookmarkTitle"];
@@ -373,11 +371,15 @@ async function showBookmarkData() {
           return;
         }
         if (bookmarkTitle.trim().length == 0) {
-          alert("You need to set a bookmarkTitle");
+          alert("You need to set a bookmark title");
           return;
         }
         if (bookmarkTitle.trim().length != bookmarkTitle.length) {
-          alert("The bookmarkTitle can not have spaces at the start or end");
+          alert("The bookmark title can not have spaces at the start or end");
+          return;
+        }
+        if (bookmarkTitle.length > 100) {
+          alert("The bookmark title is too long, 100 characters max");
           return;
         }
         const formData = new FormData();

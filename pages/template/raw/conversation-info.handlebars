@@ -17,7 +17,8 @@
                 <div>
                     <input type="file" accept="image/*" class="position-absolute visually-hidden"
                         placeholder="Profile icon" {{#if isDirect}}{{else}}id="changeGroupProfileIcon" {{/if}}
-                        aria-label="user upload files" {{#if isDirect}}disabled{{/if}} />
+                        aria-label="user upload files" {{#if isDirect}}disabled{{/if}} {{#if
+                        isGroupOwner}}{{else}}disabled{{/if}} />
                     <label for="changeGroupProfileIcon" role="button">
                         <img width="100" height="100" src="{{profileIcon}}" {{#if isDirect}}{{else}}id="showNewIcon"
                             {{/if}} alt="please select something to upload" class="rounded rounded-circle" /></label>
@@ -26,9 +27,10 @@
             {{#if isDirect}}
             {{else}}
             <form class="input-group w-100 mt-3">
-            <span class="input-group-text bg-transparent text-white border-0"><strong>Group name:</strong></span>
-            <input type="text" class="form-control bg-transparent text-white border-0 noBoxShadow"
-                placeholder="Enter a group name..." id="changeGroupNameInput" value="{{name}}" />
+                <span class="input-group-text bg-transparent text-white border-0"><strong>Group name:</strong></span>
+                <input type="text" class="form-control bg-transparent text-white border-0 noBoxShadow"
+                    placeholder="Enter a group name..." id="changeGroupNameInput" value="{{name}} " {{#if
+                    isGroupOwner}}{{else}}disabled{{/if}} />
             </form>
             {{/if}}
             <hr class="w-100 border-white border-2" />
@@ -38,12 +40,50 @@
             <button class="btn btn-primary">Clear direct message</button>
         </div>
         {{else}}
-        <div class="modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4" id="showCaseMemberNewGroup"></div>
-                <div class="modal-footer w-100 d-flex justify-content-center align-items-center">
+        {{#if isGroupOwner}}
+        <div class="d-flex flex-row mb-2 mb-2 justify-content-center">
+            <div id="addNewMemberButton" class="me-2 d-flex justify-content-center" role="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-person-add" viewBox="0 0 16 16">
+                    <path
+                        d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
+                    <path
+                        d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
+                </svg>
+            </div>
+            Add new member/s
+        </div>
+        {{/if}}
+        <div class="modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4 p-0 m-0"
+            id="showCaseMemberNewGroup">
+            {{#each members as |user|}}
+            <div class="user d-flex flex-row justify-content-between align-items-center w-100">
+                <div class="w-100 ps-4 d-flex flex-row align-items-center">
+                    <img src={{user.profileIcon}} alt="" width="44" height="44" class="rounded-circle me-2" />
+                    <div class="d-flex flex-column">
+                        <span aria-label="display name">
+                            {{user.displayName}}
+                        </span>
+                        <span class="text-white-50" aria-label="username">{{user.username}}</span>
+                    </div>
+                </div>
+                {{#if ../isGroupOwner}}
+                {{#if (isGroupOwner user.userID ../ownerID)}}
+                {{else}}
+                <button class="btn btn-warning h-75 w-50 me-4">Give 👑</button>
+                <button class="btn btn-danger h-75 w-25 me-4">Remove</button>
+                {{/if}}
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+        {{#if isGroupOwner}}
+        <div class="modal-footer w-100 d-flex justify-content-center align-items-center">
             <button class="btn btn-primary w-100" id="updateGroupButton">
                 Update group
             </button>
         </div>
+        {{/if}}
         {{/if}}
     </div>
 </div>

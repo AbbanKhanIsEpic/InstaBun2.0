@@ -64,9 +64,19 @@ class BookmarkManager {
   //Returns if user has bookmarked the post
   async hasBookmarked(userID, postID) {
     try {
-      const query = `SELECT COUNT(*) FROM bookmark INNER JOIN bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID where userID = ? AND postID = ?;`;
+      const query = `SELECT count(*) FROM bookmark INNER JOIN bookmarkpost ON bookmarkpost.bookmarkID = bookmark.bookmarkID where userID = ? AND postID = ?;`;
       const [result] = await select(query, [userID, postID]);
       return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getBookmarkIDbyPostID(postID) {
+    try {
+      const query = `SELECT bookmarkID from bookmarkpost where postID = ?`;
+      const [result] = await select(query, [postID]);
+      return result ? result?.["bookmarkID"] : null;
     } catch (error) {
       return error;
     }

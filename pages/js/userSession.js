@@ -20,10 +20,7 @@ export async function createUserSession(userIdentifier, expirationDays) {
     const path = "path=/"; // Cookie accessible from all paths
 
     //Delete cookie
-    document.cookie =
-      "userID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" +
-      domain +
-      ";";
+    document.cookie = "userID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
     //Create cookie
     document.cookie =

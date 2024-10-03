@@ -9,6 +9,7 @@ import {
 } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
+import { getUserBookmark } from "./API/bookmark.js";
 import {
   comment,
   getComments,
@@ -107,6 +108,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   const data = postID
     ? await getSelectedPost(userID, postID)
     : await getRecommend(userID);
+
+  console.log(data);
 
   const htmlOutput = templatePost({ post: data });
 
@@ -332,7 +335,6 @@ function attachEventHandlersToPost(posts) {
   Array.from(posts).forEach((post) => {
     //Declaring all interactables
     const likeButton = post.querySelector(".likeButton");
-    const uploader = post.querySelector(".uploader");
     const bookmarkButton = post.querySelector(".bookmarkButton");
     const likeCounter = post.querySelector(".likeCounter");
     const commentButton = post.querySelector(".commentButton");
@@ -379,13 +381,28 @@ function attachEventHandlersToPost(posts) {
     });
 
     //Bookmark and unbookmark
-    bookmarkButton.addEventListener("click", function (event) {});
+    bookmarkButton.addEventListener("click", async function (event) {
+      Handlebars.registerHelper("hasBookmarked", function (bookmarkID) {
+        return bookmarkID == bookmarkButton.id;
+      });
+
+      const viewBookmarkList = document.querySelector("#viewBookmarkList");
+
+      const templateList = Handlebars.templates["bookmark-list"];
+      const bookmarkData = await getUserBookmark(userID);
+      console.log(bookmarkData);
+      const bookmarkList = document.querySelector("#bookmarkList");
+      const htmlOutput = templateList({ bookmarks: bookmarkData });
+      console.log(htmlOutput);
+
+      bookmarkList.innerHTML = htmlOutput;
+
+      new bootstrap.Modal(viewBookmarkList).show();
+    });
 
     commentButton.addEventListener("click", function () {
       postID = post.id;
       populateCommentModal(postID, userID);
     });
-    //Send user to the profile of the sender
-    uploader.addEventListener("click", function () {});
   });
 }

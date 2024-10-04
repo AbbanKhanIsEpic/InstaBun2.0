@@ -393,33 +393,17 @@ class PostManager {
       //Iterating through posts
       const promises = posts.map(async (post) => {
         const postVisibility = post["postVisibility"];
-        console.log(postVisibility);
         const uploaderUserID = post["userID"];
 
-        // Handle public posts
-        if (postVisibility === 0) {
+        const isVisible = await followManager.isVisibleToUser(
+          userID,
+          uploaderUserID,
+          postVisibility
+        );
+
+        if (isVisible) {
           delete post["postVisibility"];
           filteredPost.push(post);
-        } else if (postVisibility === 1) {
-          // Check if user is following the uploader
-          const isFollowing = await followManager.isFollowing(
-            userID,
-            uploaderUserID
-          );
-          if (isFollowing) {
-            delete post["postVisibility"];
-            filteredPost.push(post);
-          }
-        } else if (postVisibility === 2) {
-          //Checks if the two users are close friends
-          const isCloseFriend = await followManager.isCloseFriend(
-            userID,
-            uploaderUserID
-          );
-          if (isCloseFriend) {
-            delete post["postVisibility"];
-            filteredPost.push(post);
-          }
         }
       });
 

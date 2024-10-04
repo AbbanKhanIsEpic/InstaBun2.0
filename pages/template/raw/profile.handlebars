@@ -11,7 +11,10 @@
       <div class="d-flex flex-row align-items-start">
         <div class="d-flex profileUsername align-self-center">{{username}}</div>
         {{#if (isCurrentUser userID)}}
-          <div class="btn bg-dark-subtle ms-4">Setting</div>
+          <div
+            class="btn bg-dark-subtle ms-4"
+            onclick="window.open('http://127.0.0.1:5500/pages/setting.html', '_self');"
+          >Setting</div>
         {{else}}
           {{#if isFollowing}}
             <div class="btn btn-secondary ms-3" id="followButton">Unfollow</div>

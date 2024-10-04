@@ -2,6 +2,11 @@ import { likePost, unlikePost } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { getProfile, block, unblock } from "./API/user.js";
 import {
+  getUserBookmark,
+  addPostToBookmark,
+  removePostFromBookmark,
+} from "./API/bookmark.js";
+import {
   follow,
   unfollow,
   getFollowingList,
@@ -72,6 +77,31 @@ const notActiveLikePost = `<svg xmlns="http://www.w3.org/2000/svg" width="24" he
 const activeLikePost = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-heart-fill like" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
           </svg>`;
+
+const activeBookmark = `          <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          class="bi bi-bookmark-fill bookmark"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"
+          />
+        </svg>`;
+const notActiveBookmark = `<svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="white"
+          class="bi bi-bookmark postInteraction"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"
+          />
+        </svg>`;
 
 const postModal = document.getElementById("post");
 
@@ -265,6 +295,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const commentButton = postModal.querySelector("#commentButton");
 
+        const bookmarkButton = postModal.querySelector(".bookmarkButton");
+
         populateComments(post.id, userID);
 
         likeButton.addEventListener("click", async function (event) {
@@ -303,6 +335,73 @@ document.addEventListener("DOMContentLoaded", async function () {
           } else {
             alert("Unable to comment, try again");
           }
+        });
+
+        bookmarkButton.addEventListener("click", async function (event) {
+          let array = [];
+          Handlebars.registerHelper("hasBookmarked", function (bookmarkID) {
+            array = bookmarkButton.id.split(",").map(Number);
+            return array.includes(bookmarkID);
+          });
+
+          const viewBookmarkList = document.querySelector("#viewBookmarkList");
+
+          const templateList = Handlebars.templates["bookmark-list"];
+          const bookmarkData = await getUserBookmark(userID);
+
+          console.log(bookmarkData);
+
+          const bookmarkList = document.querySelector("#bookmarkList");
+          const htmlOutput = templateList({ bookmarks: bookmarkData });
+
+          bookmarkList.innerHTML = htmlOutput;
+
+          new bootstrap.Modal(viewBookmarkList).show();
+
+          const bookmarks = viewBookmarkList.querySelectorAll(".bookmark");
+
+          Array.from(bookmarks).forEach((bookmark) => {
+            bookmark.addEventListener("click", async function () {
+              const isInBookmark = bookmark.innerHTML == "Remove";
+              if (!isInBookmark) {
+                const status = (await addPostToBookmark(bookmark.id, post.id))[
+                  "status"
+                ];
+                console.log(status);
+                if (status == "200") {
+                  bookmark.innerHTML = "Remove";
+                  bookmark.classList.remove("bg-primary");
+                  bookmark.classList.add("bg-dark-subtle");
+                  const array = bookmarkButton.id.split(",").map(Number);
+                  if (array.length == 1) {
+                    bookmarkButton.innerHTML = activeBookmark;
+                  }
+                  array.push(bookmark.id);
+                  bookmarkButton.id = array;
+                }
+              } else {
+                const status = await removePostFromBookmark(
+                  bookmark.id,
+                  post.id
+                );
+                console.log(status);
+                if (status == "200") {
+                  bookmark.innerHTML = "Add";
+                  bookmark.classList.add("bg-primary");
+                  bookmark.classList.remove("bg-dark-subtle");
+                  const array = bookmarkButton.id.split(",").map(Number);
+                  const index = array.findIndex(
+                    (item) => item === Number(bookmark.id)
+                  );
+                  array.splice(index, 1);
+                  bookmarkButton.id = array.join(",");
+                  if (array.length == 0) {
+                    bookmarkButton.innerHTML = notActiveBookmark;
+                  }
+                }
+              }
+            });
+          });
         });
       });
     });

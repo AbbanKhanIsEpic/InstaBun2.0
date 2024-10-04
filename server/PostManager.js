@@ -309,8 +309,6 @@ class PostManager {
 
       const result = await select(query, [tagsArray]);
 
-      console.log("E: " + result);
-
       //If there is no post with that tags
       //Return empty
       if (!result || !result.length) {

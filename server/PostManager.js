@@ -462,6 +462,7 @@ class PostManager {
         post["totalLike"] = totalLike;
         post["hasLiked"] = hasLiked;
         post["totalComment"] = totalComment;
+        console.log(totalShare);
         post["totalShare"] = totalShare;
         post["hasBookmarked"] = hasBookmarked;
         post["bookmarkIDs"] = bookmarkIDs;
@@ -642,9 +643,17 @@ class PostManager {
     try {
       const hasShared = await this.hasShared(userID, postID);
       if (hasShared) {
+        return {
+          status: 400,
+          message: "User has already shared it",
+        };
+      } else {
         const query = `INSERT INTO sharepost(postID,userID) Values(?,?);`;
         await update(query, [postID, userID]);
-        return "Record share action operation successful";
+        return {
+          status: 200,
+          message: "Record share action operation successful",
+        };
       }
     } catch (error) {
       return error;

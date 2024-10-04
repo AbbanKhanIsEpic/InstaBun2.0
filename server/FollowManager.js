@@ -1,15 +1,38 @@
 //Import
 const { select, update } = require("./DB.js");
+const BlockManager = require("./BlockManager.js");
+const e = require("express");
 
 class FollowManager {
   //Save that the user (follwerID) is following the user(followingID)
   async follow(followerID, followingID) {
     try {
-      const query = `INSERT INTO instabun.followers (FollowerID, FollowingID) VALUES (?, ?);`;
-      await update(query, [followerID, followingID]);
-      return "Follow operation successful";
+      const blockManager = new BlockManager();
+
+      const hasBlocked = await blockManager.isUserBlocked(
+        followingID,
+        followerID
+      );
+      const isBlocked = await blockManager.isUserBlocked(
+        followerID,
+        followingID
+      );
+
+      if (hasBlocked) {
+        return {
+          status: 400,
+          message: "User must first unblock then they can follow",
+        };
+      } else if (isBlocked) {
+        return { status: 400, message: "User is blocked" };
+      } else {
+        const query = `INSERT INTO instabun.followers (FollowerID, FollowingID) VALUES (?, ?);`;
+        await update(query, [followerID, followingID]);
+
+        return { status: 200, message: "Follow operation successful" };
+      }
     } catch (error) {
-      return error;
+      return { status: 500, message: error.message || "Internal Server Error" };
     }
   }
 

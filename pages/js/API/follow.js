@@ -6,6 +6,7 @@ export async function follow(requestingUserID, targetUserID) {
       requestingUserID,
       targetUserID,
     });
+    console.log(response);
     return response.status;
   } catch (error) {
     if (error.response) {

@@ -6,6 +6,7 @@ import {
   getLikeList,
   getSearchedPost,
   getSelectedPost,
+  sharePost,
 } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
@@ -258,7 +259,7 @@ function attachEventHandlersToFollow(element) {
           button.classList.remove("bg-primary");
           button.classList.add("bg-dark-subtle");
         } else {
-          alert("Error occured, unable to follow. Try again");
+          alert("Unable to follow, check if you blocked the person");
         }
       }
     });
@@ -366,6 +367,8 @@ function attachEventHandlersToPost(posts) {
     const likeButton = post.querySelector(".likeButton");
     const bookmarkButton = post.querySelector(".bookmarkButton");
     const likeCounter = post.querySelector(".likeCounter");
+    const shareButton = post.querySelector(".shareButton");
+    const totalShare = post.querySelector(".totalShare");
     const commentButton = post.querySelector(".commentButton");
     postID = post.id;
 
@@ -393,6 +396,26 @@ function attachEventHandlersToPost(posts) {
         }
       }
     });
+
+    shareButton.addEventListener("click", async function () {
+      const status = await sharePost(userID, post.id);
+      writeClipboardText(
+        `http://127.0.0.1:5500/pages/discover.html?postID=${post.id}`
+      );
+      alert("Link is now in your clipboard");
+      console.log(status);
+      if (status == "200") {
+        totalShare.innerHTML = Number(totalShare.innerHTML) + 1;
+      }
+    });
+
+    async function writeClipboardText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
 
     //Showing a list of people who liked the post
     likeCounter.parentElement.addEventListener("click", async function () {

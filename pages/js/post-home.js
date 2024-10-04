@@ -4,6 +4,7 @@ import {
   likePost,
   unlikePost,
   getLikeList,
+  sharePost,
 } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
@@ -140,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const commentArea = post.querySelector(".commentTextArea");
     const sendQuickComment = post.querySelector(".sendQuickComment");
     const likeCounter = post.querySelector(".likeCounter");
+    const shareButton = post.querySelector(".shareButton");
     const viewCommentCount = post.querySelector("#viewCommentCount");
     const viewComment = post.querySelector("#viewComment");
     postID = post.id;
@@ -258,6 +260,22 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
       });
     });
+
+    shareButton.addEventListener("click", async function () {
+      await sharePost(userID, post.id);
+      writeClipboardText(
+        `http://127.0.0.1:5500/pages/discover.html?postID=${post.id}`
+      );
+      alert("Link is now in your clipboard");
+    });
+
+    async function writeClipboardText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
 
     //Typing a quick comment -> changing the span display value
     commentArea.addEventListener("input", function () {
@@ -399,7 +417,7 @@ function attachEventHandlersToFollow(element) {
           button.classList.remove("bg-primary");
           button.classList.add("bg-dark-subtle");
         } else {
-          alert("Error occured, unable to follow. Try again");
+          alert("Unable to follow, check if you blocked the person");
         }
       }
     });

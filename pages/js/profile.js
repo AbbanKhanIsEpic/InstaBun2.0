@@ -1,6 +1,7 @@
-import { likePost, unlikePost } from "./API/post.js";
+import { likePost, unlikePost, sharePost } from "./API/post.js";
 import { userID } from "./userSession.js";
 import { getProfile, block, unblock } from "./API/user.js";
+import { sendDirectMessage } from "./API/message.js";
 import {
   getUserBookmark,
   addPostToBookmark,
@@ -142,6 +143,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const data = await getProfile(userID, profileUserID);
 
+    console.log(data);
+
     const collections = { collections: data["collections"] };
 
     collections["username"] = data["username"];
@@ -175,6 +178,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const followings = document.querySelector("#followings");
 
     const followers = document.querySelector("#followers");
+
+    const quickMessageInput = document.querySelector("#quickMessageInput");
+
+    const sendQuickMessageButton = document.querySelector(
+      "#sendQuickMessageButton"
+    );
 
     Array.from(storiesModal).forEach((modal) => {
       const carouselInner = modal.querySelector(".carousel-inner");
@@ -293,6 +302,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const likeButton = postModal.querySelector("#likeButton");
 
+        const shareButton = postModal.querySelector("#shareButton");
+
         const commentButton = postModal.querySelector("#commentButton");
 
         const bookmarkButton = postModal.querySelector(".bookmarkButton");
@@ -336,6 +347,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             alert("Unable to comment, try again");
           }
         });
+
+        shareButton.addEventListener("click", async function () {
+          await sharePost(userID, post.id);
+          writeClipboardText(
+            `http://127.0.0.1:5500/pages/discover.html?postID=${post.id}`
+          );
+          alert("Link is now in your clipboard");
+        });
+
+        async function writeClipboardText(text) {
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (error) {
+            console.error(error.message);
+          }
+        }
 
         bookmarkButton.addEventListener("click", async function (event) {
           let array = [];
@@ -482,12 +509,41 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const followingsData = await getFollowingList(userID, profileUserID);
 
+      document.querySelector("#totalFollowingsCount").innerHTML =
+        followingsData.length;
+
+      const followingList = viewFollowingList.querySelector("#followingList");
+
       const followingsOutput = followingsTemplate({ users: followingsData });
 
-      viewFollowingList.querySelector("#followingList").innerHTML =
-        followingsOutput;
+      followingList.innerHTML = followingsOutput;
 
       new bootstrap.Modal(viewFollowingList).show();
+
+      const buttons = followingList.querySelectorAll("button");
+      Array.from(buttons).forEach((button) => {
+        button.addEventListener("click", async function () {
+          const isFollowing = button.innerHTML == "Unfollow";
+          if (isFollowing) {
+            const status = await unfollow(userID, button.id);
+            if (status == "200") {
+              button.innerHTML = "Follow";
+              button.classList.add("bg-primary");
+              button.classList.remove("bg-dark-subtle");
+            }
+          } else {
+            const status = await follow(userID, button.id);
+            console.log(status);
+            if (status == "200") {
+              button.innerHTML = "Unfollow";
+              button.classList.remove("bg-primary");
+              button.classList.add("bg-dark-subtle");
+            } else {
+              alert("Unable to follow, check if you blocked the person");
+            }
+          }
+        });
+      });
     });
 
     followers.addEventListener("click", async function () {
@@ -503,10 +559,46 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const followersOutput = followersTemplate({ users: followersData });
 
-      viewFollowerList.querySelector("#followerList").innerHTML =
-        followersOutput;
+      const followerList = viewFollowerList.querySelector("#followerList");
+
+      followerList.innerHTML = followersOutput;
 
       new bootstrap.Modal(viewFollowerList).show();
+
+      const buttons = followerList.querySelectorAll("button");
+      Array.from(buttons).forEach((button) => {
+        button.addEventListener("click", async function () {
+          const isFollowing = button.innerHTML == "Unfollow";
+          if (isFollowing) {
+            const status = await unfollow(userID, button.id);
+            if (status == "200") {
+              button.innerHTML = "Follow";
+              button.classList.add("bg-primary");
+              button.classList.remove("bg-dark-subtle");
+            }
+          } else {
+            const status = await follow(userID, button.id);
+            console.log(status);
+            if (status == "200") {
+              button.innerHTML = "Unfollow";
+              button.classList.remove("bg-primary");
+              button.classList.add("bg-dark-subtle");
+            } else {
+              alert("Unable to follow, check if you blocked the person");
+            }
+          }
+        });
+      });
+    });
+
+    sendQuickMessageButton.addEventListener("click", async function () {
+      const quickMessage = quickMessageInput.value;
+      if (quickMessage.length == 0) {
+        alert("You need to type something to send a message");
+        return;
+      }
+      await sendDirectMessage(userID, profileUserID, quickMessage);
+      window.open("http://127.0.0.1:5500/pages/message.html", "_self");
     });
   } catch (error) {
     console.error("Error fetching posts or rendering template:", error);

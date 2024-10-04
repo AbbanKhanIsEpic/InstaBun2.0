@@ -6,72 +6,6 @@ const StoryManager = require("./StoryManager");
 //What is a CollectionManager
 //It is a class that manages the creation collections and adds post to specific collections
 class CollectionManager {
-  //Returns a list of collections
-  async getCollections(requestingUserID, targetUserID) {
-    try {
-      //Manager
-      const storyManager = new StoryManager();
-
-      if (requestingUserID == targetUserID) {
-        const userCollections = await this.getUserCollections(targetUserID);
-
-        if (!userCollections.length) {
-          return new Error("The user does not have any collection");
-        }
-
-        const promises = userCollections.map(async (collection) => {
-          const storyIDs = (
-            await this.getStoryIDs(collection["collectionID"])
-          ).map((element) => {
-            return element["storyID"];
-          });
-
-          const storiesWithDetails = await storyManager.getStories(
-            targetUserID,
-            storyIDs
-          );
-
-          collection["stories"] = storiesWithDetails[0]["stories"];
-        });
-
-        await Promise.all(promises);
-
-        return userCollections;
-      } else {
-        const publicCollections = await this.getPublicCollections(targetUserID);
-
-        if (!publicCollections.length) {
-          return new Error(
-            "The target user does not have any collection that the requesting user can see"
-          );
-        }
-
-        const promises = publicCollections.map(async (collection) => {
-          const storyIDs = (
-            await this.getStoryIDs(collection["collectionID"])
-          ).map((element) => {
-            return element["storyID"];
-          });
-
-          const storiesWithDetails = await storyManager.getStories(
-            targetUserID,
-            storyIDs
-          );
-
-          console.log(storiesWithDetails);
-
-          collection["stories"] = storiesWithDetails[0]["stories"];
-        });
-
-        await Promise.all(promises);
-
-        return publicCollections;
-      }
-    } catch (error) {
-      return error;
-    }
-  }
-
   //Creates a collection
   async create(collectionTitle, userID, coverImage, isPublic) {
     try {
@@ -89,17 +23,6 @@ class CollectionManager {
       const query = `INSERT INTO collection(collectionTitle,coverPhoto,userID,isPublic) VALUE(?,?,?,?);`;
       await update(query, [collectionTitle, coverLink, userID, isPublic]);
       return "Collection creation operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //Delete a collection
-  async delete(collectionID) {
-    try {
-      const query = `DELETE FROM collection WHERE collectionID = ?;`;
-      await update(query, [collectionID]);
-      return "Collection deletion operation successful";
     } catch (error) {
       return error;
     }
@@ -139,9 +62,39 @@ class CollectionManager {
 
   async getPublicCollections(userID) {
     try {
+      const storyManager = new StoryManager();
+
+      console.log(userID);
+
       const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ? AND isPublic = 1;`;
-      const result = await select(query, [userID]);
-      return result;
+      const publicCollections = await select(query, [userID]);
+
+      if (!publicCollections.length) {
+        return new Error(
+          "The target user does not have any collection that the requesting user can see"
+        );
+      }
+
+      const promises = publicCollections.map(async (collection) => {
+        const storyIDs = (
+          await this.getStoryIDs(collection["collectionID"])
+        ).map((element) => {
+          return element["storyID"];
+        });
+
+        const storiesWithDetails = await storyManager.getStories(
+          userID,
+          storyIDs
+        );
+
+        console.log(storiesWithDetails);
+
+        collection["stories"] = storiesWithDetails[0]["stories"];
+      });
+
+      await Promise.all(promises);
+
+      return publicCollections;
     } catch (error) {
       return error;
     }
@@ -149,9 +102,55 @@ class CollectionManager {
 
   async getUserCollections(userID) {
     try {
+      const storyManager = new StoryManager();
+
+      const userCollections = await this.getAllCollections(userID);
+
+      if (!userCollections.length) {
+        return new Error("The user does not have any collection");
+      }
+
+      const promises = userCollections.map(async (collection) => {
+        const storyIDs = (
+          await this.getStoryIDs(collection["collectionID"])
+        ).map((element) => {
+          return element?.["storyID"];
+        });
+
+        if (storyIDs.length == 0) {
+          return { ...collection, stories: [] };
+        }
+
+        const storiesWithDetails = await storyManager.getStories(
+          userID,
+          storyIDs
+        );
+
+        collection["stories"] = storiesWithDetails[0]["stories"];
+      });
+
+      await Promise.all(promises);
+      return userCollections;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async isStoryInCollection(collectionID, storyID) {
+    try {
+      const query = `Select count(*) from collectionstory where collectionID = ? and storyID = ?`;
+      const [result] = await select(query, [collectionID, storyID]);
+      return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async getAllCollections(userID) {
+    try {
       const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ?`;
       const result = await select(query, [userID]);
-      return result;
+      return result ? result : [];
     } catch (error) {
       return error;
     }

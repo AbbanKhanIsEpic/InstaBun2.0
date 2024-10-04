@@ -117,3 +117,16 @@ export async function updatePost(postID, tags, description, visibility) {
     throw error; // Rethrow the error for further handling if needed
   }
 }
+
+export async function sharePost(userID, postID) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/share`, {
+      userID: userID,
+      postID: postID,
+    });
+    console.log(response);
+    return response["status"];
+  } catch (error) {
+    console.error(error);
+  }
+}

@@ -145,6 +145,9 @@ class StoryManager {
 
   async getStories(userID, storyIDs) {
     try {
+      if (!storyIDs || !storyIDs.length) {
+        return [];
+      }
       const query = `SELECT story.userID, (JSON_ARRAYAGG(JSON_OBJECT('id', storyID,'isVideo', isVideo,'url', storyLink,'uploadDate', uploadDate,'isCloseFriend', (storyVisibility = 2)))) AS stories, CASE WHEN MAX(storyVisibility) = 2 THEN 1 ELSE 0 END AS hasCloseFriend FROM instabun.story WHERE story.storyID IN (?) GROUP BY story.userID  ORDER BY CASE WHEN story.userID = ? THEN 1 ELSE 0 END DESC,MAX(uploadDate) DESC;`;
       const result = await select(query, [storyIDs, userID]);
       return result;

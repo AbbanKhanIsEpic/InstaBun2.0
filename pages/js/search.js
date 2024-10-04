@@ -60,7 +60,7 @@ function attachEventHandlersToButtons(element) {
           button.classList.remove("bg-primary");
           button.classList.add("bg-dark-subtle");
         } else {
-          alert("Error occured, unable to follow. Try again");
+          alert("Unable to follow, check if you blocked the person");
         }
       }
     });

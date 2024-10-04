@@ -21,9 +21,10 @@ class BlockManager {
       const query = `INSERT INTO block(blockerUserID,blockedUserID) VALUE(?,?);`;
       await update(query, [blockerUserID, blockedUserID]);
       //When user block someone, they want no association with them
-      //So therefore, they will not be following them
+      //So therefore, both party will stop following each other will not be following them
       const follow = new FollowManager();
       follow.unfollow(blockerUserID, blockedUserID);
+      follow.unfollow(blockedUserID, blockerUserID);
       return "Block operation successful";
     } catch (error) {
       return error;

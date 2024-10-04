@@ -265,12 +265,12 @@ app.get("/api/user/userInfo", async (req, res) => {
     const is2StepEnabled = await userManager.checkTwoStepVerificationEnabled(
       profile["username"]
     );
-    const emailAddress = await userManager.getEmail(profile["username"]);
+    const dmLimit = await userManager.getDMLimit(userID);
 
     console.log(is2StepEnabled);
 
     profile["is2StepEnabled"] = is2StepEnabled;
-    profile["emailAddress"] = emailAddress;
+    profile["dmLimit"] = dmLimit;
 
     res.status(200).send(profile);
   } catch (error) {
@@ -354,19 +354,25 @@ app.get("/api/user/profile", async (req, res) => {
     const collectionManager = new CollectionManager();
     const postManager = new PostManager();
 
+    console.log(targetUserID);
+
     const profileData = await userManager.getProfile(targetUserID);
 
+    const isSelfRequest = requestingUserID == targetUserID;
+
     const additionalData = await Promise.all([
-      requestingUserID !== targetUserID
-        ? followManager.isFollowing(requestingUserID, targetUserID)
-        : null,
-      requestingUserID !== targetUserID
-        ? blockManager.isUserBlocked(targetUserID, requestingUserID)
-        : null,
-      requestingUserID !== targetUserID
-        ? directMessageManager.canUserMessage(requestingUserID, targetUserID)
-        : null,
-      collectionManager.getCollections(requestingUserID, targetUserID),
+      isSelfRequest
+        ? null
+        : followManager.isFollowing(requestingUserID, targetUserID),
+      isSelfRequest
+        ? null
+        : blockManager.isUserBlocked(targetUserID, requestingUserID),
+      isSelfRequest
+        ? null
+        : directMessageManager.canUserMessage(requestingUserID, targetUserID),
+      isSelfRequest
+        ? collectionManager.getUserCollections(targetUserID)
+        : collectionManager.getPublicCollections(targetUserID),
       postManager.getProfilePost(requestingUserID, targetUserID),
       followManager.getTotalFollowing(targetUserID),
       followManager.getTotalFollowers(targetUserID),
@@ -384,9 +390,9 @@ app.get("/api/user/profile", async (req, res) => {
 
     const responseData = {
       ...profileData,
-      isFollowing,
-      hasBlockedUser,
-      canMessage,
+      isFollowing: isSelfRequest ? null : isFollowing,
+      hasBlockedUser: isSelfRequest ? null : hasBlockedUser,
+      canMessage: isSelfRequest ? null : canMessage,
       collections,
       posts,
       totalFollowings,
@@ -438,24 +444,34 @@ app.get("/api/user/dmlimit", (req, res) => {
 });
 
 //Update user's profile
-app.post("/api/user/profile", (req, res) => {
-  const userID = req.body.userID;
-  const newDisplayName = req.body.newDisplayName;
-  const newBio = req.body.newBio;
-  const newProfileIconLink = req.body.newProfileIconLink;
-  const newVisibility = req.body.newVisibility;
-  const newDMLimit = req.body.newDMLimit;
+app.patch("/api/user/profile", upload.single("file"), async (req, res) => {
+  try {
+    const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
 
-  const user = new UserManager();
-  user.updateProfile(
-    userID,
-    newDisplayName,
-    newBio,
-    newProfileIconLink,
-    newVisibility,
-    newDMLimit
-  );
-  res.json({ message: "Data received and processed successfully" });
+    if (!jsonData || Object.keys(jsonData).length === 0) {
+      return res.status(400).json({
+        message: "Error occurred, did not receive jsonData",
+      });
+    }
+
+    const { userID, displayName, bio, dmLimit, auth } = jsonData;
+
+    const file = req.file ? req.file : null;
+
+    const user = new UserManager();
+
+    // Await the asynchronous update operation
+    if (file != null) {
+      await user.updateProfileIcon(userID, file);
+    }
+
+    await user.updateProfile(userID, displayName, bio, dmLimit, auth);
+
+    res.json({ message: "Profile updated successfully" });
+  } catch (error) {
+    // Handle errors and send appropriate response
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
 });
 
 //Returns user's email address
@@ -621,15 +637,14 @@ app.get("/api/follow/followingList", async (req, res) => {
 });
 
 //
-app.post("/api/follow", (req, res) => {
+app.post("/api/follow", async (req, res) => {
   const { requestingUserID, targetUserID } = req.body;
 
   try {
     const follow = new FollowManager();
-    follow.follow(requestingUserID, targetUserID);
-    res
-      .status(200)
-      .json({ message: "Data received and processed successfully" });
+    const result = await follow.follow(requestingUserID, targetUserID);
+    console.log(result);
+    res.status(result.status).send(result.message);
   } catch (error) {
     res.status(500).send({
       error: error,
@@ -638,20 +653,19 @@ app.post("/api/follow", (req, res) => {
   }
 });
 
-app.delete("/api/follow/:requestingUserID/:targetUserID", (req, res) => {
+app.delete("/api/follow/:requestingUserID/:targetUserID", async (req, res) => {
   const { requestingUserID, targetUserID } = req.params;
 
   const follow = new FollowManager();
   try {
-    follow.unfollow(requestingUserID, targetUserID);
+    await follow.unfollow(requestingUserID, targetUserID);
+    res.status(200).send({ message: "Unfollow completed" });
   } catch (error) {
     res.status(500).send({
       error: error.message || error,
       message: "Error occurred",
-    });
+    }); // Send error response in case of failure
   }
-
-  res.json({ message: "Data received and processed successfully" });
 });
 
 //Post
@@ -843,13 +857,16 @@ app.get("/api/post/share", (req, res) => {
     });
 });
 
-app.post("/api/post/share", (req, res) => {
-  const userID = req.body.userID;
-  const postID = req.body.postID;
+app.post("/api/post/share", async (req, res) => {
+  const { userID, postID } = req.body;
 
-  const post = new PostManager();
-  post.share(userID, postID);
-  res.json({ message: "Data received and processed successfully" });
+  try {
+    const post = new PostManager();
+    const result = await post.share(userID, postID);
+    res.status(result.status).send(result.message);
+  } catch (error) {
+    return error;
+  }
 });
 
 //Story
@@ -1448,6 +1465,64 @@ app.post("/api/collection", upload.single("file"), async (req, res) => {
     res.status(500).send({
       error: error.message || error,
       message: "Error occurred while creating collection",
+    });
+  }
+});
+
+app.get("/api/collection/list", async (req, res) => {
+  const { userID, storyID } = req.query;
+
+  const collectionManager = new CollectionManager();
+
+  try {
+    const collections = await collectionManager.getAllCollections(userID);
+
+    const promises = collections.map(async (collection) => {
+      const collectionID = collection?.["collectionID"];
+      collection["doesContainStory"] =
+        await collectionManager.isStoryInCollection(collectionID, storyID);
+      return collection;
+    });
+
+    const updatedCollections = await Promise.all(promises);
+
+    res.status(200).send(updatedCollections);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred");
+  }
+});
+
+app.post("/api/collection/story", async (req, res) => {
+  try {
+    const { collectionID, storyID } = req.body;
+
+    const collectionManager = new CollectionManager();
+
+    await collectionManager.addStory(collectionID, storyID);
+    res.status(200).json({ message: "Add story to collection completed" });
+  } catch (error) {
+    console.error("Error add story to collection:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred while add story to collection",
+    });
+  }
+});
+
+app.delete("/api/collection/story/:collectionID/:postID", async (req, res) => {
+  try {
+    const { collectionID, postID } = req.params;
+
+    const collectionManager = new CollectionManager();
+
+    await collectionManager.removeStory(collectionID, postID);
+    res.status(200).json({ message: "Remove story from collection completed" });
+  } catch (error) {
+    console.error("Error removing stories from collection:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error removing stories from collection",
     });
   }
 });

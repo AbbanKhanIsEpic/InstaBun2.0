@@ -22,7 +22,12 @@
             <div class="btn btn-primary ms-3" id="followButton">Follow</div>
           {{/if}}
           {{#if canMessage}}
-            <div class="btn btn-primary ms-3" id="messageButton">Message</div>
+            <div
+              class="btn btn-primary ms-3"
+              id="messageButton"
+              data-bs-toggle="modal"
+              data-bs-target="#sendQuickMessage"
+            >Message</div>
           {{else}}
           {{/if}}
           {{#if hasBlockedUser}}

@@ -1,6 +1,8 @@
 const { select, update } = require("./DB.js");
 const FollowManager = require("./FollowManager.js");
 const BlockManager = require("./BlockManager.js");
+const sha1 = require("sha1");
+const FirebaseStorageManager = require("./FirebaseStorageManager");
 
 //Imports
 class UserManager {
@@ -169,6 +171,15 @@ class UserManager {
         );
       }
       return result;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateProfile(userID, displayName, bio, dmLimit, auth) {
+    try {
+      const query = `UPDATE users SET displayName = ?, bio = ?, DML = ?, 2SVE = ? WHERE (userID = ?)`;
+      await update(query, [displayName, bio, dmLimit, auth, userID]);
     } catch (error) {
       return error;
     }
@@ -344,6 +355,30 @@ class UserManager {
       const query = `SELECT count(*) FROM instabun.Users where Email = ?;`;
       const [result] = await select(query, [email]);
       return result["count(*)"] == 1;
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateProfileIcon(userID, file) {
+    try {
+      console.log("Hello");
+      const buffer = file.buffer;
+      const fileName = sha1(buffer);
+      const url = "profileIcon/" + fileName;
+      const mimetype = file.mimetype;
+
+      const firebaseStorageManager = new FirebaseStorageManager();
+      const profileLink = await firebaseStorageManager.uploadFile(
+        buffer,
+        url,
+        mimetype
+      );
+
+      console.log(profileLink);
+
+      const query = `UPDATE users SET profileIcon = ? WHERE (userID = ?);`;
+      await update(query, [profileLink, userID]);
     } catch (error) {
       return error;
     }

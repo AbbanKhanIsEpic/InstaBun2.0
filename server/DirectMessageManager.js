@@ -334,6 +334,21 @@ class DirectMessageManager {
       //Managers
       const userManager = new UserManager();
       const followManager = new FollowManager();
+      const blockManager = new BlockManager();
+
+      const isBlocked = await blockManager.isUserBlocked(
+        targetUserID,
+        requestingUserID
+      );
+
+      const hasBlocked = await blockManager.isUserBlocked(
+        requestingUserID,
+        targetUserID
+      );
+
+      if (isBlocked || hasBlocked) {
+        return false;
+      }
 
       const dmLimit = await userManager.getDMLimit(targetUserID);
       if (dmLimit == 0) {

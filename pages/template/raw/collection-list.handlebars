@@ -1,0 +1,31 @@
+{{#each collections as |collection|}}
+  <div
+    class="user d-flex flex-row justify-content-between align-items-center w-100 pt-2 pb-2"
+  >
+    <div class="d-flex flex-row ms-4">
+      <img
+        src="{{collection.coverPhoto}}"
+        height="50"
+        width="50"
+        alt=""
+        class="rounded-circle"
+      />
+      <div class="d-flex flex-column ms-3 justify-content-center">
+        <div class="collectionTitle">
+          <strong>{{collection.collectionTitle}}</strong>
+        </div>
+      </div>
+    </div>
+    {{#if doesContainStory}}
+      <button
+        class="btn bg-dark-subtle h-75 w-25 me-4 collection"
+        id="{{collection.collectionID}}"
+      >Remove</button>
+    {{else}}
+      <button
+        class="btn bg-primary h-75 w-25 me-4 collection"
+        id="{{collection.collectionID}}"
+      >Add</button>
+    {{/if}}
+  </div>
+{{/each}}

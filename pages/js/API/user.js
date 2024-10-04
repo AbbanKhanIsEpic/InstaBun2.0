@@ -180,3 +180,17 @@ export async function isUsernameTaken(username) {
     console.error(error);
   }
 }
+
+export async function updateProfile(formData) {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/profile`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+}

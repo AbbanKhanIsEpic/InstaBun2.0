@@ -251,6 +251,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 (item) => item === Number(bookmark.id)
               );
               array.splice(index, 1);
+              array.splice(array.indexOf(0), 1);
               bookmarkButton.id = array.join(",");
               if (array.length == 0) {
                 bookmarkButton.innerHTML = notActiveBookmark;

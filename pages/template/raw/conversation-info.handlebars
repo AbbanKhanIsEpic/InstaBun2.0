@@ -37,6 +37,8 @@
         </div>
         <div class="modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4">
 
+            {{#if isDirect}}
+            {{else}}
             {{#if isGroupOwner}}
             <div class="d-flex flex-row mb-2 mb-2 justify-content-center">
                 <div id="addNewMemberButton" class="me-2 d-flex justify-content-center" role="button">
@@ -50,6 +52,7 @@
                 </div>
                 Add new member/s
             </div>
+            {{/if}}
             {{/if}}
             {{#if isDirect}}
             {{else}}
@@ -78,10 +81,13 @@
             </div>
             {{/if}}
             <div class="modal-footer w-100 d-flex justify-content-center align-items-center {{#if isDirect}}border-0{{/if}}">
+            {{#if isDirect}}
+            {{else}}
                             {{#if isGroupOwner}}
                 <button class="btn btn-primary" id="updateGroupButton">
                     Update group
                 </button>
+                            {{/if}}
                             {{/if}}
                 <button class="btn btn-primary" id="clearMessage">Clear {{#if isDirect}}direct{{else}}group{{/if}} messages</button>
                 {{#if isDirect}}

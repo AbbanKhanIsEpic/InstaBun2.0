@@ -494,6 +494,8 @@ async function setMessageContainer(
       isGroupOwner: selectedGroupOwner == userID,
     };
 
+    console.log(data);
+
     const modalOutput = modalTemplate(data);
     const conversationInfoModal = document.querySelector(
       "#conversationInfoModal"
@@ -527,9 +529,12 @@ async function setMessageContainer(
     let selectedFile = null;
     let hasSelectedFile = false;
 
-    document
-      .querySelector("#changeGroupProfileIcon")
-      .addEventListener("change", function (event) {
+    const changeGroupProfileIcon = document.querySelector(
+      "#changeGroupProfileIcon"
+    );
+
+    if (changeGroupProfileIcon) {
+      changeGroupProfileIcon.addEventListener("change", function (event) {
         selectedFile = event.target.files[0];
         if (selectedFile.type.match("image.*")) {
           const reader = new FileReader();
@@ -543,6 +548,7 @@ async function setMessageContainer(
           alert("Only images allowed, sorry");
         }
       });
+    }
 
     if (updateGroupButton) {
       updateGroupButton.addEventListener("click", async function () {

@@ -36,8 +36,17 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(11, data, 0),"data":data,"loc":{"start":{"line":32,"column":100},"end":{"line":33,"column":57}}})) != null ? stack1 : "")
     + " />\r\n            </form>\r\n";
 },"17":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(18, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":42,"column":12},"end":{"line":55,"column":19}}})) != null ? stack1 : "");
+},"18":function(container,depth0,helpers,partials,data) {
     return "            <div class=\"d-flex flex-row mb-2 mb-2 justify-content-center\">\r\n                <div id=\"addNewMemberButton\" class=\"me-2 d-flex justify-content-center\" role=\"button\">\r\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" fill=\"currentColor\"\r\n                        class=\"bi bi-person-add\" viewBox=\"0 0 16 16\">\r\n                        <path\r\n                            d=\"M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4\" />\r\n                        <path\r\n                            d=\"M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z\" />\r\n                    </svg>\r\n                </div>\r\n                Add new member/s\r\n            </div>\r\n";
-},"19":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"20":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -46,9 +55,9 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
     };
 
   return "            <div class=\"modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4 p-0 m-0\"\r\n                id=\"showCaseMemberNewGroup\">\r\n"
-    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"members") : depth0),{"name":"each","hash":{},"fn":container.program(20, data, 1, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":58,"column":16},"end":{"line":77,"column":25}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"each").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"members") : depth0),{"name":"each","hash":{},"fn":container.program(21, data, 1, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":61,"column":16},"end":{"line":80,"column":25}}})) != null ? stack1 : "")
     + "            </div>\r\n";
-},"20":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"21":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -63,9 +72,9 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
     + "\r\n                            </span>\r\n                            <span class=\"text-white-50\" aria-label=\"username\">"
     + alias2(alias1(((stack1 = blockParams[0][0]) != null ? lookupProperty(stack1,"username") : stack1), depth0))
     + "</span>\r\n                        </div>\r\n                    </div>\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depths[1] != null ? lookupProperty(depths[1],"isGroupOwner") : depths[1]),{"name":"if","hash":{},"fn":container.program(21, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":69,"column":20},"end":{"line":75,"column":27}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depths[1] != null ? lookupProperty(depths[1],"isGroupOwner") : depths[1]),{"name":"if","hash":{},"fn":container.program(22, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":72,"column":20},"end":{"line":78,"column":27}}})) != null ? stack1 : "")
     + "                </div>\r\n";
-},"21":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"22":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {}), lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -73,8 +82,8 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isGroupOwner")||(depth0 && lookupProperty(depth0,"isGroupOwner"))||container.hooks.helperMissing).call(alias1,((stack1 = blockParams[1][0]) != null ? lookupProperty(stack1,"userID") : stack1),(depths[1] != null ? lookupProperty(depths[1],"ownerID") : depths[1]),{"name":"isGroupOwner","hash":{},"data":data,"blockParams":blockParams,"loc":{"start":{"line":70,"column":26},"end":{"line":70,"column":63}}}),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(22, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":70,"column":20},"end":{"line":74,"column":27}}})) != null ? stack1 : "");
-},"22":function(container,depth0,helpers,partials,data,blockParams) {
+  return ((stack1 = lookupProperty(helpers,"if").call(alias1,(lookupProperty(helpers,"isGroupOwner")||(depth0 && lookupProperty(depth0,"isGroupOwner"))||container.hooks.helperMissing).call(alias1,((stack1 = blockParams[1][0]) != null ? lookupProperty(stack1,"userID") : stack1),(depths[1] != null ? lookupProperty(depths[1],"ownerID") : depths[1]),{"name":"isGroupOwner","hash":{},"data":data,"blockParams":blockParams,"loc":{"start":{"line":73,"column":26},"end":{"line":73,"column":63}}}),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(23, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":73,"column":20},"end":{"line":77,"column":27}}})) != null ? stack1 : "");
+},"23":function(container,depth0,helpers,partials,data,blockParams) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -87,15 +96,9 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
     + ">Give 👑</button>\r\n                    <button class=\"btn btn-danger h-75 w-25 me-4 removeMember\" id="
     + alias2(alias1(((stack1 = blockParams[2][0]) != null ? lookupProperty(stack1,"userID") : stack1), depth0))
     + ">Remove</button>\r\n";
-},"24":function(container,depth0,helpers,partials,data) {
+},"25":function(container,depth0,helpers,partials,data) {
     return "border-0";
-},"26":function(container,depth0,helpers,partials,data) {
-    return "                <button class=\"btn btn-primary\" id=\"updateGroupButton\">\r\n                    Update group\r\n                </button>\r\n";
-},"28":function(container,depth0,helpers,partials,data) {
-    return "direct";
-},"30":function(container,depth0,helpers,partials,data) {
-    return "group";
-},"32":function(container,depth0,helpers,partials,data) {
+},"27":function(container,depth0,helpers,partials,data) {
     var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
         if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
           return parent[propertyName];
@@ -103,8 +106,23 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
         return undefined
     };
 
-  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(33, data, 0),"data":data,"loc":{"start":{"line":89,"column":16},"end":{"line":92,"column":23}}})) != null ? stack1 : "");
-},"33":function(container,depth0,helpers,partials,data) {
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(28, data, 0),"inverse":container.noop,"data":data,"loc":{"start":{"line":86,"column":28},"end":{"line":90,"column":35}}})) != null ? stack1 : "");
+},"28":function(container,depth0,helpers,partials,data) {
+    return "                <button class=\"btn btn-primary\" id=\"updateGroupButton\">\r\n                    Update group\r\n                </button>\r\n";
+},"30":function(container,depth0,helpers,partials,data) {
+    return "direct";
+},"32":function(container,depth0,helpers,partials,data) {
+    return "group";
+},"34":function(container,depth0,helpers,partials,data) {
+    var stack1, lookupProperty = container.lookupProperty || function(parent, propertyName) {
+        if (Object.prototype.hasOwnProperty.call(parent, propertyName)) {
+          return parent[propertyName];
+        }
+        return undefined
+    };
+
+  return ((stack1 = lookupProperty(helpers,"if").call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(35, data, 0),"data":data,"loc":{"start":{"line":95,"column":16},"end":{"line":98,"column":23}}})) != null ? stack1 : "");
+},"35":function(container,depth0,helpers,partials,data) {
     return "                <button class=\"btn btn-danger\" id=\"leaveGroupButton\">Leave</button>\r\n";
 },"compiler":[8,">= 4.3.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=container.hooks.helperMissing, alias3="function", alias4=container.escapeExpression, lookupProperty = container.lookupProperty || function(parent, propertyName) {
@@ -133,16 +151,16 @@ templates['conversation-info'] = template({"1":function(container,depth0,helpers
     + " alt=\"please select something to upload\" class=\"rounded rounded-circle\" /></label>\r\n                </div>\r\n            </form>\r\n"
     + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(15, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":27,"column":12},"end":{"line":35,"column":19}}})) != null ? stack1 : "")
     + "            <hr class=\"w-100 border-white border-2\" />\r\n        </div>\r\n        <div class=\"modal-body d-flex w-100 d-flex flex-column overflow-y-auto gap-4\">\r\n\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(17, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":40,"column":12},"end":{"line":53,"column":19}}})) != null ? stack1 : "")
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(19, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":54,"column":12},"end":{"line":79,"column":19}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(17, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":40,"column":12},"end":{"line":56,"column":19}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(20, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":57,"column":12},"end":{"line":82,"column":19}}})) != null ? stack1 : "")
     + "            <div class=\"modal-footer w-100 d-flex justify-content-center align-items-center "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(24, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":80,"column":92},"end":{"line":80,"column":123}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(25, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":83,"column":92},"end":{"line":83,"column":123}}})) != null ? stack1 : "")
     + "\">\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isGroupOwner") : depth0),{"name":"if","hash":{},"fn":container.program(26, data, 0, blockParams, depths),"inverse":container.noop,"data":data,"blockParams":blockParams,"loc":{"start":{"line":81,"column":28},"end":{"line":85,"column":35}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(27, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":84,"column":12},"end":{"line":91,"column":35}}})) != null ? stack1 : "")
     + "                <button class=\"btn btn-primary\" id=\"clearMessage\">Clear "
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(28, data, 0, blockParams, depths),"inverse":container.program(30, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":86,"column":72},"end":{"line":86,"column":114}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(30, data, 0, blockParams, depths),"inverse":container.program(32, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":92,"column":72},"end":{"line":92,"column":114}}})) != null ? stack1 : "")
     + " messages</button>\r\n"
-    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(32, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":87,"column":16},"end":{"line":93,"column":23}}})) != null ? stack1 : "")
+    + ((stack1 = lookupProperty(helpers,"if").call(alias1,(depth0 != null ? lookupProperty(depth0,"isDirect") : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(34, data, 0, blockParams, depths),"data":data,"blockParams":blockParams,"loc":{"start":{"line":93,"column":16},"end":{"line":99,"column":23}}})) != null ? stack1 : "")
     + "            </div>\r\n        </div>\r\n</div>";
 },"useData":true,"useDepths":true,"useBlockParams":true});
 })();

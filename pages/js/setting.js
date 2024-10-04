@@ -1,7 +1,7 @@
 import { getUserInfo } from "./API/user.js";
 import { getUserStories, updateStory } from "./API/story.js";
 import { getUserPosts, updatePost } from "./API/post.js";
-import { getUserCollection } from "./API/collection.js";
+import { getUserCollection, createCollection } from "./API/collection.js";
 import {
   getUserBookmark,
   createBookmark,
@@ -290,6 +290,100 @@ async function showCollectionData() {
   Array.from(collections).forEach((collection) => {
     collection.addEventListener("click", function () {});
   });
+
+  document
+    .querySelector("#createCollectionButton")
+    .addEventListener("click", function () {
+      const template = Handlebars.templates["create-collection"];
+
+      const modalOutput = template();
+
+      standardModal.innerHTML = modalOutput;
+
+      new bootstrap.Modal(standardModal).show();
+
+      let hasSelectedFile = false;
+
+      let selectedFile = null;
+
+      const newCollectionCover = document.querySelector("#newCollectionCover");
+
+      const newCollectionTitleInput = document.querySelector(
+        "#newCollectionTitleInput"
+      );
+
+      const collectionVisibilityAll = document.querySelector(
+        "#collectionVisibilityAll"
+      );
+
+      const collectionCreateButton = document.querySelector(
+        "#collectionCreateButton"
+      );
+
+      document
+        .querySelector("#newCollectionCoverInput")
+        .addEventListener("change", function (event) {
+          selectedFile = event.target.files[0];
+          if (selectedFile.type.match("image.*")) {
+            const reader = new FileReader();
+            reader.addEventListener("load", async (event) => {
+              const imageSource = event.target.result;
+              newCollectionCover.src = imageSource;
+            });
+            reader.readAsDataURL(selectedFile);
+            hasSelectedFile = true;
+          } else {
+            alert("Only images allowed, sorry");
+          }
+        });
+
+      collectionCreateButton.addEventListener("click", async function () {
+        const collectionTitle = newCollectionTitleInput.value;
+        if (!hasSelectedFile) {
+          alert("You need to set a cover");
+          return;
+        }
+        if (collectionTitle.trim().length == 0) {
+          alert("You need to set a collection title");
+          return;
+        }
+        if (collectionTitle.trim().length != collectionTitle.length) {
+          alert("The collection title can not have spaces at the start or end");
+          return;
+        }
+        if (collectionTitle.length > 100) {
+          alert("The collection title is too long, 100 characters max");
+          return;
+        }
+        const formData = new FormData();
+
+        const mime = selectedFile.type;
+
+        const name = selectedFile.name;
+
+        const newFile = new File([selectedFile], name, { type: mime });
+
+        formData.append("file", newFile);
+
+        formData.append(
+          "jsonData",
+          JSON.stringify({
+            collectionTitle: collectionTitle,
+            userID: userID,
+            isPublic: collectionVisibilityAll.checked,
+          })
+        );
+
+        collectionCreateButton.classList.add("disabled");
+        const response = await createCollection(formData);
+        if (response.status == "200") {
+          alert("The collection has been created");
+        } else {
+          alert("Error has occured, try again");
+        }
+        window.open("http://127.0.0.1:5500/pages/setting.html", "_self");
+      });
+    });
 }
 
 async function showBookmarkData() {

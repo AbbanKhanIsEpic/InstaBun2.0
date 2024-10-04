@@ -209,6 +209,9 @@ class PostManager {
 
       const posts = await this.#getPostForAll(userID, tagIDsArray);
 
+      console.log("Balls: " + tagIDsArray);
+      console.log("Balls: " + posts);
+
       if (!posts.length || !posts) {
         return new Error("Unable to retrieve post via the provided tags");
       }
@@ -302,11 +305,11 @@ class PostManager {
       const blockManager = new BlockManager();
 
       //Get post that is public to all
-      const query = `SELECT tagpost.postID,post.userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID INNER JOIN block on block.blockerUserID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY post.postID ORDER BY COUNT(DISTINCT tagID) DESC`;
+      const query = `SELECT tagpost.postID,post.userID FROM tagpost INNER JOIN post ON post.postID = tagpost.postID WHERE tagID IN (?) AND postVisibility = 0 GROUP BY post.postID ORDER BY COUNT(DISTINCT tagID) DESC`;
 
       const result = await select(query, [tagsArray]);
 
-      console.log(result);
+      console.log("E: " + result);
 
       //If there is no post with that tags
       //Return empty
@@ -322,10 +325,12 @@ class PostManager {
           userID,
           uploaderUserID
         );
+        console.log(isBlocked);
         const hasBlocked = await blockManager.isUserBlocked(
           uploaderUserID,
           userID
         );
+        console.log(hasBlocked);
         if (!isBlocked && !hasBlocked) {
           filteredPostIDs.push(postID);
         }

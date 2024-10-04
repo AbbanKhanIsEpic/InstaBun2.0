@@ -8,6 +8,8 @@
       width="56"
       height="56"
       class="rounded-circle me-2"
+      {{#if isDirect}}onclick="window.open('http://127.0.0.1:5500/pages/profile.html?userID={{id}}', '_self');"
+      role="button"{{/if}}
     />
     <span> <strong>{{name}}</strong></span>
   </div>

@@ -452,7 +452,12 @@ async function setMessageContainer(
     ? Handlebars.templates["hidden-container"]
     : Handlebars.templates["message-container"];
 
-  const data = { name: toName, profileIcon: toProfileIcon };
+  const data = {
+    isDirect: isDirect,
+    id: toID,
+    name: toName,
+    profileIcon: toProfileIcon,
+  };
 
   // Render the template with data
   const htmlOutput = template(data);
@@ -575,7 +580,6 @@ async function setMessageContainer(
           alert("Title has been updated");
         }
       });
-      location.reload();
     }
 
     if (leaveGroupButton) {
@@ -591,7 +595,6 @@ async function setMessageContainer(
         ) {
           alert("Confirmed");
           removeMember(communicatingToID, userID);
-          location.reload();
           return;
         } else {
           alert("Click the button again to confirm your departure");
@@ -622,7 +625,6 @@ async function setMessageContainer(
         ) {
           await changeOwner(communicatingToID, transferOwnership.id);
           alert("Transfer is done");
-          location.reload();
           return;
         } else {
           alert("Click the button again to confirm your transfer of ownership");
@@ -654,7 +656,7 @@ async function setMessageContainer(
         ) {
           await removeMember(communicatingToID, removeMemberButton.id);
           alert("Removing the member is done");
-          location.reload();
+          window.open("http://127.0.0.1:5500/pages/message.html", "_self");
           return;
         } else {
           alert("Click the button again to confirm removing the member");
@@ -686,7 +688,6 @@ async function setMessageContainer(
         ) {
           await clearDirectMessage(userID, communicatingToID);
           alert("Clearing messages is done");
-          location.reload();
           return;
         } else {
           alert("Click the button again to confirm clearing messages");
@@ -714,7 +715,6 @@ async function setMessageContainer(
         ) {
           await clearGroupMessage(userID, communicatingToID);
           alert("Clearing messages is done");
-          location.reload();
           return;
         } else {
           alert("Click the button again to confirm clearing messages");
@@ -772,7 +772,7 @@ async function setMessageContainer(
             await addMember(communicatingToID, memberID);
           }
           alert("Member/s are added");
-          location.reload();
+          window.open("http://127.0.0.1:5500/pages/message.html", "_self");
         });
 
         searchNewMemberInput.addEventListener("input", function () {

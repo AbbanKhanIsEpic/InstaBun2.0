@@ -8,6 +8,11 @@ import {
 import { userID } from "./userSession.js";
 import { follow, unfollow } from "./API/follow.js";
 import {
+  getUserBookmark,
+  addPostToBookmark,
+  removePostFromBookmark,
+} from "./API/bookmark.js";
+import {
   comment,
   getComments,
   like,
@@ -165,7 +170,65 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     //Bookmark and unbookmark
-    bookmarkButton.addEventListener("click", function (event) {});
+    bookmarkButton.addEventListener("click", async function (event) {
+      Handlebars.registerHelper("hasBookmarked", function (bookmarkID) {
+        const array = bookmarkButton.id.split(",").map(Number);
+        return array.includes(bookmarkID);
+      });
+
+      const viewBookmarkList = document.querySelector("#viewBookmarkList");
+
+      const templateList = Handlebars.templates["bookmark-list"];
+      const bookmarkData = await getUserBookmark(userID);
+
+      console.log(bookmarkData);
+
+      const bookmarkList = document.querySelector("#bookmarkList");
+      const htmlOutput = templateList({ bookmarks: bookmarkData });
+
+      bookmarkList.innerHTML = htmlOutput;
+
+      new bootstrap.Modal(viewBookmarkList).show();
+
+      const bookmarks = viewBookmarkList.querySelectorAll(".bookmark");
+
+      Array.from(bookmarks).forEach((bookmark) => {
+        bookmark.addEventListener("click", async function () {
+          const isInBookmark = bookmark.innerHTML == "Remove";
+          if (!isInBookmark) {
+            const status = (await addPostToBookmark(bookmark.id, post.id))[
+              "status"
+            ];
+            console.log(status);
+            if (status == "200") {
+              bookmark.innerHTML = "Remove";
+              bookmark.classList.remove("bg-primary");
+              bookmark.classList.add("bg-dark-subtle");
+              const array = bookmarkButton.id.split(",").map(Number);
+              array.push(bookmark.id);
+              bookmarkButton.id = array;
+            }
+          } else {
+            const status = await removePostFromBookmark(bookmark.id, post.id);
+            console.log(status);
+            if (status == "200") {
+              bookmark.innerHTML = "Add";
+              bookmark.classList.add("bg-primary");
+              bookmark.classList.remove("bg-dark-subtle");
+              const array = bookmarkButton.id.split(",").map(Number);
+              const index = array.findIndex(function (selected) {
+                return selected === bookmark.id;
+              });
+
+              if (index !== -1) {
+                array.splice(index, 1);
+                bookmarkButton.id = array.join(",");
+              }
+            }
+          }
+        });
+      });
+    });
 
     //Typing a quick comment -> changing the span display value
     commentArea.addEventListener("input", function () {

@@ -1428,6 +1428,30 @@ app.get("/api/collection/user", (req, res) => {
     });
 });
 
+app.post("/api/collection", upload.single("file"), async (req, res) => {
+  try {
+    const jsonData = req.body.jsonData ? JSON.parse(req.body.jsonData) : {};
+
+    if (!jsonData || Object.keys(jsonData).length === 0) {
+      return res.status(400).json({
+        message: "Error occurred, did not receive jsonData",
+      });
+    }
+
+    const { collectionTitle, userID, isPublic } = jsonData;
+    const collectionManager = new CollectionManager();
+
+    await collectionManager.create(collectionTitle, userID, req.file, isPublic);
+    res.status(200).json({ message: "Complete collection created" });
+  } catch (error) {
+    console.error("Error creating collection:", error);
+    res.status(500).send({
+      error: error.message || error,
+      message: "Error occurred while creating collection",
+    });
+  }
+});
+
 app.get("/api/bookmark/user", (req, res) => {
   const { userID } = req.query;
 

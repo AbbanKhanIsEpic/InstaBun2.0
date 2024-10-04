@@ -180,6 +180,10 @@ searchPostButton.addEventListener("click", async function () {
 commentBtn.addEventListener("click", async function () {
   const commentText = document.querySelector("#commentInput").value;
 
+  const commentCount = document.querySelector(
+    `#\\3${postID}.post .totalComment`
+  );
+
   if (commentText.length == 0) {
     alert("You have to write something to comment");
     return;
@@ -190,6 +194,7 @@ commentBtn.addEventListener("click", async function () {
   const status = await comment(postID, userID, commentText);
   if (status == "200") {
     populateCommentModal(postID, userID);
+    commentCount.innerHTML = Number(commentCount.innerHTML) + 1;
   } else {
     alert("Unable to comment, try again");
   }
@@ -352,6 +357,10 @@ function attachEventHandlersToCommenters() {
           if (status == "200") {
             deleteCommentID = null;
             populateCommentModal(postID, userID);
+            const commentCount = document.querySelector(
+              `#\\3${postID}.post .totalComment`
+            );
+            commentCount.innerHTML = Number(commentCount.innerHTML) - 1;
           } else {
             alert("Unable to delete the comment, try again");
           }

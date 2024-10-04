@@ -509,6 +509,17 @@ function attachEventHandlersToCommenters() {
           if (status == "200") {
             deleteCommentID = null;
             populateCommentModal(postID, userID);
+            const viewCommentCount = document
+              .querySelector(`#\\3${postID}`)
+              .querySelector("#viewCommentCount");
+            const count = viewCommentCount.querySelector("span");
+            if (viewCommentCount.textContent == "View the only comment") {
+              viewCommentCount.textContent == "There is no comment D:";
+            } else if (Number(count.textContent) == 2) {
+              viewCommentCount.textContent == "View the only comment";
+            } else {
+              count.textContent = Number(count.textContent) - 1;
+            }
           } else {
             alert("Unable to delete the comment, try again");
           }

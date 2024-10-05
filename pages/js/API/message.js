@@ -60,6 +60,7 @@ export async function clearGroupMessage(userID, groupID) {
       userID,
       groupID,
     });
+    console.log(response);
     return response["status"];
   } catch (error) {
     console.error(error);

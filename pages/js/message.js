@@ -601,6 +601,7 @@ async function setMessageContainer(
         ) {
           alert("Confirmed");
           removeMember(communicatingToID, userID);
+          window.open("http://127.0.0.1:5500/pages/message.html", "_self");
           return;
         } else {
           alert("Click the button again to confirm your departure");
@@ -631,6 +632,7 @@ async function setMessageContainer(
         ) {
           await changeOwner(communicatingToID, transferOwnership.id);
           alert("Transfer is done");
+          window.open("http://127.0.0.1:5500/pages/message.html", "_self");
           return;
         } else {
           alert("Click the button again to confirm your transfer of ownership");
@@ -721,6 +723,7 @@ async function setMessageContainer(
         ) {
           await clearGroupMessage(userID, communicatingToID);
           alert("Clearing messages is done");
+          window.open("http://127.0.0.1:5500/pages/message.html", "_self");
           return;
         } else {
           alert("Click the button again to confirm clearing messages");

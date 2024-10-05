@@ -59,7 +59,6 @@ class GroupMessageManager {
   //Does not actually clear the message (will just appear as if on the client side of who wanted to clear the message)
   async clearMessage(userID, groupID) {
     try {
-      console.log("Hello");
       const hasUserClearBefore = await this.#hasClearedMessageBefore(
         userID,
         groupID
@@ -82,32 +81,6 @@ class GroupMessageManager {
       const query = `SELECT count(*) FROM ClearGroupMessage WHERE UserID = ? AND GroupID = ?;`;
       const [result] = await select(query, [userID, groupID]);
       return result["count(*)"] == 1;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //When group owner deletes the group
-  //Everything related to the group has to be deleted first
-  //Before the group can be deleted because of foreign key
-  async deleteGroupMessages(groupID) {
-    try {
-      const query = `DELETE FROM GroupMessages WHERE (GroupID = ?);`;
-      await update(query, [groupID]);
-      return "Delete group messages operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
-  //When group owner deletes the group
-  //Everything related to the group has to be deleted first
-  //Before the group can be deleted because of foreign key
-  async deleteClearMessages(groupID) {
-    try {
-      const query = `DELETE FROM ClearGroupMessage WHERE (GroupID = ?);`;
-      await update(query, [groupID]);
-      return "Delete clear messages operation successful";
     } catch (error) {
       return error;
     }

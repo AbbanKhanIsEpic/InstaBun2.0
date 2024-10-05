@@ -160,23 +160,6 @@ class GroupManager {
     }
   }
 
-  //Remove everything related to the group(groupID)
-  async deleteGroup(groupID, groupMembers) {
-    try {
-      const groupMessage = new GroupMessageManager();
-      await groupMessage.deleteGroupMessages(groupID);
-      await groupMessage.deleteClearMessages(groupID);
-      for (const groupMember of groupMembers) {
-        await this.removeMember(groupID, groupMember);
-      }
-      const query = `DELETE FROM community WHERE (GroupID = ?);`;
-      await update(query, [groupID]);
-      return "Delete group operation successful";
-    } catch (error) {
-      return error;
-    }
-  }
-
   async getOwnerID(groupID) {
     try {
       const query = "Select ownerID from groupDB where groupID = ?";

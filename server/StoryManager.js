@@ -49,7 +49,7 @@ class StoryManager {
 
       followingList.push(userID);
 
-      const getStoryIDQuery = `SELECT storyID FROM instabun.story where userID in (?) AND timestampdiff(hour,uploadDate,now()) <= 24`;
+      const getStoryIDQuery = `SELECT storyID FROM instabun.story where userID in (?)`;
 
       const storyIDs = await select(getStoryIDQuery, [followingList]);
 

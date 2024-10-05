@@ -413,9 +413,6 @@ async function showCollectionData() {
   });
 
   Handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
-    console.log(arg1);
-    console.log(arg2);
-    console.log(options);
     return arg1 == arg2 ? options.fn(this) : options.inverse(this);
   });
 
@@ -427,21 +424,42 @@ async function showCollectionData() {
 
   const data = await getUserCollection(userID);
 
-  console.log(data);
-
   const collections = { collections: data };
 
   collections["username"] = await getUsername(userID);
 
   collections["profileIcon"] = await getProfileIcon(userID);
 
-  console.log(collections);
-
   const output = template(collections);
 
   document.querySelector("#contentPage").innerHTML = output;
 
   const storiesModal = document.getElementsByClassName("modal");
+
+  document
+    .querySelector("#searchCollectionButton")
+    .addEventListener("click", async function () {
+      const searchCollectionInput = document.querySelector(
+        "#searchCollectionInput"
+      );
+
+      const input = searchCollectionInput.value.toLowerCase();
+
+      console.log(data);
+
+      data.map((collection) => {
+        const isMatch = collection["collectionTitle"]
+          .toLowerCase()
+          .includes(input);
+        const id = collection["collectionID"];
+        const element = document.querySelector(`#\\3${id} .collection`);
+        if (!isMatch) {
+          element.classList.add("d-none");
+        } else {
+          element.classList.remove("d-none");
+        }
+      });
+    });
 
   document
     .querySelector("#createCollectionButton")
@@ -630,6 +648,8 @@ async function showBookmarkData() {
 
   const data = await getUserBookmark(userID);
 
+  console.log(data);
+
   const output = template({ bookmarks: data });
 
   document.querySelector("#contentPage").innerHTML = output;
@@ -654,6 +674,29 @@ async function showBookmarkData() {
       new bootstrap.Modal(standardModal).show();
     });
   });
+
+  document
+    .querySelector("#searchBookmarkButton")
+    .addEventListener("click", async function () {
+      const searchBookmarkInput = document.querySelector(
+        "#searchBookmarkInput"
+      );
+
+      const input = searchBookmarkInput.value.toLowerCase();
+
+      console.log(data);
+
+      data.map((bookmark) => {
+        const isMatch = bookmark["bookmarkTitle"].toLowerCase().includes(input);
+        const id = bookmark["bookmarkID"];
+        const element = document.querySelector(`#\\3${id} .bookmark`);
+        if (!isMatch) {
+          element.classList.add("d-none");
+        } else {
+          element.classList.remove("d-none");
+        }
+      });
+    });
 
   document
     .querySelector("#createBookmarkButton")

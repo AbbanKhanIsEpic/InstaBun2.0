@@ -54,7 +54,7 @@ class CollectionManager {
     try {
       const query = `SELECT storyID FROM collection INNER JOIN collectionstory ON collection.collectionID = collectionstory.collectionID Where collection.collectionID = ? ORDER BY storyID`;
       const result = await select(query, [collectionID]);
-      return result;
+      return result ? result.map((element) => element["storyID"]) : [];
     } catch (error) {
       return error;
     }
@@ -62,75 +62,9 @@ class CollectionManager {
 
   async getPublicCollections(userID) {
     try {
-      const storyManager = new StoryManager();
-
-      console.log(userID);
-
       const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ? AND isPublic = 1;`;
-      const publicCollections = await select(query, [userID]);
-
-      if (!publicCollections.length) {
-        return new Error(
-          "The target user does not have any collection that the requesting user can see"
-        );
-      }
-
-      const promises = publicCollections.map(async (collection) => {
-        const storyIDs = (
-          await this.getStoryIDs(collection["collectionID"])
-        ).map((element) => {
-          return element["storyID"];
-        });
-
-        const storiesWithDetails = await storyManager.getStories(
-          userID,
-          storyIDs
-        );
-
-        console.log(storiesWithDetails);
-
-        collection["stories"] = storiesWithDetails[0]["stories"];
-      });
-
-      await Promise.all(promises);
-
-      return publicCollections;
-    } catch (error) {
-      return error;
-    }
-  }
-
-  async getUserCollections(userID) {
-    try {
-      const storyManager = new StoryManager();
-
-      const userCollections = await this.getAllCollections(userID);
-
-      if (!userCollections.length) {
-        return new Error("The user does not have any collection");
-      }
-
-      const promises = userCollections.map(async (collection) => {
-        const storyIDs = (
-          await this.getStoryIDs(collection["collectionID"])
-        ).map((element) => {
-          return element?.["storyID"];
-        });
-
-        if (storyIDs.length == 0) {
-          return { ...collection, stories: [] };
-        }
-
-        const storiesWithDetails = await storyManager.getStories(
-          userID,
-          storyIDs
-        );
-
-        collection["stories"] = storiesWithDetails[0]["stories"];
-      });
-
-      await Promise.all(promises);
-      return userCollections;
+      const result = await select(query, [userID]);
+      return result ? result : [];
     } catch (error) {
       return error;
     }
@@ -146,7 +80,7 @@ class CollectionManager {
     }
   }
 
-  async getAllCollections(userID) {
+  async getUserCollections(userID) {
     try {
       const query = `SELECT collectionID,collectionTitle,coverPhoto FROM collection where userID = ?`;
       const result = await select(query, [userID]);

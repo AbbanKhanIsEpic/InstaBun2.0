@@ -1,7 +1,6 @@
 //Import
 const { select, update } = require("./DB.js");
 const BlockManager = require("./BlockManager.js");
-const e = require("express");
 
 class FollowManager {
   //Save that the user (follwerID) is following the user(followingID)

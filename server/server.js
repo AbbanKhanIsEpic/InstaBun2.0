@@ -349,16 +349,15 @@ app.get("/api/user/profile", async (req, res) => {
   try {
     const userManager = new UserManager();
     const followManager = new FollowManager();
+    const storyManager = new StoryManager();
     const blockManager = new BlockManager();
     const directMessageManager = new DirectMessageManager();
     const collectionManager = new CollectionManager();
     const postManager = new PostManager();
 
-    console.log(targetUserID);
-
     const profileData = await userManager.getProfile(targetUserID);
 
-    const isSelfRequest = requestingUserID == targetUserID;
+    const isSelfRequest = requestingUserID === targetUserID;
 
     const additionalData = await Promise.all([
       isSelfRequest
@@ -371,12 +370,37 @@ app.get("/api/user/profile", async (req, res) => {
         ? null
         : directMessageManager.canUserMessage(requestingUserID, targetUserID),
       isSelfRequest
-        ? collectionManager.getUserCollections(targetUserID)
-        : collectionManager.getPublicCollections(targetUserID),
+        ? addDetails(collectionManager.getUserCollections(targetUserID))
+        : addDetails(collectionManager.getPublicCollections(targetUserID)),
       postManager.getProfilePost(requestingUserID, targetUserID),
       followManager.getTotalFollowing(targetUserID),
       followManager.getTotalFollowers(targetUserID),
     ]);
+
+    async function addDetails(dataPromise) {
+      const data = await dataPromise;
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      const promises = data.map(async (collection) => {
+        const storyIDs = await collectionManager.getStoryIDs(
+          collection?.["collectionID"]
+        );
+
+        if (!storyIDs || storyIDs.length === 0) {
+          return { ...collection, stories: [] };
+        }
+
+        const storiesWithDetails = await storyManager.getStories(
+          targetUserID,
+          storyIDs
+        );
+        return { ...collection, stories: storiesWithDetails[0]?.stories || [] };
+      });
+
+      return Promise.all(promises);
+    }
 
     const [
       isFollowing,
@@ -1429,20 +1453,51 @@ app.get("/api/comment", (req, res) => {
     });
 });
 
-app.get("/api/collection/user", (req, res) => {
+app.get("/api/collection/user", async (req, res) => {
   const { userID } = req.query;
 
   const collectionManager = new CollectionManager();
+  const storyManager = new StoryManager(); // Ensure storyManager is instantiated
 
-  collectionManager
-    .getUserCollections(userID)
-    .then((jsonifiedResult) => {
-      res.status(200).json(jsonifiedResult);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error occurred");
-    });
+  try {
+    // Await addDetails as it returns a promise
+    const collections = await addDetails(
+      collectionManager.getUserCollections(userID)
+    );
+
+    // Function to add story details to each collection
+    async function addDetails(dataPromise) {
+      const data = await dataPromise; // Await the promise here
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      const promises = data.map(async (collection) => {
+        const storyIDs = await collectionManager.getStoryIDs(
+          collection?.["collectionID"]
+        );
+
+        if (!storyIDs || storyIDs.length === 0) {
+          return { ...collection, stories: [] };
+        }
+
+        // Use userID instead of undefined targetUserID
+        const storiesWithDetails = await storyManager.getStories(
+          userID,
+          storyIDs
+        );
+        return { ...collection, stories: storiesWithDetails[0]?.stories || [] };
+      });
+
+      return Promise.all(promises);
+    }
+
+    // Send the updated collection list
+    res.status(200).send(collections);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred");
+  }
 });
 
 app.post("/api/collection", upload.single("file"), async (req, res) => {
@@ -1475,7 +1530,7 @@ app.get("/api/collection/list", async (req, res) => {
   const collectionManager = new CollectionManager();
 
   try {
-    const collections = await collectionManager.getAllCollections(userID);
+    const collections = await collectionManager.getUserCollections(userID);
 
     const promises = collections.map(async (collection) => {
       const collectionID = collection?.["collectionID"];
